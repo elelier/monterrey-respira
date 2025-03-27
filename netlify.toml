@@ -6,3 +6,4 @@
   from = "/*"
   to = "/index.html"
   status = 200
+  conditions = {type = "path_not_exists", query = {path = ":path"}}
