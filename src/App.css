@@ -1,0 +1,211 @@
+/* Estilos específicos de la aplicación */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  border-radius: 0.75rem;
+}
+
+/* Personalización de marcadores del mapa */
+.leaflet-marker-icon {
+  transition: transform 0.2s ease;
+}
+
+.leaflet-marker-icon:hover {
+  transform: scale(1.2);
+}
+
+/* Personalización del tooltip */
+.leaflet-popup-content-wrapper {
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  padding: 0.5rem;
+}
+
+.leaflet-popup-content {
+  margin: 0.5rem;
+  min-width: 150px;
+}
+
+/* Personalización de la barra de scroll */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Media queries para los gráficos en dispositivos móviles */
+@media (max-width: 640px) {
+  .recharts-wrapper {
+    margin: 0 auto;
+  }
+}
+
+/* Animaciones adicionales */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse 3s infinite;
+}
+
+/* Estilos para modo oscuro */
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-track {
+    background: #1e293b;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #475569;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+  }
+}
+
+/* Estilos para modo daltónico */
+.colorblind-mode .bg-green-500,
+.colorblind-mode .from-green-400,
+.colorblind-mode .text-green-800,
+.colorblind-mode .text-green-700,
+.colorblind-mode .text-green-600 {
+  --tw-bg-opacity: 1;
+  --tw-text-opacity: 1;
+  background-color: rgb(0, 92, 230) !important;
+  color: rgb(0, 46, 115) !important;
+}
+
+.colorblind-mode .bg-amber-500,
+.colorblind-mode .from-amber-400,
+.colorblind-mode .text-amber-800,
+.colorblind-mode .text-amber-700,
+.colorblind-mode .text-amber-600 {
+  --tw-bg-opacity: 1;
+  --tw-text-opacity: 1;
+  background-color: rgb(2, 136, 209) !important;
+  color: rgb(1, 68, 104) !important;
+}
+
+.colorblind-mode .bg-orange-500,
+.colorblind-mode .from-orange-400,
+.colorblind-mode .text-orange-800,
+.colorblind-mode .text-orange-700,
+.colorblind-mode .text-orange-600 {
+  --tw-bg-opacity: 1;
+  --tw-text-opacity: 1;
+  background-color: rgb(97, 97, 97) !important;
+  color: rgb(48, 48, 48) !important;
+}
+
+.colorblind-mode .bg-red-500,
+.colorblind-mode .from-red-400,
+.colorblind-mode .text-red-800,
+.colorblind-mode .text-red-700,
+.colorblind-mode .text-red-600 {
+  --tw-bg-opacity: 1;
+  --tw-text-opacity: 1;
+  background-color: rgb(238, 177, 17) !important;
+  color: rgb(119, 88, 8) !important;
+}
+
+.colorblind-mode .bg-purple-500,
+.colorblind-mode .from-purple-400,
+.colorblind-mode .text-purple-800,
+.colorblind-mode .text-purple-700,
+.colorblind-mode .text-purple-600 {
+  --tw-bg-opacity: 1;
+  --tw-text-opacity: 1;
+  background-color: rgb(121, 85, 72) !important;
+  color: rgb(60, 42, 36) !important;
+}
+
+.colorblind-mode .bg-rose-600,
+.colorblind-mode .from-rose-700,
+.colorblind-mode .text-rose-800,
+.colorblind-mode .text-rose-700,
+.colorblind-mode .text-rose-600 {
+  --tw-bg-opacity: 1;
+  --tw-text-opacity: 1;
+  background-color: rgb(37, 37, 37) !important;
+  color: rgb(18, 18, 18) !important;
+}
+
+/* Modo de alto contraste */
+.high-contrast-mode .bg-white,
+.high-contrast-mode .bg-gray-50,
+.high-contrast-mode .bg-gray-100 {
+  background-color: #ffffff !important;
+}
+
+.high-contrast-mode .text-gray-600,
+.high-contrast-mode .text-gray-700,
+.high-contrast-mode .text-gray-800 {
+  color: #000000 !important;
+}
+
+.high-contrast-mode .border-gray-200,
+.high-contrast-mode .border-gray-300 {
+  border-color: #000000 !important;
+}
+
+/* Tamaños de texto accesibles */
+.text-size-normal {
+  /* El tamaño base ya está definido en Tailwind */
+}
+
+.text-size-large {
+  font-size: 1.1rem !important;
+}
+
+.text-size-large h1 {
+  font-size: 2.2rem !important;
+}
+
+.text-size-large h2 {
+  font-size: 1.7rem !important;
+}
+
+.text-size-large h3 {
+  font-size: 1.4rem !important;
+}
+
+.text-size-extra-large {
+  font-size: 1.25rem !important;
+}
+
+.text-size-extra-large h1 {
+  font-size: 2.5rem !important;
+}
+
+.text-size-extra-large h2 {
+  font-size: 2rem !important;
+}
+
+.text-size-extra-large h3 {
+  font-size: 1.6rem !important;
+}
