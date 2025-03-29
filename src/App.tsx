@@ -21,7 +21,7 @@ function ScrollToTop() {
 function App() {
   return (
     
-    <Router basename="/mtyrespira">
+    <Router >
       <ScrollToTop />
       <AirQualityProvider>
         <Routes>
