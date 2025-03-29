@@ -19,18 +19,6 @@ export default defineConfig({
         },
         assetFileNames: 'assets/[name].[hash][extname]'
       },
-      plugins: [
-        {
-          name: 'copy-manifest',
-          generateBundle() {
-            this.emitFile({
-              type: 'asset',
-              fileName: 'manifest.json',
-              source: require('fs').readFileSync(resolve(__dirname, 'public/manifest.json'), 'utf-8')
-            })
-          }
-        }
-      ]
     }
   },
   server: {
