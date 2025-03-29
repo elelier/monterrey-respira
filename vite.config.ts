@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { resolve } from 'path'
 
 export default defineConfig({
   base: '/',
@@ -17,7 +18,19 @@ export default defineConfig({
           chartjs: ['chart.js']
         },
         assetFileNames: 'assets/[name].[hash][extname]'
-      }
+      },
+      plugins: [
+        {
+          name: 'copy-manifest',
+          generateBundle() {
+            this.emitFile({
+              type: 'asset',
+              fileName: 'manifest.json',
+              source: require('fs').readFileSync(resolve(__dirname, 'public/manifest.json'), 'utf-8')
+            })
+          }
+        }
+      ]
     }
   },
   server: {
