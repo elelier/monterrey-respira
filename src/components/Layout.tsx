@@ -165,9 +165,19 @@ export default function Layout({ children }: LayoutProps) {
             to="/asociaciones"
             className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
           >
-            Asociaciones
+Asociaciones
           </Link>
+          {' · '}
+          <a
+            href="https://ko-fi.com/Y8Y11CCJPV"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+          >
+            ¡Apoya el proyecto con un cafecito!
+          </a>
         </p>
+        <p className="mt-2 text-xs sm:text-sm">Desarrollado con <span aria-label="corazón" role="img">❤️< /span> por <a href="https://www.elelier.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">elelier</a></p>
       </footer>
 
       {/* Mobile bottom navigation */}

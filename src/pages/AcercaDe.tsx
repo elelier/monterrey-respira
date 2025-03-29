@@ -1,6 +1,7 @@
 import Layout from '../components/Layout';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { IoLogoGithub } from 'react-icons/io5';
 
 export default function AcercaDe() {
   return (
@@ -69,8 +70,30 @@ export default function AcercaDe() {
               </Link>
             </div>
           </div>
+          <div className="mt-4 text-center">
+            <a
+              href="https://github.com/elelier/monterrey-respira"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-6 py-3 text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow-md transition-colors duration-300 ease-in-out"
+            >
+              <IoLogoGithub className="mr-2 text-xl" />
+              ¡Contribuye en GitHub!
+            </a>
+          </div>
+          <div className="mt-4 text-center">
+            <a
+              href="https://ko-fi.com/Y8Y11CCJPV"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-6 py-3 text-white bg-amber-500 hover:bg-amber-600 rounded-md shadow-md transition-colors duration-300 ease-in-out"
+            >
+              <img src="https://ko-fi.com/img/cup-border.png" className="mr-2 h-6 w-6 object-contain" alt="Ko-fi" />
+              ¡Apoya el proyecto con un cafecito!
+            </a>
+          </div>
         </motion.div>
       </div>
     </Layout>
-  );
+  );  
 }

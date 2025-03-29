@@ -72,3 +72,7 @@ Este documento presenta la visión a futuro y las funcionalidades planificadas p
 - Disponibilidad > 99.9%
 - Crecimiento de usuarios activos > 15% mensual
 - Reducción de rebote < 30%
+
+## Despliegue en Netlify
+
+El proyecto "MonterreyRespira" ha sido desplegado exitosamente en Netlify. Se ha configurado el archivo `netlify.toml` para el build y las redirecciones, y se ha ajustado la configuración de Vite para el despliegue en la raíz del dominio.
