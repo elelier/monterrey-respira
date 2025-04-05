@@ -23,7 +23,7 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
   const [dateTime, setDateTime] = useState<string>('');
   const [isSimulated, setIsSimulated] = useState<boolean>(false);
   const [isInfoVisible, setIsInfoVisible] = useState(false);
-  const { theme, refreshData } = useAirQuality();
+  const { theme, refreshData, selectedCity } = useAirQuality();
 
   useEffect(() => {
     const timestamp = new Date(data.timestamp);
@@ -156,7 +156,8 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
             </p>
             <div className="mt-2">
               <span className="text-xs font-semibold uppercase tracking-wider opacity-90">
-                {data.location.name}
+                {/* {data.location.name} */}
+                {selectedCity.name} 
               </span>
             </div>
           </div>
@@ -234,7 +235,8 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
             </div>
             <div className="ml-3">
               <div className="text-xs text-slate-500 dark:text-slate-400">Viento</div>
-              <div className="font-semibold">{data.wind.speed} km/h</div>
+              {/* <div className="font-semibold">{data.wind.speed} km/h</div> */}
+              <div className="font-semibold">{data.wind?.speed} km/h</div>
             </div>
           </motion.div>
           <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }} className="flex items-center">

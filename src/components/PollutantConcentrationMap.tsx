@@ -5,7 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import { IoLocationSharp, IoLayersOutline, IoExpand, IoContract, IoOptions, IoFilterOutline } from 'react-icons/io5';
 import { AirQualityData, Station } from '../types';
 import { useAirQuality } from '../context/AirQualityContext';
-import { getMonitoringStations } from '../services/apiService';
+// import { getMonitoringStations, } from '../services/apiService'; // {{ comment }}
 import { generateAdditionalMonitoringPoints } from '../utils/heatmapUtils';
 
 // Fix the Leaflet icon issue
@@ -308,18 +308,19 @@ export default function PollutantConcentrationMap({ centralData, className = '' 
     setLoading(true);
     try {
       // Get base station data
-      const baseStations = await getMonitoringStations();
-
+      // const baseStations = await getMonitoringStations(); // {{ comment }}
+  
       // Get additional simulated stations
       const additionalStations = generateAdditionalMonitoringPoints();
-
+  
       // Combine all stations
-      const allStations = [...baseStations, ...additionalStations];
+      // const allStations = [...baseStations, ...additionalStations]; // {{ comment }}
+      const allStations = [...additionalStations]; // {{ edit }}
       setStations(allStations);
-
+  
       // Update visualization
       updateVisualization(allStations);
-
+  
       setLoading(false);
     } catch (error) {
       console.error('Error loading station data:', error);

@@ -1,3 +1,20 @@
+export interface CityAirQualityData {
+  city_id: number;
+  city_name: string;
+  api_name: string;
+  latitude: number;
+  longitude: number;
+  reading_timestamp: string;
+  aqi_us: number;
+  main_pollutant_us: string;
+  temperature_c: number;
+  humidity_percent: number;
+  wind_speed_ms: number;
+  wind_direction_deg: number;
+  weather_icon: string;
+  last_successful_update_at: string;
+}
+
 export interface AirQualityData {
   aqi: number;
   status: AirQualityStatus;
@@ -21,13 +38,20 @@ export interface AirQualityData {
   };
 }
 
-export type AirQualityStatus = 'good' | 'moderate' | 'unhealthy-sensitive' | 'unhealthy' | 'very-unhealthy' | 'hazardous';
+export type AirQualityStatus =
+  | 'good'
+  | 'moderate'
+  | 'unhealthy-sensitive'
+  | 'unhealthy'
+  | 'very-unhealthy'
+  | 'hazardous'
+  | 'unknown';
 
 export interface HistoricalData {
   date: string;
   aqi: number;
-  pm25: number;
-  pm10: number;
+  pm25?: number;
+  pm10?: number;
 }
 
 export interface Station {

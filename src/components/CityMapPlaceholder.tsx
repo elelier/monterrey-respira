@@ -1,4 +1,4 @@
-import { MONTERREY_LOCATIONS } from '../services/apiService';
+import { MONTERREY_LOCATIONS_WITH_COORDS } from '../services/apiService';
 
 interface CityMapPlaceholderProps {
   className?: string;
@@ -7,11 +7,11 @@ interface CityMapPlaceholderProps {
 
 export default function CityMapPlaceholder({ className = '', selectedCityName = 'Monterrey Centro' }: CityMapPlaceholderProps) {
   // Encontrar la ciudad seleccionada de la lista
-  const selectedCity = MONTERREY_LOCATIONS.find(city => city.name === selectedCityName) || MONTERREY_LOCATIONS[0];
+  const selectedCity = MONTERREY_LOCATIONS_WITH_COORDS.find(city => city.name === selectedCityName) || MONTERREY_LOCATIONS_WITH_COORDS[0];
 
   // Obtener un color basado en el nombre de la ciudad para darle variedad visual
   const getCityColor = () => {
-    const cityIndex = MONTERREY_LOCATIONS.findIndex(city => city.name === selectedCityName);
+    const cityIndex = MONTERREY_LOCATIONS_WITH_COORDS.findIndex(city => city.name === selectedCityName);
     const colors = [
       'bg-blue-500', 'bg-indigo-500', 'bg-purple-500',
       'bg-green-500', 'bg-teal-500', 'bg-cyan-500', 'bg-pink-500'
@@ -55,7 +55,7 @@ export default function CityMapPlaceholder({ className = '', selectedCityName = 
           <div className="bg-white dark:bg-slate-700 rounded-lg p-3 shadow-sm text-xs text-slate-600 dark:text-slate-300">
             <p className="text-center font-medium mb-1">Estaciones cercanas en el Área Metropolitana</p>
             <div className="flex justify-center gap-2">
-              {MONTERREY_LOCATIONS.filter(city => city.name !== selectedCity.name)
+              {MONTERREY_LOCATIONS_WITH_COORDS.filter(city => city.name !== selectedCity.name)
                 .slice(0, 3)
                 .map(city => (
                   <span key={city.name} className="px-2 py-1 bg-slate-100 dark:bg-slate-600 rounded">
@@ -63,9 +63,9 @@ export default function CityMapPlaceholder({ className = '', selectedCityName = 
                   </span>
                 ))
               }
-              {MONTERREY_LOCATIONS.length > 4 && (
+              {MONTERREY_LOCATIONS_WITH_COORDS.length > 4 && (
                 <span className="px-2 py-1 bg-slate-100 dark:bg-slate-600 rounded">
-                  +{MONTERREY_LOCATIONS.length - 4}
+                  +{MONTERREY_LOCATIONS_WITH_COORDS.length - 4}
                 </span>
               )}
             </div>

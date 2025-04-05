@@ -63,7 +63,7 @@ El flujo de datos está implementado en el archivo `src/services/apiService.ts`:
 // Pseudocódigo simplificado (adaptado a API Keys y OpenAQ v3)
 import { getAirQualityFromIQAir, getAirQualityFromOpenAQ, getFallbackAirQualityData } from './apiCalls'; // Asumiendo funciones separadas
 
-export const getCurrentAirQualityData = async (location) => {
+export const fetchLatestMonterreyAirQuality = async (location) => {
   const iqAirApiKey = process.env.REACT_APP_IQAIR_API_KEY;
   const openAqApiKey = process.env.REACT_APP_OPENAQ_API_KEY;
 

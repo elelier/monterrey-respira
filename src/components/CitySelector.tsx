@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IoLocationOutline, IoChevronDownOutline } from 'react-icons/io5';
-import { MONTERREY_LOCATIONS } from '../services/apiService';
+import { MONTERREY_LOCATIONS_WITH_COORDS } from '../services/apiService';
 
 interface CitySelectorProps {
   onCityChange: (city: { name: string; latitude: number; longitude: number }) => void;
@@ -9,7 +9,7 @@ interface CitySelectorProps {
 }
 
 export default function CitySelector({ onCityChange, className = '' }: CitySelectorProps) {
-  const [selectedCity, setSelectedCity] = useState(MONTERREY_LOCATIONS[0].name);
+  const [selectedCity, setSelectedCity] = useState(MONTERREY_LOCATIONS_WITH_COORDS[0].name);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -73,7 +73,7 @@ export default function CitySelector({ onCityChange, className = '' }: CitySelec
               <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Selecciona una ciudad</p>
             </div>
             <div className="max-h-60 overflow-y-auto">
-              {MONTERREY_LOCATIONS.map((city) => (
+              {MONTERREY_LOCATIONS_WITH_COORDS.map((city) => (
                 <motion.div
                   key={city.name}
                   className={`px-4 py-3 hover:bg-purple-50 cursor-pointer transition-colors dark:hover:bg-purple-900/10 ${

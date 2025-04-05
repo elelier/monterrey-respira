@@ -6,7 +6,7 @@ import 'leaflet.heat';
 import { IoLocationSharp, IoLayersOutline, IoExpand, IoContract, IoOptions, IoInformationCircleOutline } from 'react-icons/io5';
 import { AirQualityData, Station } from '../types';
 import { useAirQuality } from '../context/AirQualityContext';
-import { getMonitoringStations } from '../services/apiService';
+import { /* getMonitoringStations, */ } from '../services/apiService'; // {{ highlight-line }}
 import { generateHeatmapGrid, generateAdditionalMonitoringPoints } from '../utils/heatmapUtils';
 
 // Fix the Leaflet icon issue
@@ -175,13 +175,13 @@ export default function AirQualityHeatmap({ centralData, className = '' }: AirQu
     setLoading(true);
     try {
       // Get base monitoring stations from API/mock data
-      const baseStations = await getMonitoringStations();
+      // const baseStations = await /* getMonitoringStations, */(); // {{ highlight-line }}
 
       // Get additional simulated monitoring points
       const additionalStations = generateAdditionalMonitoringPoints();
 
       // Combine all stations for a richer dataset
-      const allStations = [...baseStations, ...additionalStations];
+      const allStations = [...additionalStations]; // {{ highlight-line }}
       setStations(allStations);
 
       // Create the visual representation

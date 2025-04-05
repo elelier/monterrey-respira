@@ -1,5 +1,5 @@
 import { Station } from '../types';
-import { MONTERREY_LOCATIONS } from '../services/apiService';
+import { MONTERREY_LOCATIONS_WITH_COORDS } from '../services/apiService';
 
 // Coordinates for the metropolitan area of Monterrey for bounding
 const MONTERREY_BOUNDS = {

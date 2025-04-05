@@ -19,7 +19,7 @@ interface StationMapProps {
 }
 
 export default function StationMap({ data, className = '' }: StationMapProps) {
-  const { theme } = useAirQuality();
+  const { theme, selectedCity } = useAirQuality();
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [fullscreen, setFullscreen] = useState(false);
   const [mapStyle, setMapStyle] = useState<'standard' | 'satellite'>('standard');
@@ -228,9 +228,10 @@ export default function StationMap({ data, className = '' }: StationMapProps) {
     <div className={`relative bg-white rounded-xl shadow-lg overflow-hidden dark:bg-slate-800 ${getFullscreenStyles}`}>
       {/* Map Header */}
       <div className="absolute top-0 left-0 right-0 px-4 py-3 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm z-[401] flex justify-between items-center border-b border-gray-200 dark:border-gray-700">
-        <h3 className="text-sm font-medium text-gray-900 dark:text-white flex items-center">
+      <h3 className="text-sm font-medium text-gray-900 dark:text-white flex items-center">
           <IoLocationSharp className="mr-1 text-red-500" />
-          {data.location.name}
+          {/* {data.location.name} */}
+          {selectedCity.name}
         </h3>
         <div className="flex items-center space-x-2">
           <motion.button

@@ -1,13 +1,20 @@
 import { AirQualityStatus, AirQualityTheme, RecommendationInfo } from '../types';
 
-export const getAirQualityStatus = (aqi: number): AirQualityStatus => {
-  if (aqi <= 50) return 'good';
-  if (aqi <= 100) return 'moderate';
-  if (aqi <= 150) return 'unhealthy-sensitive';
-  if (aqi <= 200) return 'unhealthy';
-  if (aqi <= 300) return 'very-unhealthy';
-  return 'hazardous';
-};
+export function getAirQualityStatus(aqi: number): AirQualityStatus {
+  if (aqi <= 50) {
+    return 'good';
+  } else if (aqi <= 100) {
+    return 'moderate';
+  } else if (aqi <= 150) {
+    return 'unhealthy-sensitive';
+  } else if (aqi <= 200) {
+    return 'unhealthy';
+  } else if (aqi <= 300) {
+    return 'very-unhealthy';
+  } else {
+    return 'hazardous';
+  }
+}
 
 export const getAirQualityTheme = (status: AirQualityStatus): AirQualityTheme => {
   switch (status) {
