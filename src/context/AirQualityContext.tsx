@@ -17,6 +17,7 @@ const AirQualityContext = createContext<AirQualityContextType | undefined>(undef
 
 export function useAirQuality() {
   const context = useContext(AirQualityContext);
+  console.log("useAirQuality context:", context);
   if (context === undefined) {
     throw new Error('useAirQuality must be used within an AirQualityProvider');
   }

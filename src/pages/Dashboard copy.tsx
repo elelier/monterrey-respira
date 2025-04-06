@@ -115,11 +115,97 @@ export default function Dashboard() {
           {/* Recomendaciones basadas en la calidad del aire */}
           <Recommendations status={airQualityData.status} />
 
+          {/* Gráfico de contaminantes */}
+          <PollutantsChart data={airQualityData} />
 
+          {/* Gráfico histórico */}
+          <HistoricalChart />
         </div>
 
         {/* Segunda columna */}
-        
+        <div className="flex flex-col gap-6">
+          {/* Selector de Vista de Mapa */}
+          <div className="bg-white rounded-lg dark:bg-slate-800 shadow-sm border border-gray-200 dark:border-gray-700 p-2 flex flex-wrap">
+            <button
+              className={`flex-1 py-2 px-1 sm:px-3 text-xs sm:text-sm rounded-md flex items-center justify-center ${
+                activeMapView === 'standard'
+                  ? `bg-gradient-to-r ${theme?.gradient || 'from-blue-400 to-blue-500'} text-white`
+                  : 'text-gray-600 dark:text-gray-400'
+              }`}
+              onClick={() => setActiveMapView('standard')}
+            >
+              <IoMapOutline className="mr-1" />
+              <span className="hidden sm:inline">Estándar</span>
+            </button>
+            <button
+              className={`flex-1 py-2 px-1 sm:px-3 text-xs sm:text-sm rounded-md flex items-center justify-center ${
+                activeMapView === 'heatmap'
+                  ? `bg-gradient-to-r ${theme?.gradient || 'from-blue-400 to-blue-500'} text-white`
+                  : 'text-gray-600 dark:text-gray-400'
+              }`}
+              onClick={() => setActiveMapView('heatmap')}
+            >
+              <IoStatsChartOutline className="mr-1" />
+              <span className="hidden sm:inline">Mapa Calor</span>
+            </button>
+            <button
+              className={`flex-1 py-2 px-1 sm:px-3 text-xs sm:text-sm rounded-md flex items-center justify-center ${
+                activeMapView === 'pollutant'
+                  ? `bg-gradient-to-r ${theme?.gradient || 'from-blue-400 to-blue-500'} text-white`
+                  : 'text-gray-600 dark:text-gray-400'
+              }`}
+              onClick={() => setActiveMapView('pollutant')}
+            >
+              <IoFilterOutline className="mr-1" />
+              <span className="hidden sm:inline">Contaminantes</span>
+            </button>
+          </div>
+
+          {/* Mapa de estaciones */}
+          <div>
+            <AnimatePresence mode="wait">
+              {useStaticMap ? (
+                <motion.div
+                  key="static-map"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <CityMapPlaceholder selectedCityName={selectedCity.name} />
+                </motion.div>
+              ) : activeMapView === 'standard' ? (
+                <motion.div
+                  key="standard-map"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <StationMap data={airQualityData} />
+                </motion.div>
+              ) : activeMapView === 'heatmap' ? (
+                <motion.div
+                  key="heatmap"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <AirQualityHeatmap centralData={airQualityData} />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="pollutant-map"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <PollutantConcentrationMap centralData={airQualityData} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          
+        </div>
       </div>
 
       {/* CTA para asociaciones */}
@@ -145,9 +231,9 @@ export default function Dashboard() {
         </div>
       </motion.div>
 
-{/* Sección de recursos temáticos según la calidad del aire */}
-<div className="mt-10">
-        <h2 className="text-xl font-bold mb-6" style={{ color: theme?.text }}>Recursos para cuidar nuestra calidad del aire</h2>
+      {/* Sección de recursos temáticos según la calidad del aire */}
+      <div className="mt-10">
+        <h2 className="text-xl font-bold mb-6 text-amber-900 dark:text-amber-200">Recursos para cuidar nuestra calidad del aire</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Link to="https://www.who.int/es/news-room/fact-sheets/detail/ambient-(outdoor)-air-quality-and-health" target="_blank">
             <motion.div
@@ -156,10 +242,10 @@ export default function Dashboard() {
               className="bg-white dark:bg-slate-800 rounded-lg overflow-hidden shadow h-full cursor-pointer" style={{ borderColor: theme?.primary }}
             >
               <div className="p-6 flex flex-col items-center text-center h-full">
-                <div className={`w-16 h-16 mb-4 rounded-full flex items-center justify-center`} style={{ backgroundColor: theme?.primary }}>
+                <div className={`w-16 h-16 mb-4 rounded-full flex items-center justify-center bg-amber-500`}>
                   <IoEarthOutline className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-lg font-semibold mb-3" style={{ color: theme?.text }}>Monitoreo Ambiental</h3>
+                <h3 className="text-lg font-semibold mb-3 text-amber-800 dark:text-amber-300">Monitoreo Ambiental</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
                   Accede a datos en tiempo real y aprende a interpretar los índices de calidad del aire y su impacto en la salud.
                 </p>
@@ -174,10 +260,10 @@ export default function Dashboard() {
               className="bg-white dark:bg-slate-800 rounded-lg overflow-hidden shadow h-full cursor-pointer" style={{ borderColor: theme?.primary }}
             >
               <div className="p-6 flex flex-col items-center text-center h-full">
-                <div className={`w-16 h-16 mb-4 rounded-full flex items-center justify-center`} style={{ backgroundColor: theme?.primary }}>
+                <div className={`w-16 h-16 mb-4 rounded-full flex items-center justify-center bg-amber-500`}>
                   <IoLeafOutline className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-lg font-semibold mb-3" style={{ color: theme?.text }}>Acciones Cotidianas</h3>
+                <h3 className="text-lg font-semibold mb-3 text-amber-800 dark:text-amber-300">Acciones Cotidianas</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
                   Descubre qué puedes hacer en tu día a día para contribuir a mejorar la calidad del aire en tu comunidad.
                 </p>
@@ -192,10 +278,10 @@ export default function Dashboard() {
               className="bg-white dark:bg-slate-800 rounded-lg overflow-hidden shadow h-full cursor-pointer" style={{ borderColor: theme?.primary }}
             >
               <div className="p-6 flex flex-col items-center text-center h-full">
-                <div className={`w-16 h-16 mb-4 rounded-full flex items-center justify-center`} style={{ backgroundColor: theme?.primary }}>
+                <div className={`w-16 h-16 mb-4 rounded-full flex items-center justify-center bg-amber-500`}>
                   <IoHelpBuoyOutline className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-lg font-semibold mb-3" style={{ color: theme?.text }}>Protección Personal</h3>
+                <h3 className="text-lg font-semibold mb-3 text-amber-800 dark:text-amber-300">Protección Personal</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
                   Medidas de protección personal y familiar durante episodios de contaminación elevada del aire.
                 </p>
@@ -204,7 +290,12 @@ export default function Dashboard() {
           </Link>
         </div>
       </div>
-      
+
+      {/* Sección de información sobre contaminantes */}
+      <div className="mt-10">
+        <PollutantsInfo />
+      </div>
+
       {/* Sección de fuentes de datos */}
       <div className="mt-6 bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
         <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Fuentes de Datos</h2>
@@ -218,13 +309,18 @@ export default function Dashboard() {
               <a href="https://www.iqair.com/air-pollution-data-api" target="_blank" rel="noopener noreferrer" className={`ml-1 hover:underline ${getStatusBorderClass().replace('border-', 'text-')}`}>Ver API</a>
             </li>
             <li>
+              <strong>OpenAQ:</strong> Plataforma de código abierto que agrega datos de calidad del aire de múltiples fuentes.
+              <a href="https://openaq.org/" target="_blank" rel="noopener noreferrer" className={`ml-1 hover:underline ${getStatusBorderClass().replace('border-', 'text-')}`}>Ver plataforma</a>
+            </li>
+            <li>
               <strong>Sistema Integral de Monitoreo Ambiental (SIMA):</strong> Red de estaciones de monitoreo que cubre la zona metropolitana de Monterrey.
               <a href="http://aire.nl.gob.mx/" target="_blank" rel="noopener noreferrer" className={`ml-1 hover:underline ${getStatusBorderClass().replace('border-', 'text-')}`}>Ver sitio oficial</a>
             </li>
           </ul>
 
           <p className={`mt-4 p-3 rounded-lg ${getStatusButtonClass().replace('bg-', 'bg-').replace('hover:bg-', 'bg-').replace('text-white', 'bg-opacity-10 ' + getStatusBorderClass().replace('border-', 'text-'))}`}>
-            <strong>Última actualización:</strong> {airQualityData ? new Date(airQualityData.timestamp).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }) : 'Cargando...'}
+            <strong>Nota:</strong> Algunos datos pueden ser estimados cuando no están disponibles de las fuentes oficiales.
+            En un entorno de producción, se requeriría acceso a APIs oficiales mediante convenios con las instituciones correspondientes.
           </p>
         </div>
       </div>

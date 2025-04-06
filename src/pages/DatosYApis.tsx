@@ -53,20 +53,6 @@ export default function DatosYApis() {
                   </a>
                 </div>
 
-                <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2">OpenAQ</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-                    Plataforma de código abierto que agrega y distribuye datos de calidad del aire de estaciones oficiales de monitoreo en todo el mundo.
-                  </p>
-                  <ul className="text-sm space-y-1 text-gray-600 dark:text-gray-300 list-disc pl-5">
-                    <li>Proporciona datos sobre PM2.5, PM10, O3, NO2, SO2 y CO.</li>
-                    <li>Datos provenientes de fuentes gubernamentales y sensores validados.</li>
-                    <li>API abierta y gratuita con actualizaciones constantes.</li>
-                  </ul>
-                  <a href="https://docs.openaq.org/" target="_blank" rel="noopener noreferrer" className={`mt-2 inline-block text-sm font-medium ${getThemeTextColor()}`}>
-                    Documentación de la API →
-                  </a>
-                </div>
 
                 <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg">
                   <h3 className="font-semibold mb-2">Sistema Integral de Monitoreo Ambiental (SIMA)</h3>
@@ -96,7 +82,6 @@ export default function DatosYApis() {
                 <li>Recolección de datos en tiempo real de múltiples fuentes.</li>
                 <li>Verificación y validación de datos para eliminar lecturas erróneas o atípicas.</li>
                 <li>Integración de datos de diferentes fuentes para proporcionar una visión completa.</li>
-                <li>Cálculo del Índice de Calidad del Aire según estándares internacionales.</li>
                 <li>Generación de recomendaciones basadas en los niveles actuales de contaminación.</li>
                 <li>Presentación visual de datos para facilitar su comprensión.</li>
               </ol>
