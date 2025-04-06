@@ -1,6 +1,7 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAirQuality } from '../context/AirQualityContext';
+import { getMainLogoIcon } from '../utils/airQualityUtils';
 import { Link, useLocation } from 'react-router-dom';
 import { IoHomeOutline, IoInformationCircleOutline, IoLayersOutline, IoLinkOutline, IoMenuOutline } from 'react-icons/io5';
 
@@ -63,29 +64,29 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen pb-16 md:pb-0">
-      {/* Header - Now sticky and mobile-optimized */}
-      <header className="sticky top-0 z-30 backdrop-blur-sm bg-white/90 dark:bg-slate-900/90 border-b border-gray-200 dark:border-slate-700">
-        <div className="container mx-auto py-3 md:py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="flex items-center"
-          >
-            <Link to="/" className="flex items-center group hover:opacity-90 transition-opacity">
-              <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center mr-2 sm:mr-3 ${
-                theme ? `bg-gradient-to-r ${theme.gradient}` : 'bg-blue-500'
-              } text-white group-hover:shadow-md transition-shadow`}>
-                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                </svg>
-              </div>
-              <div>
-                <h1 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-gray-100 leading-tight">MonterreyRespira</h1>
-                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 hidden sm:block">Calidad del Aire en Tiempo Real</p>
-              </div>
-            </Link>
-          </motion.div>
+  {/* Header - Now sticky and mobile-optimized */}
+  <header className={`sticky top-0 z-30 backdrop-blur-sm border-b border-gray-200 dark:border-slate-700 ${theme ? `bg-gradient-to-r ${theme.gradient}` : 'bg-white/90 dark:bg-slate-900/90'}`}>
+  <div className="container mx-auto py-3 md:py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="flex items-center"
+      >
+        <Link to="/" className="flex items-center group hover:opacity-90 transition-opacity">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center mr-2 sm:mr-3">
+            <img
+              src={getMainLogoIcon()} // ⛰️ ¡Usamos getMainLogoIcon como src!
+              alt="Logo Monterrey Respira" // ✅ ¡Alt text descriptivo!
+              className="w-6 h-6 sm:w-6 sm:h-6" // ✅ ¡Mismas clases de tamaño que el SVG!
+            />
+          </div>
+          <div>
+          <h1 className="text-lg sm:text-2xl font-bold text-white leading-tight">MonterreyRespira</h1>
+          <p className="text-xs sm:text-sm text-slate-200 hidden sm:block">Calidad del Aire en Tiempo Real</p>
+          </div>
+        </Link>
+      </motion.div>
 
           <div className="flex items-center gap-2 sm:gap-4">
             {airQualityData && (
@@ -109,8 +110,7 @@ export default function Layout({ children }: LayoutProps) {
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 rounded-md md:hidden focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              <IoMenuOutline className="w-6 h-6 text-gray-700 dark:text-gray-300" />
-            </button>
+            <IoMenuOutline className="w-6 h-6 text-white" />            </button>
           </div>
         </div>
 
@@ -122,7 +122,7 @@ export default function Layout({ children }: LayoutProps) {
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden border-t border-gray-200 dark:border-gray-700"
           >
-            <nav className="px-4 py-2 space-y-1">
+            <nav className="px-4 py-2 rounded-md bg-white text-black">
               <Link to="/" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
                 Inicio
               </Link>

@@ -18,10 +18,15 @@ import iconlowwind from '../assets/icons/low-wind.png'
 import iconmidwind from '../assets/icons/mid-wind.png'
 import iconwindstorm from '../assets/icons/wind-storm.png'
 import icontornado from '../assets/icons/tornado.png'
-import iconradioactive from '../assets/icons/radioactive.png' // ☢️ ¡Aquí mero importamos el nuevo icono!
+import iconradioactive from '../assets/icons/radioactive.png'
+import iconmty from '../assets/icons/mty.png';
 
 export function getMainPollutantIcon(): string {
-  return iconradioactive; // ✅ ¡IMPORTANTE! Debe RETORNAR la VARIABLE importada
+  return iconradioactive; 
+}
+
+export function getMainLogoIcon(): string { 
+  return iconmty; 
 }
 
 export function getAirQualityStatus(aqi: number): AirQualityStatus {
