@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { IoAlertCircleOutline, IoLeafOutline, IoCheckmarkCircleOutline, IoChevronDownOutline } from 'react-icons/io5';
 import { AirQualityStatus } from '../types';
+import leafIcon from '../assets/recomendations-icons/leaf.png';
+import checkmarkIcon from '../assets/recomendations-icons/checkmark.png';
+import alertIcon from '../assets/recomendations-icons/alert.png';
+import { IoChevronDownOutline } from 'react-icons/io5';
+
 
 interface RecommendationsProps {
   status: AirQualityStatus;
@@ -134,8 +138,8 @@ export default function Recommendations({ status, className = '' }: Recommendati
             aria-expanded={expandedSection === 'air'}
           >
             <span className="flex items-center">
-              <IoLeafOutline className="mr-2" />
-              Aire limpio
+              <img src={leafIcon} alt="Leaf Icon" className="w-5 h-5" />
+              <span className="ml-2">Aire limpio</span>
             </span>
             <IoChevronDownOutline className={`transition-transform duration-300 ${expandedSection === 'air' ? 'transform rotate-180' : ''}`} />
           </button>
@@ -149,8 +153,8 @@ export default function Recommendations({ status, className = '' }: Recommendati
             aria-expanded={expandedSection === 'health'}
           >
             <span className="flex items-center">
-              <IoAlertCircleOutline className="mr-2" />
-              Salud
+              <img src={alertIcon} alt="Alert Icon" className="w-5 h-5" />
+              <span className="ml-2">Salud</span>
             </span>
             <IoChevronDownOutline className={`transition-transform duration-300 ${expandedSection === 'health' ? 'transform rotate-180' : ''}`} />
           </button>
@@ -278,7 +282,7 @@ function getAirRecommendations(status: AirQualityStatus): RecommendationItem[] {
       id: 'transport',
       title: 'Usa transporte sostenible',
       description: 'Opta por caminar, usar bicicleta o transporte público cuando sea posible. Si debes usar auto, compártelo.',
-      icon: <IoLeafOutline className="w-5 h-5" />,
+      icon: <img src={leafIcon} alt="Leaf Icon" className="w-5 h-5" />,
       priority: 'medium'
     }
   ];
@@ -292,14 +296,14 @@ function getAirRecommendations(status: AirQualityStatus): RecommendationItem[] {
           id: 'windows',
           title: 'Ventila tu hogar',
           description: 'Aprovecha la buena calidad del aire para ventilar naturalmente tu hogar y renovar el aire interior.',
-          icon: <IoCheckmarkCircleOutline className="w-5 h-5" />,
+          icon: <img src={checkmarkIcon} alt="Checkmark Icon" className="w-5 h-5" />,
           priority: 'high'
         },
         {
           id: 'outdoor',
           title: 'Actividades al aire libre',
           description: 'Excelente momento para realizar actividades al aire libre y ejercicio.',
-          icon: <IoCheckmarkCircleOutline className="w-5 h-5" />,
+          icon: <img src={checkmarkIcon} alt="Checkmark Icon" className="w-5 h-5" />,
           priority: 'medium'
         }
       ];
@@ -311,14 +315,14 @@ function getAirRecommendations(status: AirQualityStatus): RecommendationItem[] {
           id: 'sensitive',
           title: 'Precaución para grupos sensibles',
           description: 'Personas con enfermedades respiratorias o cardíacas, niños y adultos mayores deben considerar reducir actividades físicas intensas al aire libre.',
-          icon: <IoAlertCircleOutline className="w-5 h-5" />,
+          icon: <img src={alertIcon} alt="Alert Icon" className="w-5 h-5" />,
           priority: 'medium'
         },
         {
           id: 'reduce_driving',
           title: 'Reduce el uso del auto',
           description: 'Considera usar transporte público o compartir viajes para disminuir emisiones.',
-          icon: <IoLeafOutline className="w-5 h-5" />,
+          icon: <img src={leafIcon} alt="Leaf Icon" className="w-5 h-5" />,
           priority: 'medium'
         }
       ];
@@ -331,21 +335,21 @@ function getAirRecommendations(status: AirQualityStatus): RecommendationItem[] {
           id: 'stay_indoors',
           title: 'Limita actividades al aire libre',
           description: 'Reduce el tiempo de exposición al aire exterior, especialmente en zonas de alto tráfico o industriales.',
-          icon: <IoAlertCircleOutline className="w-5 h-5" />,
+          icon: <img src={alertIcon} alt="Alert Icon" className="w-5 h-5" />,
           priority: 'high'
         },
         {
           id: 'no_burning',
           title: 'Evita quemar residuos',
           description: 'No quemes basura, hojas o residuos de jardín. Esto contribuye significativamente a la contaminación.',
-          icon: <IoAlertCircleOutline className="w-5 h-5" />,
+          icon: <img src={alertIcon} alt="Alert Icon" className="w-5 h-5" />,
           priority: 'high'
         },
         {
           id: 'plan_travel',
           title: 'Planifica desplazamientos',
           description: 'Combina viajes y actividades para reducir el tiempo en exteriores y el uso de vehículos.',
-          icon: <IoLeafOutline className="w-5 h-5" />,
+          icon: <img src={leafIcon} alt="Leaf Icon" className="w-5 h-5" />,
           priority: 'medium'
         }
       ];
@@ -357,28 +361,28 @@ function getAirRecommendations(status: AirQualityStatus): RecommendationItem[] {
           id: 'stay_indoors_critical',
           title: 'Permanece en interiores',
           description: 'Evita cualquier actividad al aire libre que no sea absolutamente necesaria.',
-          icon: <IoAlertCircleOutline className="w-5 h-5" />,
+          icon: <img src={alertIcon} alt="Alert Icon" className="w-5 h-5" />,
           priority: 'high'
         },
         {
           id: 'air_purifiers',
           title: 'Usa purificadores de aire',
           description: 'Si dispones de purificadores de aire, es el momento de utilizarlos. Mantén puertas y ventanas cerradas.',
-          icon: <IoAlertCircleOutline className="w-5 h-5" />,
+          icon: <img src={alertIcon} alt="Alert Icon" className="w-5 h-5" />,
           priority: 'high'
         },
         {
           id: 'no_exercise',
           title: 'Evita ejercicio al aire libre',
           description: 'Suspende cualquier actividad física en espacios exteriores, incluso para personas saludables.',
-          icon: <IoAlertCircleOutline className="w-5 h-5" />,
+          icon: <img src={alertIcon} alt="Alert Icon" className="w-5 h-5" />,
           priority: 'high'
         },
         {
           id: 'minimize_driving',
           title: 'Minimiza conducción',
           description: 'Reduce al mínimo indispensable el uso de vehículos para ayudar a disminuir la contaminación.',
-          icon: <IoAlertCircleOutline className="w-5 h-5" />,
+          icon: <img src={alertIcon} alt="Alert Icon" className="w-5 h-5" />,
           priority: 'high'
         }
       ];
@@ -397,14 +401,14 @@ function getHealthRecommendations(status: AirQualityStatus): RecommendationItem[
           id: 'health_exercise',
           title: 'Disfruta actividad física',
           description: 'Ideal para todo tipo de ejercicio al aire libre para todas las personas.',
-          icon: <IoCheckmarkCircleOutline className="w-5 h-5" />,
+          icon: <img src={checkmarkIcon} alt="Checkmark Icon" className="w-5 h-5" />,
           priority: 'high'
         },
         {
           id: 'health_ventilate',
           title: 'Ventilación natural',
           description: 'Aprovecha para ventilar tu hogar y espacios cerrados.',
-          icon: <IoCheckmarkCircleOutline className="w-5 h-5" />,
+          icon: <img src={checkmarkIcon} alt="Checkmark Icon" className="w-5 h-5" />,
           priority: 'medium'
         }
       ];
@@ -415,14 +419,14 @@ function getHealthRecommendations(status: AirQualityStatus): RecommendationItem[
           id: 'health_sensitive',
           title: 'Grupos sensibles: precaución',
           description: 'Personas con asma, EPOC o afecciones cardíacas deben considerar limitar actividad física prolongada al aire libre.',
-          icon: <IoAlertCircleOutline className="w-5 h-5" />,
+          icon: <img src={alertIcon} alt="Alert Icon" className="w-5 h-5" />,
           priority: 'medium'
         },
         {
           id: 'health_monitor',
           title: 'Monitorea síntomas',
           description: 'Si perteneces a grupos de riesgo, presta atención a síntomas como tos, dificultad para respirar o fatiga inusual.',
-          icon: <IoAlertCircleOutline className="w-5 h-5" />,
+          icon: <img src={alertIcon} alt="Alert Icon" className="w-5 h-5" />,
           priority: 'low'
         }
       ];
@@ -433,21 +437,21 @@ function getHealthRecommendations(status: AirQualityStatus): RecommendationItem[
           id: 'health_reduce_exposure',
           title: 'Reduce exposición prolongada',
           description: 'Personas sensibles deben acortar el tiempo en exteriores. Todos deben evitar actividad física intensa al aire libre.',
-          icon: <IoAlertCircleOutline className="w-5 h-5" />,
+          icon: <img src={alertIcon} alt="Alert Icon" className="w-5 h-5" />,
           priority: 'high'
         },
         {
           id: 'health_medications',
           title: 'Medicación preventiva',
           description: 'Si tienes asma o afecciones respiratorias, mantén a mano tus medicamentos de rescate.',
-          icon: <IoAlertCircleOutline className="w-5 h-5" />,
+          icon: <img src={alertIcon} alt="Alert Icon" className="w-5 h-5" />,
           priority: 'medium'
         },
         {
           id: 'health_indoor_exercise',
           title: 'Ejercicio en interiores',
           description: 'Considera trasladar tu rutina de ejercicios a espacios cerrados con buena filtración de aire.',
-          icon: <IoAlertCircleOutline className="w-5 h-5" />,
+          icon: <img src={alertIcon} alt="Alert Icon" className="w-5 h-5" />,
           priority: 'medium'
         }
       ];
@@ -458,21 +462,21 @@ function getHealthRecommendations(status: AirQualityStatus): RecommendationItem[
           id: 'health_avoid_outdoor',
           title: 'Evita actividades al aire libre',
           description: 'Todas las personas, incluso las saludables, deben limitar el esfuerzo prolongado al aire libre.',
-          icon: <IoAlertCircleOutline className="w-5 h-5" />,
+          icon: <img src={alertIcon} alt="Alert Icon" className="w-5 h-5" />,
           priority: 'high'
         },
         {
           id: 'health_masks',
           title: 'Considera usar mascarilla',
           description: 'En exteriores, el uso de mascarillas N95 o KN95 puede reducir la exposición a partículas contaminantes.',
-          icon: <IoAlertCircleOutline className="w-5 h-5" />,
+          icon: <img src={alertIcon} alt="Alert Icon" className="w-5 h-5" />,
           priority: 'high'
         },
         {
           id: 'health_air_filters',
           title: 'Sistemas de filtración',
           description: 'Usa sistemas de aire acondicionado con filtros HEPA o purificadores de aire en interiores.',
-          icon: <IoAlertCircleOutline className="w-5 h-5" />,
+          icon: <img src={alertIcon} alt="Alert Icon" className="w-5 h-5" />,
           priority: 'medium'
         }
       ];
@@ -484,28 +488,28 @@ function getHealthRecommendations(status: AirQualityStatus): RecommendationItem[
           id: 'health_stay_indoors',
           title: 'Permanece en interiores',
           description: 'Evita toda actividad física al aire libre. Mantente en espacios interiores con ventanas y puertas cerradas.',
-          icon: <IoAlertCircleOutline className="w-5 h-5" />,
+          icon: <img src={alertIcon} alt="Alert Icon" className="w-5 h-5" />,
           priority: 'high'
         },
         {
           id: 'health_air_purification',
           title: 'Purificación de aire',
           description: 'Usa purificadores de aire con filtros HEPA. Considera crear una "habitación limpia" en tu hogar.',
-          icon: <IoAlertCircleOutline className="w-5 h-5" />,
+          icon: <img src={alertIcon} alt="Alert Icon" className="w-5 h-5" />,
           priority: 'high'
         },
         {
           id: 'health_masks_mandatory',
           title: 'Usa mascarilla en exteriores',
           description: 'Si debes salir, usa mascarillas N95 o KN95 correctamente ajustadas para reducir la exposición.',
-          icon: <IoAlertCircleOutline className="w-5 h-5" />,
+          icon: <img src={alertIcon} alt="Alert Icon" className="w-5 h-5" />,
           priority: 'high'
         },
         {
           id: 'health_medical_attention',
           title: 'Atención a síntomas',
           description: 'Busca atención médica inmediata si experimentas dificultad para respirar, opresión en el pecho o fatiga inusual.',
-          icon: <IoAlertCircleOutline className="w-5 h-5" />,
+          icon: <img src={alertIcon} alt="Alert Icon" className="w-5 h-5" />,
           priority: 'high'
         }
       ];
@@ -516,7 +520,7 @@ function getHealthRecommendations(status: AirQualityStatus): RecommendationItem[
           id: 'health_default',
           title: 'Mantente informado',
           description: 'Consulta regularmente los niveles de calidad del aire y ajusta tus actividades según sea necesario.',
-          icon: <IoCheckmarkCircleOutline className="w-5 h-5" />,
+          icon: <img src={checkmarkIcon} alt="Checkmark Icon" className="w-5 h-5" />,
           priority: 'low'
         }
       ];
