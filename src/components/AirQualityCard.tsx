@@ -1,18 +1,27 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   IoTimeOutline,
   IoThermometerOutline,
   IoWaterOutline,
   IoSpeedometerOutline,
   IoInformationCircleOutline,
-  IoCloudOutline,
-  IoWarningOutline,
-  IoRefreshOutline
+  IoPulseOutline,
+  IoRefreshOutline,
+  IoHelpCircleOutline,
+  IoLocationOutline,
+  IoWarningOutline, // Para estados peligrosos
+  IoLeafOutline, // Para estado bueno
+  IoCloudOutline, // Para moderado
+  IoBodyOutline, // Para insalubre GS
+  IoSkullOutline, // Para muy insalubre / peligroso
+  // Considera iconos más específicos si los tienes
 } from 'react-icons/io5';
-import { AirQualityData } from '../types';
+import { AirQualityData, AirQualityStatus } from '../types'; // Asegúrate que AirQualityStatus esté exportado
 import { getAQIDescription } from '../utils/airQualityUtils';
 import { useAirQuality } from '../context/AirQualityContext';
+// Importa tu componente Tooltip preferido
+// import Tooltip from './Tooltip'; // Ejemplo
 
 interface AirQualityCardProps {
   data: AirQualityData;
@@ -21,237 +30,232 @@ interface AirQualityCardProps {
 
 export default function AirQualityCard({ data, className = '' }: AirQualityCardProps) {
   const [dateTime, setDateTime] = useState<string>('');
-  const [isSimulated, setIsSimulated] = useState<boolean>(false);
-  const [isInfoVisible, setIsInfoVisible] = useState(false);
   const { theme, refreshData, selectedCity } = useAirQuality();
 
   useEffect(() => {
     const timestamp = new Date(data.timestamp);
-    const formattedDate = new Intl.DateTimeFormat('es-MX', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
+    // Formato más legible y estándar
+    const formattedDate = timestamp.toLocaleTimeString('es-MX', {
       hour: 'numeric',
-      minute: 'numeric',
-    }).format(timestamp);
-
-    // Capitalize first letter
-    const dateStr = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
-    setDateTime(dateStr);
-
-    // Determinar si los datos son simulados
-    // Esta es una forma aproximada de detectar datos simulados basada en patrones
-    // Los datos reales suelen tener más variabilidad en los decimales
-    const isProbablySimulated =
-      (data.pm25 % 1 === 0 && data.pm10 % 1 === 0 && data.o3 % 1 === 0) || // Todos son números enteros exactos
-      (Math.round(data.o3) === Math.round(data.aqi * 0.4)) || // Coincide con la fórmula de simulación
-      (Math.round(data.no2) === Math.round(data.aqi * 0.3)); // Coincide con la fórmula de simulación
-
-    setIsSimulated(isProbablySimulated);
+      minute: '2-digit',
+      hour12: true,
+    }) + ' - ' + timestamp.toLocaleDateString('es-MX', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+    });
+    setDateTime(formattedDate.replace(/^\w/, c => c.toUpperCase())); // Capitaliza inicio
   }, [data]);
 
-  // Get the status-based color directly from the theme context
-  const getBgGradient = () => {
-    if (!theme) return 'from-blue-400 to-blue-500';
-    return theme.gradient;
+  // --- Funciones de Estilo y Contenido ---
+
+  const getStatusStyle = (type: 'gradient' | 'iconColor' | 'bgColor' | 'textColor' | 'ringColor') => {
+    // Define colores base para cada estado (ajusta según tu paleta)
+    const styles: Record<AirQualityStatus, Record<string, string>> = {
+      good: { gradient: 'from-green-400 to-green-600', iconColor: 'text-green-600', bgColor: 'bg-green-500', textColor: 'text-green-700', ringColor: 'ring-green-500' },
+      moderate: { gradient: 'from-yellow-400 to-yellow-600', iconColor: 'text-yellow-600', bgColor: 'bg-yellow-500', textColor: 'text-yellow-700', ringColor: 'ring-yellow-500' },
+      'unhealthy-sensitive': { gradient: 'from-orange-400 to-orange-600', iconColor: 'text-orange-600', bgColor: 'bg-orange-500', textColor: 'text-orange-700', ringColor: 'ring-orange-500' },
+      unhealthy: { gradient: 'from-red-400 to-red-600', iconColor: 'text-red-600', bgColor: 'bg-red-500', textColor: 'text-red-700', ringColor: 'ring-red-500' },
+      'very-unhealthy': { gradient: 'from-purple-400 to-purple-600', iconColor: 'text-purple-600', bgColor: 'bg-purple-500', textColor: 'text-purple-700', ringColor: 'ring-purple-500' },
+      hazardous: { gradient: 'from-rose-500 to-rose-700', iconColor: 'text-rose-600', bgColor: 'bg-rose-600', textColor: 'text-rose-700', ringColor: 'ring-rose-600' },
+      unknown: { gradient: 'from-slate-400 to-slate-600', iconColor: 'text-slate-600', bgColor: 'bg-slate-500', textColor: 'text-slate-700', ringColor: 'ring-slate-500' },
+    };
+    const currentStatus = data.status || 'unknown';
+    const selectedStyle = styles[currentStatus] || styles.unknown;
+
+    // Adapta el color del texto principal para que contraste con el gradiente
+    if (type === 'textColor' && ['unhealthy', 'very-unhealthy', 'hazardous'].includes(currentStatus)) {
+        return 'text-white'; // Texto blanco en fondos oscuros/intensos
+    }
+    if (type === 'textColor') {
+        return 'text-slate-800'; // Texto oscuro en fondos claros
+    }
+    // Para el icono y el anillo, usa el color base del estado
+    if (type === 'iconColor') return selectedStyle.iconColor + ' dark:text-' + selectedStyle.iconColor.split('-')[1] + '-400'; // Ajuste dark mode
+    if (type === 'ringColor') return selectedStyle.ringColor;
+    if (type === 'bgColor') return selectedStyle.bgColor;
+
+
+    return selectedStyle.gradient; // Devuelve el gradiente por defecto
   };
 
-  // Get the complementary text color for the status
-  const getInfoBgColor = () => {
-    if (!theme) return 'bg-white/10';
-
-    // Seleccionar un color de fondo semi-transparente basado en el tema
-    switch (theme.primary) {
-      case '#4ade80': return 'bg-green-50/20 text-green-50';
-      case '#fbbf24': return 'bg-amber-50/20 text-amber-50';
-      case '#fb923c': return 'bg-orange-50/20 text-orange-50';
-      case '#f87171': return 'bg-red-50/20 text-red-50';
-      case '#c084fc': return 'bg-purple-50/20 text-purple-50';
-      case '#9f1239': return 'bg-rose-50/20 text-rose-50';
-      default: return 'bg-blue-50/20 text-blue-50';
+  const getStatusText = (status: AirQualityStatus | undefined): string => {
+    switch (status) {
+      case 'good': return 'Buena';
+      case 'moderate': return 'Moderada';
+      case 'unhealthy-sensitive': return 'Dañina (Grupos Sensibles)';
+      case 'unhealthy': return 'Dañina';
+      case 'very-unhealthy': return 'Muy Dañina';
+      case 'hazardous': return 'Peligrosa';
+      default: return 'Desconocida';
     }
   };
 
-  // Get badge colors based on the theme
-  const getStatusIndicatorClass = () => {
-    if (!theme) return 'bg-blue-600/80 text-white';
-
-    switch (theme.primary) {
-      case '#4ade80': return 'bg-green-600/80 text-white';
-      case '#fbbf24': return 'bg-amber-600/80 text-white';
-      case '#fb923c': return 'bg-orange-600/80 text-white';
-      case '#f87171': return 'bg-red-600/80 text-white';
-      case '#c084fc': return 'bg-purple-600/80 text-white';
-      case '#9f1239': return 'bg-rose-600/80 text-white';
-      default: return 'bg-blue-600/80 text-white';
-    }
-  };
-
-  const getRefreshButtonClass = () => {
-    if (!theme) return 'bg-white/20 hover:bg-white/30';
-    return 'bg-white/20 hover:bg-white/30';
-  };
-
-  const getStatusText = () => {
-    switch (data.status) {
-      case 'good':
-        return 'Buena';
-      case 'moderate':
-        return 'Moderada';
-      case 'unhealthy-sensitive':
-        return 'Insalubre para grupos sensibles';
-      case 'unhealthy':
-        return 'Insalubre';
-      case 'very-unhealthy':
-        return 'Muy insalubre';
-      case 'hazardous':
-        return 'Peligrosa';
-      default:
-        return 'Desconocida';
-    }
-  };
+    const getStatusIcon = (status: AirQualityStatus | undefined) => {
+        const iconClass = `w-6 h-6 sm:w-7 sm:h-7 ${getStatusStyle('iconColor')}`;
+        switch (status) {
+          case 'good': return <IoLeafOutline className={iconClass} aria-label="Buena"/>;
+          case 'moderate': return <IoCloudOutline className={iconClass} aria-label="Moderada"/>;
+          case 'unhealthy-sensitive': return <IoBodyOutline className={iconClass} aria-label="Dañina para Grupos Sensibles"/>;
+          case 'unhealthy': return <IoWarningOutline className={iconClass} aria-label="Dañina"/>;
+          case 'very-unhealthy': return <IoSkullOutline className={iconClass} aria-label="Muy Dañina"/>; // O IoWarningOutline con color más intenso
+          case 'hazardous': return <IoSkullOutline className={`w-6 h-6 sm:w-7 sm:h-7 ${getStatusStyle('iconColor')} animate-pulse`} aria-label="Peligrosa"/>; // Pulso para peligro
+          default: return <IoHelpCircleOutline className={iconClass} aria-label="Desconocida"/>;
+        }
+    };
 
   const handleRefresh = () => {
     refreshData();
   };
 
+  const aqiInfoText = "El Índice de Calidad del Aire (AQI) indica qué tan limpio o contaminado está el aire. Un valor más alto significa mayor preocupación para la salud.";
+  const dataSourceInfoText = "Datos de fuentes como IQAir, actualizados frecuentemente. Pueden existir ligeras variaciones o estimaciones.";
+
   return (
-    <div
-      className={`rounded-xl shadow-lg overflow-hidden ${className}`}
+    <motion.div
+      layout
+      className={`rounded-xl shadow-lg overflow-hidden bg-white dark:bg-slate-800 ${className} border ${getStatusStyle('ringColor')}/30`} // Borde sutil del color del estado
     >
-      <div className={`bg-gradient-to-r ${getBgGradient()} p-4 sm:p-6 text-white relative`}>
-        {/* Refresh button in top-right corner */}
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          onClick={handleRefresh}
-          className={`absolute top-2 left-2 p-2 rounded-full ${getRefreshButtonClass()} transition-colors z-10`}
-          aria-label="Refrescar datos"
-        >
-          <IoRefreshOutline className="w-5 h-5" />
-        </motion.button>
+      {/* === SECCIÓN PRINCIPAL (Estado y AQI) === */}
+      <div className={`relative p-5 sm:p-6 bg-gradient-to-br ${getStatusStyle('gradient')} ${getStatusStyle('textColor')}`}>
 
-        {/* Indicador de datos simulados/reales */}
-        <div className="absolute top-2 right-2">
-          {isSimulated ? (
-            <div className={`${getStatusIndicatorClass()} text-xs px-2 py-1 rounded-full flex items-center`}>
-              <IoWarningOutline className="mr-1" />
-              <span className="hidden sm:inline">Datos simulados</span>
-              <span className="sm:hidden">Simulados</span>
+        {/* Controles Superiores (Más discretos) */}
+        <div className="absolute top-3 right-3 z-10 flex items-center space-x-2">
+           {/* <Tooltip content={dataSourceInfoText}> */}
+            <div className={`text-[10px] px-2 py-0.5 rounded-full flex items-center bg-black/10 text-white/80 backdrop-blur-sm`}>
+              <IoPulseOutline className="w-3 h-3 mr-1 text-green-400" />
+              <span>Vivo</span>
             </div>
-          ) : (
-            <div className={`${getStatusIndicatorClass()} text-xs px-2 py-1 rounded-full flex items-center`}>
-              <IoCloudOutline className="mr-1" />
-              <span className="hidden sm:inline">Datos en vivo</span>
-              <span className="sm:hidden">En vivo</span>
-            </div>
-          )}
+           {/* </Tooltip> */}
+           <motion.button
+             whileTap={{ scale: 0.9 }}
+             whileHover={{ scale: 1.1, rotate: 45 }}
+             onClick={handleRefresh}
+             className="p-1.5 rounded-full bg-black/10 hover:bg-black/20 text-white/80 hover:text-white transition-all"
+             aria-label="Refrescar datos"
+           >
+             <IoRefreshOutline className="w-4 h-4" />
+           </motion.button>
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mt-6 sm:mt-4">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold">Calidad del Aire</h2>
-            <p className="text-sm opacity-90 flex items-center mt-1">
-              <IoTimeOutline className="mr-1 flex-shrink-0" />
-              <span className="truncate">{dateTime}</span>
-            </p>
-            <div className="mt-2">
-              <span className="text-xs font-semibold uppercase tracking-wider opacity-90">
-                {/* {data.location.name} */}
-                {selectedCity.name} 
-              </span>
+        {/* Info Ubicación y Hora */}
+        <div className="mb-4 text-sm opacity-90">
+            <div className="flex items-center gap-1 font-medium">
+                <IoLocationOutline className="w-4 h-4 flex-shrink-0"/>
+                {selectedCity.name}
             </div>
-          </div>
-
-          <div className="flex items-end justify-between sm:justify-end sm:text-right mt-4 sm:mt-0">
-            <div className="flex items-center sm:justify-end">
-              <motion.div
-                className="text-5xl sm:text-6xl font-bold"
-                initial={{ scale: 0.8 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 100 }}
-              >
-                {data.aqi}
-              </motion.div>
-              <div className="ml-2 text-right">
-                <div className="text-xs font-semibold uppercase tracking-wider opacity-90">Índice</div>
-                <div className="text-xs font-semibold uppercase tracking-wider opacity-90">AQI</div>
-              </div>
+            <div className="flex items-center gap-1 text-xs opacity-80 mt-0.5">
+                <IoTimeOutline className="w-3 h-3 flex-shrink-0"/>
+                {dateTime}
             </div>
-            <span className={`ml-auto sm:ml-0 sm:mt-2 inline-block px-3 py-1 rounded-full text-sm font-semibold ${getStatusIndicatorClass()}`}>
-              {getStatusText()}
-            </span>
-          </div>
         </div>
 
-        <p className="mt-4 text-sm opacity-90">{getAQIDescription(data.status)}</p>
-
-        {/* Information button for mobile */}
-        <button
-          onClick={() => setIsInfoVisible(!isInfoVisible)}
-          className="mt-3 p-2 rounded w-full sm:hidden flex items-center justify-center"
-          aria-expanded={isInfoVisible}
-          aria-label="Mostrar información adicional"
-        >
-          <span className="text-xs mr-1">
-            {isInfoVisible ? 'Ocultar información' : 'Mostrar información'}
-          </span>
-          <IoInformationCircleOutline className="w-4 h-4" />
-        </button>
-
-        {/* Información sobre datos simulados */}
-        <div className={`mt-3 p-2 rounded text-xs flex items-start ${getInfoBgColor()} ${isInfoVisible ? 'block' : 'hidden sm:flex'}`}>
-          <IoInformationCircleOutline className="min-w-5 w-5 h-5 mr-1 mt-0.5" />
-          <span>
-            {isSimulated
-              ? "Los datos mostrados son simulados debido a limitaciones en el acceso a APIs públicas de calidad del aire. Los valores son estimaciones aproximadas."
-              : "Los datos provienen de APIs públicas en tiempo real. Algunos valores pueden complementarse con estimaciones cuando no están disponibles de las fuentes."}
-          </span>
-        </div>
-      </div>
-
-      <div className="bg-white p-4 dark:bg-slate-800 dark:text-white">
-        <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }} className="flex items-center">
-            <div className="bg-slate-100 p-2 rounded-full dark:bg-slate-700">
-              <IoThermometerOutline className="text-slate-500 w-5 h-5 dark:text-slate-300" />
-            </div>
-            <div className="ml-3">
-              <div className="text-xs text-slate-500 dark:text-slate-400">Temperatura</div>
-              <div className="font-semibold">{data.temperature}°C</div>
-            </div>
-          </motion.div>
-          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }} className="flex items-center">
-            <div className="bg-slate-100 p-2 rounded-full dark:bg-slate-700">
-              <IoWaterOutline className="text-slate-500 w-5 h-5 dark:text-slate-300" />
-            </div>
-            <div className="ml-3">
-              <div className="text-xs text-slate-500 dark:text-slate-400">Humedad</div>
-              <div className="font-semibold">{data.humidity}%</div>
-            </div>
-          </motion.div>
-          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }} className="flex items-center">
-            <div className="bg-slate-100 p-2 rounded-full dark:bg-slate-700">
-              <IoSpeedometerOutline className="text-slate-500 w-5 h-5 dark:text-slate-300" />
-            </div>
-            <div className="ml-3">
-              <div className="text-xs text-slate-500 dark:text-slate-400">Viento</div>
-              {/* <div className="font-semibold">{data.wind.speed} km/h</div> */}
-              <div className="font-semibold">{data.wind?.speed} km/h</div>
-            </div>
-          </motion.div>
-          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }} className="flex items-center">
+        {/* Contenido Central: Estado + AQI */}
+        <div className="text-center flex flex-col items-center justify-center mb-3">
+             {/* 1. Icono y Texto del Estado (Lo más importante) */}
             <motion.div
-              whileHover={{ scale: 1.05 }}
-              className={`p-2 rounded-full bg-gradient-to-r ${getBgGradient()} text-white`}>
-              <span className="font-bold text-sm">PM</span>
+                key={data.status + "-icon"} // Animar cambio de icono/texto
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className={`flex items-center gap-2 mb-2 p-2 rounded-lg bg-white/20 dark:bg-black/20 backdrop-blur-sm`}
+            >
+                {getStatusIcon(data.status)}
+                <span className="text-lg sm:text-xl font-semibold tracking-tight">
+                    {getStatusText(data.status)}
+                </span>
             </motion.div>
-            <div className="ml-3">
-              <div className="text-xs text-slate-500 dark:text-slate-400">PM2.5/PM10</div>
-              <div className="font-semibold">{data.pm25}/{data.pm10}</div>
+
+            {/* 2. Número AQI con contexto */}
+            <div className="flex items-baseline justify-center gap-2">
+                <motion.div
+                    key={data.aqi}
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 120, damping: 12 }}
+                    className="text-6xl sm:text-7xl font-bold"
+                    style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.1)' }}
+                >
+                    {data.aqi}
+                </motion.div>
+                <div className="flex flex-col items-start">
+                    <span className="text-sm font-semibold">AQI</span>
+                    <span className="text-xs opacity-80">US</span>
+                </div>
+                 {/* <Tooltip content={aqiInfoText}> */}
+                    <button aria-label="¿Qué es AQI?" className="ml-1 text-white/60 hover:text-white">
+                        <IoHelpCircleOutline className="w-4 h-4" />
+                    </button>
+                 {/* </Tooltip> */}
             </div>
-          </motion.div>
+
+             {/* 3. Recomendación Clara */}
+            <p className="mt-3 text-sm sm:text-base max-w-xs mx-auto opacity-95 font-medium leading-snug">
+                {getAQIDescription(data.status)}
+            </p>
         </div>
       </div>
-    </div>
+
+      {/* === SECCIÓN DE DETALLES (Más integrada) === */}
+      <div className="p-4 bg-slate-50 dark:bg-slate-800/50">
+          <h4 className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400 mb-2 tracking-wider">Detalles Ambientales</h4>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+              {/* Temperatura */}
+              <DetailItem
+                  icon={<IoThermometerOutline />}
+                  label="Temperatura"
+                  value={`${data.temperature}°C`}
+                  iconColorClass={getStatusStyle('iconColor')}
+              />
+              {/* Humedad */}
+              <DetailItem
+                  icon={<IoWaterOutline />}
+                  label="Humedad"
+                  value={`${data.humidity}%`}
+                  iconColorClass={getStatusStyle('iconColor')}
+              />
+              {/* Viento */}
+              <DetailItem
+                  icon={<IoSpeedometerOutline />}
+                  label="Viento"
+                  value={`${data.wind?.speed ?? 'N/A'} km/h`} // Manejo de nulo
+                  iconColorClass={getStatusStyle('iconColor')}
+              />
+              {/* Partículas PM (Agrupadas) */}
+              <DetailItem
+                  icon={<span className="text-xs font-bold">PM</span>} // Icono texto simple
+                  label="PM₂₅ / PM₁₀"
+                  value={`${data.pm25 ?? 'N/A'} / ${data.pm10 ?? 'N/A'} µg/m³`} // Añadir unidad y manejar nulos
+                  iconColorClass={getStatusStyle('iconColor')}
+              />
+          </div>
+      </div>
+    </motion.div>
   );
+}
+
+// --- Componente Auxiliar para Detalles ---
+interface DetailItemProps {
+    icon: React.ReactNode;
+    label: string;
+    value: string;
+    iconColorClass: string;
+}
+
+function DetailItem({ icon, label, value, iconColorClass }: DetailItemProps) {
+    return (
+        <motion.div
+            whileHover={{ scale: 1.03 }}
+            className="flex items-center gap-2 p-1.5 rounded transition-colors hover:bg-slate-100 dark:hover:bg-slate-700/50"
+        >
+            <div className={`flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full ${iconColorClass} bg-opacity-10 dark:bg-opacity-20 bg-current`}>
+                 {/* Ajusta tamaño icono si es necesario */}
+                 <span className="w-4 h-4">{icon}</span>
+            </div>
+            <div>
+                <div className="text-xs text-slate-500 dark:text-slate-400 leading-tight">{label}</div>
+                <div className="font-medium text-sm sm:text-base text-slate-700 dark:text-slate-200 leading-tight">{value}</div>
+            </div>
+        </motion.div>
+    );
 }

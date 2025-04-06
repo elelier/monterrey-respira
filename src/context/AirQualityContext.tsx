@@ -41,10 +41,15 @@ export function AirQualityProvider({ children }: AirQualityProviderProps) {
     const cachedData = localStorage.getItem(CACHE_KEY); // Obtener datos del caché
     const cachedTime = localStorage.getItem(`${CACHE_KEY}_timestamp`); // Obtener hora del caché
 
+    console.log('Checking Cache...');
+
     if (cachedData && cachedTime) { // Si hay datos en caché
       const timeElapsed = Date.now() - Number(cachedTime);
+      console.log('Cache Time:', new Date(Number(cachedTime)).toLocaleString()); // Mostrar hora del caché {{ edit: 2 }}
+      console.log('Time Elapsed:', timeElapsed / (60 * 60 * 1000), 'hours'); // Mostrar tiempo transcurrido en horas {{ edit: 2 }}
+
       if (timeElapsed < CACHE_EXPIRATION_TIME) { // Si el caché es reciente (menos de 1 hora)
-        console.log('Data from Cache'); // Mensaje para indicar que se usan datos del caché
+        console.log('Data from Cache - Cache is valid'); // Mensaje más claro {{ edit: 2 }}
         const parsedCacheData = JSON.parse(cachedData); // Parsear datos del caché
         // Transformar datos cacheados al formato AirQualityData
         const transformedCacheData = transformApiResponse(parsedCacheData, selectedCity.name); // {{ edit }}
@@ -53,8 +58,10 @@ export function AirQualityProvider({ children }: AirQualityProviderProps) {
         setLoading(false);
         return; // Salir de la función, no hacer petición a la API
       } else {
-        console.log('Cache Expired'); // Mensaje si el caché expiró
+        console.log('Cache Expired - Fetching new data from API'); // Mensaje más claro {{ edit: 2 }}
       }
+    } else {
+      console.log('No Cache Found - Fetching data from API'); // Mensaje si no hay caché {{ edit: 2 }}
     }
 
     try {
@@ -64,7 +71,7 @@ export function AirQualityProvider({ children }: AirQualityProviderProps) {
       if (Array.isArray(cityDataArray) && cityDataArray.length > 0) {
         localStorage.setItem(CACHE_KEY, JSON.stringify(cityDataArray)); // Guardar datos en caché
         localStorage.setItem(`${CACHE_KEY}_timestamp`, Date.now().toString()); // Guardar hora en caché
-        console.log('Data from API'); // Mensaje para indicar que se usan datos de la API
+        console.log('Cache Updated - New data from API'); // Mensaje al actualizar el caché {{ edit: 2 }}
 
         // Transformar datos de la API al formato AirQualityData
         const transformedData = transformApiResponse(cityDataArray, selectedCity.name); // {{ edit }}
@@ -74,12 +81,12 @@ export function AirQualityProvider({ children }: AirQualityProviderProps) {
         setError('No se pudieron cargar los datos de calidad del aire');
       }
       setError(null);
-    } catch (err) {
-      console.error('Error fetching air quality data:', err);
-      setError('No se pudieron cargar los datos de calidad del aire');
-    } finally {
-      setLoading(false);
-    }
+      } catch (err) {
+          console.error('Error fetching air quality data:', err);
+          setError('No se pudieron cargar los datos de calidad del aire');
+      } finally {
+          setLoading(false);
+      }
   };
 
   // Función para transformar la respuesta de la API al formato AirQualityData
