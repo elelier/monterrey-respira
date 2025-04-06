@@ -11,7 +11,18 @@ import icon11d from '../assets/weather-icons/11d.png';
 import icon13d from '../assets/weather-icons/13d.png';
 import icon04n from '../assets/weather-icons/04n.png';
 import icon50d from '../assets/weather-icons/50d.png';
+import iconmidhum from '../assets/icons/mid-hum.png';
+import iconhighhum from '../assets/icons/high-hum.png';
+import icondry from '../assets/icons/dry.png';
+import iconlowwind from '../assets/icons/low-wind.png'
+import iconmidwind from '../assets/icons/mid-wind.png'
+import iconwindstorm from '../assets/icons/wind-storm.png'
+import icontornado from '../assets/icons/tornado.png'
+import iconradioactive from '../assets/icons/radioactive.png' // ☢️ ¡Aquí mero importamos el nuevo icono!
 
+export function getMainPollutantIcon(): string {
+  return iconradioactive; // ✅ ¡IMPORTANTE! Debe RETORNAR la VARIABLE importada
+}
 
 export function getAirQualityStatus(aqi: number): AirQualityStatus {
   if (aqi <= 50) {
@@ -27,6 +38,39 @@ export function getAirQualityStatus(aqi: number): AirQualityStatus {
   } else {
     return 'hazardous';
   }
+}
+
+export function getHumidityIcon(humidity: number): string {
+  if (humidity < 40) {
+    return icondry;
+  } else if (humidity >= 40 && humidity <= 70) {
+    return iconmidhum;
+  } else {
+    return iconhighhum;
+  }
+}
+
+export function getWindIcon(windSpeedMs: number | undefined, windDirectionDeg: number | undefined): { icon: string, rotation?: number } {
+  if (windSpeedMs === undefined || windDirectionDeg === undefined) {
+    return { icon: '' }; // O un ícono por defecto si quieres
+  }
+
+  let icon = '';
+  let rotation = 0;
+
+  if (windSpeedMs < 5) {
+    icon = iconlowwind;
+    rotation = windDirectionDeg;
+  } else if (windSpeedMs < 15) {
+    icon = iconmidwind;
+    rotation = windDirectionDeg;
+  } else if (windSpeedMs < 25) {
+    icon = iconwindstorm;
+  } else {
+    icon = icontornado;
+  }
+
+  return { icon, rotation };
 }
 
 export const getAirQualityTheme = (status: AirQualityStatus): AirQualityTheme => {
@@ -272,6 +316,16 @@ export const getPollutantInfo = (pollutant: string): { name: string; description
       return {
         name: pollutant,
         description: 'Contaminante atmosférico que puede afectar la salud y el medio ambiente.',
+      };
+      case 'p2': // ✅ ¡CASE 'p2' para PM2.5!
+      return {
+        name: 'PM2.5',
+        description: 'Partículas finas con un diámetro de 2.5 micrómetros o menos, que pueden penetrar profundamente en los pulmones.',
+      };
+    case 'p1': // ✅ ¡CASE 'p1' para PM10!
+      return {
+        name: 'PM10',
+        description: 'Partículas inhalables con un diámetro de 10 micrómetros o menos, que pueden entrar en los pulmones.',
       };
   }
 };

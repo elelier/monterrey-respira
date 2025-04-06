@@ -120,6 +120,7 @@ export function AirQualityProvider({ children }: AirQualityProviderProps) {
           longitude: cityData.longitude,
         },
         weather_icon: cityData.weather_icon,
+        main_pollutant_us: cityData.main_pollutant_us,
       };
   };
 

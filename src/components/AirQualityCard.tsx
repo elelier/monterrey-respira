@@ -17,7 +17,7 @@ import {
   IoChevronDownOutline
 } from 'react-icons/io5';
 import { AirQualityData, AirQualityStatus } from '../types';
-import { getAQIDescription, getWeatherIconUrl } from '../utils/airQualityUtils';
+import { getAQIDescription, getWeatherIconUrl, getHumidityIcon, getWindIcon, getPollutantInfo, getMainPollutantIcon } from '../utils/airQualityUtils'; // ✅ ¡Verifica que getMainPollutantIcon esté en la lista!
 import { useAirQuality } from '../context/AirQualityContext';
 
 interface AirQualityCardProps {
@@ -228,23 +228,26 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
                   useWeatherIconAsMainIcon={true}
                 />
                 <DetailItem
-                  icon={<IoWaterOutline />}
                   label="Humedad"
                   value={`${data.humidity}%`}
                   iconColorClass={getStatusStyle('iconColor')}
+                  useHumidityIcon={true} // 👈 Indicamos que use el icono de humedad
+                  humidityValue={data.humidity} // 👈 Le pasamos el valor de humedad
                 />
                 <DetailItem
-                  icon={<IoSpeedometerOutline />}
                   label="Viento"
                   value={`${data.wind?.speed ?? 'N/A'} km/h`}
                   iconColorClass={getStatusStyle('iconColor')}
+                  useWindIcon={true} // 👈 Indicamos que use el icono de viento
+                  windSpeed={data.wind?.speed} // 👈 Pasamos la velocidad del viento
+                  windDirection={data.wind?.direction} // 👈 Pasamos la dirección del viento
                 />
                 <DetailItem
-                  icon={<span className="text-xs font-bold">PM</span>}
-                  label="PM₂₅ / PM₁₀"
-                  value={`${data.pm25 ?? 'N/A'} / ${data.pm10 ?? 'N/A'} µg/m³`}
+                  useMainPollutantIcon={true}
+                  label="Contaminantes"
+                  value={data.main_pollutant_us ? getPollutantInfo(data.main_pollutant_us).name : 'N/A'} // ✅ ¡REVISA QUE ESTÉ .name AQUÍ!
                   iconColorClass={getStatusStyle('iconColor')}
-                  tooltipText="Partículas en suspensión menores a 2.5 y 10 micrómetros"
+                  tooltipText={data.main_pollutant_us ? getPollutantInfo(data.main_pollutant_us).description : "No hay información disponible sobre el contaminante principal."}
                 />
               </div>
             </motion.div>
@@ -263,21 +266,27 @@ interface DetailItemProps {
   weatherIcon?: string;
   useWeatherIconAsMainIcon?: boolean;
   tooltipText?: string;
+  useHumidityIcon?: boolean; 
+  humidityValue?: number;
+  useWindIcon?: boolean;    
+  windSpeed?: number;        
+  windDirection?: number;       
+  useMainPollutantIcon?: boolean;
 }
 
-function DetailItem({ icon, label, value, iconColorClass, weatherIcon, useWeatherIconAsMainIcon, tooltipText }: DetailItemProps) {
+function DetailItem({ icon, label, value, iconColorClass, weatherIcon, useWeatherIconAsMainIcon, tooltipText, useHumidityIcon, humidityValue, useWindIcon, windSpeed, windDirection, useMainPollutantIcon }: DetailItemProps) { // ✅ ¡Asegúrate que useMainPollutantIcon esté AQUÍ en los parámetros!
   const [showTooltip, setShowTooltip] = useState(false);
-  
+
   return (
     <motion.div
       whileHover={{ scale: 1.02 }}
       className="flex items-center gap-3 p-2 rounded-lg transition-colors hover:bg-slate-100 dark:hover:bg-slate-700/50 relative"
     >
-      {!useWeatherIconAsMainIcon ? (
+      {!useWeatherIconAsMainIcon && !useHumidityIcon && !useWindIcon && !useMainPollutantIcon ? ( // ✅ ¡Asegúrate que useMainPollutantIcon esté en la CONDICIÓN NEGATIVA!
         <div className={`flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full ${iconColorClass} bg-opacity-10 dark:bg-opacity-20 bg-current`}>
           <span className="w-4 h-4 text-white dark:text-white">{icon}</span>
         </div>
-      ) : (
+      ) : useWeatherIconAsMainIcon ? (
         <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full">
           {weatherIcon && (
             <img
@@ -287,7 +296,36 @@ function DetailItem({ icon, label, value, iconColorClass, weatherIcon, useWeathe
             />
           )}
         </div>
-      )}
+      ) : useHumidityIcon ? (
+        <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full">
+          {humidityValue !== undefined && (
+            <img
+              src={getHumidityIcon(humidityValue)}
+              alt="Humedad"
+              className="w-8 h-8"
+            />
+          )}
+        </div>
+      ) : useWindIcon ? ( // 👈 Nueva condición para iconos de viento
+        <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full">
+          {windSpeed !== undefined && windDirection !== undefined && (
+            <img
+              src={getWindIcon(windSpeed, windDirection).icon} // 👈 Usamos getWindIcon para obtener el icono
+              alt="Viento"
+              className="w-8 h-8"
+              style={{ transform: `rotate(${getWindIcon(windSpeed, windDirection).rotation}deg)` }} // 👈 Aplicamos rotación
+            />
+          )}
+        </div>
+      ) : useMainPollutantIcon ? ( // ☢️ ¡BLOQUE PARA EL ICONO RADIOACTIVO!
+        <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full">
+          <img
+            src={getMainPollutantIcon()} // ✅ ¡Aquí LLAMAMOS a getMainPollutantIcon()!
+            alt="Contaminante"
+            className="w-8 h-8"
+          />
+        </div>
+      ) : null}
       <div className="flex-1">
         <div className="flex items-center">
           <div className="text-xs text-slate-600 dark:text-slate-300 font-medium">{label}</div>
