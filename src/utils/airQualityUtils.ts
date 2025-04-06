@@ -1,4 +1,17 @@
 import { AirQualityStatus, AirQualityTheme, RecommendationInfo } from '../types';
+import icon01n from '../assets/weather-icons/01n.png'; // ✅ ¡ASEGÚRATE DE QUE ESTOS IMPORTS ESTÉN AQUÍ TAMBIÉN!
+import icon02d from '../assets/weather-icons/02d.png';
+import icon02n from '../assets/weather-icons/02n.png';
+import icon03d from '../assets/weather-icons/03d.png';
+import icon04d from '../assets/weather-icons/04d.png';
+import icon09d from '../assets/weather-icons/09d.png';
+import icon10d from '../assets/weather-icons/10d.png';
+import icon10n from '../assets/weather-icons/10n.png';
+import icon11d from '../assets/weather-icons/11d.png';
+import icon13d from '../assets/weather-icons/13d.png';
+import icon04n from '../assets/weather-icons/04n.png';
+import icon50d from '../assets/weather-icons/50d.png';
+
 
 export function getAirQualityStatus(aqi: number): AirQualityStatus {
   if (aqi <= 50) {
@@ -180,6 +193,30 @@ export const getRecommendations = (status: AirQualityStatus): RecommendationInfo
         },
       ];
   }
+};
+export const getWeatherIconUrl = (iconCode: string | undefined): string | undefined => {
+  if (!iconCode) {
+    return undefined;
+  }
+
+  // ¡AQUÍ VAMOS A "MAPPING" LOS ICON CODES A LAS VARIABLES QUE IMPORTAMOS!
+  const iconMap: Record<string, any> = { // 👈 ¡CAMBIA Record<string, string> A Record<string, any>!
+    '01n': icon01n, // ✅ ¡AHORA SÍ, USAMOS LAS VARIABLES IMPORTADAS!
+    '02d': icon02d,
+    '02n': icon02n,
+    '03d': icon03d,
+    '03n': icon03d,
+    '04d': icon04d,
+    '04n': icon04n,
+    '09d': icon09d,
+    '10d': icon10d,
+    '10n': icon10n,
+    '11d': icon11d,
+    '13d': icon13d,
+    '50d': icon50d,
+  };
+
+  return iconMap[iconCode]; // ¡REGRESA LA URL DE LA IMAGEN IMPORTADA!
 };
 
 export const getAQIDescription = (status: AirQualityStatus): string => {

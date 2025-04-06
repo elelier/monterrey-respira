@@ -36,7 +36,7 @@ export interface AirQualityData {
     latitude: number;
     longitude: number;
   };
-  weatherIcon?: string;
+  weather_icon?: string;
 }
 
 export type AirQualityStatus =

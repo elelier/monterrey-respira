@@ -18,7 +18,7 @@ import {
   // Considera iconos más específicos si los tienes
 } from 'react-icons/io5';
 import { AirQualityData, AirQualityStatus } from '../types'; // Asegúrate que AirQualityStatus esté exportado
-import { getAQIDescription } from '../utils/airQualityUtils';
+import { getAQIDescription, getWeatherIconUrl } from '../utils/airQualityUtils'; // Importa getWeatherIconUrl {{ edit: 1 }}
 import { useAirQuality } from '../context/AirQualityContext';
 // Importa tu componente Tooltip preferido
 // import Tooltip from './Tooltip'; // Ejemplo
@@ -116,8 +116,7 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
       layout
       className={`rounded-xl shadow-lg overflow-hidden bg-white dark:bg-slate-800 ${className} border ${getStatusStyle('ringColor')}/30`} // Borde sutil del color del estado
     >
-      {/* === SECCIÓN PRINCIPAL (Estado y AQI) === */}
-      <div className={`relative p-5 sm:p-6 bg-gradient-to-br ${getStatusStyle('gradient')} ${getStatusStyle('textColor')}`}>
+      {/* === SECCIÓN PRINCIPAL (Estado y AQI) === */}<div className={`relative p-5 sm:p-6 bg-gradient-to-br ${getStatusStyle('gradient')} ${getStatusStyle('textColor')}`}>
 
         {/* Controles Superiores (Más discretos) */}
         <div className="absolute top-3 right-3 z-10 flex items-center space-x-2">
@@ -139,17 +138,15 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
         </div>
 
         {/* Info Ubicación y Hora */}
-        <div className="mb-4 text-sm opacity-90">
-            <div className="flex items-center gap-1 font-medium">
-                <IoLocationOutline className="w-4 h-4 flex-shrink-0"/>
-                {selectedCity.name}
-            </div>
-            <div className="flex items-center gap-1 text-xs opacity-80 mt-0.5">
+        
+        <div className="mb-4 text-sm opacity-90 flex items-center justify-between">  {/* flex y justify-between para alinear icono y texto {{ edit: 2 }} */}
+            
+
+            <div className="flex items-center gap-1 text-xs opacity-80 mt-0.5 justify-end"> {/* justify-end para alinear a la derecha */}
                 <IoTimeOutline className="w-3 h-3 flex-shrink-0"/>
                 {dateTime}
             </div>
         </div>
-
         {/* Contenido Central: Estado + AQI */}
         <div className="text-center flex flex-col items-center justify-center mb-3">
              {/* 1. Icono y Texto del Estado (Lo más importante) */}
@@ -202,10 +199,11 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
           <div className="grid grid-cols-2 gap-x-4 gap-y-3">
               {/* Temperatura */}
               <DetailItem
-                  icon={<IoThermometerOutline />}
                   label="Temperatura"
                   value={`${data.temperature}°C`}
                   iconColorClass={getStatusStyle('iconColor')}
+                  weatherIcon={data.weather_icon}
+                  useWeatherIconAsMainIcon={true}
               />
               {/* Humedad */}
               <DetailItem
@@ -236,24 +234,58 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
 
 // --- Componente Auxiliar para Detalles ---
 interface DetailItemProps {
-    icon: React.ReactNode;
-    label: string;
-    value: string;
-    iconColorClass: string;
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  iconColorClass: string;
+  weatherIcon?: string;
+  useWeatherIconAsMainIcon?: boolean;
 }
 
-function DetailItem({ icon, label, value, iconColorClass }: DetailItemProps) {
+function DetailItem({ icon, label, value, iconColorClass, weatherIcon, useWeatherIconAsMainIcon }: DetailItemProps) { // Recibimos la nueva prop {{ edit: 5 }}
     return (
         <motion.div
             whileHover={{ scale: 1.03 }}
             className="flex items-center gap-2 p-1.5 rounded transition-colors hover:bg-slate-100 dark:hover:bg-slate-700/50"
         >
-            <div className={`flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full ${iconColorClass} bg-opacity-10 dark:bg-opacity-20 bg-current`}>
-                 {/* Ajusta tamaño icono si es necesario */}
-                 <span className="w-4 h-4">{icon}</span>
-            </div>
+            {/* Condicional para el fondo del círculo */}
+            {!useWeatherIconAsMainIcon ? ( // Si NO se usa el icono del clima como principal, muestra el círculo
+                <div className={`flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full ${iconColorClass} bg-opacity-10 dark:bg-opacity-20 bg-current`}>
+                     {/* Ajusta tamaño icono si es necesario */}
+                     {useWeatherIconAsMainIcon ? ( // Si se usa el icono del clima como principal
+                        weatherIcon && (
+                            <img
+                                src={getWeatherIconUrl(weatherIcon)}
+                                alt="Clima"
+                                className="w-6 h-6" // Tamaño del icono principal
+                            />
+                        )
+                     ) : (
+                         <span className="w-4 h-4">{icon}</span> // Si no, usa el icono original
+                     )}
+                </div>
+            ) : ( // Si SÍ se usa el icono del clima como principal, NO muestra el círculo
+                <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-transparent"> {/* Fondo transparente */}
+                    {weatherIcon && (
+                        <img
+                            src={getWeatherIconUrl(weatherIcon)}
+                            alt="Clima"
+                            className="w-6 h-6" // Tamaño del icono principal
+                        />
+                    )}
+                </div>
+            )}
             <div>
-                <div className="text-xs text-slate-500 dark:text-slate-400 leading-tight">{label}</div>
+                <div className="text-xs text-slate-500 dark:text-slate-400 leading-tight flex items-center gap-1"> {/* Flex para alinear icono y texto */}
+                    {label}
+                    {!useWeatherIconAsMainIcon && weatherIcon && ( // Mostrar icono del clima solo si NO es el principal
+                        <img
+                            src={getWeatherIconUrl(weatherIcon)}
+                            alt="Clima"
+                            className="w-4 h-4 inline-block ml-1" // Ajusta tamaño y margen
+                        />
+                    )}
+                </div>
                 <div className="font-medium text-sm sm:text-base text-slate-700 dark:text-slate-200 leading-tight">{value}</div>
             </div>
         </motion.div>

@@ -101,23 +101,25 @@ export function AirQualityProvider({ children }: AirQualityProviderProps) {
       };
     }
 
-    return {
-      aqi: cityData.aqi_us,
-      status: getAirQualityStatus(cityData.aqi_us),
-      pm25: 0, pm10: 0, o3: 0, no2: 0, so2: 0, co: 0,
-      temperature: cityData.temperature_c,
-      humidity: cityData.humidity_percent,
-      wind: {
-        speed: cityData.wind_speed_ms,
-        direction: cityData.wind_direction_deg,
-      },
-      timestamp: cityData.reading_timestamp,
-      location: {
-        name: cityData.city_name,
-        latitude: cityData.latitude,
-        longitude: cityData.longitude,
-      },
-    };
+
+      return {
+        aqi: cityData.aqi_us,
+        status: getAirQualityStatus(cityData.aqi_us),
+        pm25: 0, pm10: 0, o3: 0, no2: 0, so2: 0, co: 0,
+        temperature: cityData.temperature_c,
+        humidity: cityData.humidity_percent,
+        wind: {
+          speed: cityData.wind_speed_ms,
+          direction: cityData.wind_direction_deg,
+        },
+        timestamp: cityData.reading_timestamp,
+        location: {
+          name: cityData.city_name,
+          latitude: cityData.latitude,
+          longitude: cityData.longitude,
+        },
+        weather_icon: cityData.weather_icon,
+      };
   };
 
 
