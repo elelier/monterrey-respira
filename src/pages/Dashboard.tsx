@@ -67,10 +67,37 @@ export default function Dashboard() {
   };
 
   if (loading && !airQualityData) {
+    // Definir los colores en orden
+    const colors = [
+      'green-500',
+      'amber-500',
+      'orange-500',
+      'red-500',
+      'purple-500',
+      'rose-600',
+      'blue-500'
+    ];
+
     return (
       <Layout>
         <div className="flex flex-col items-center justify-center py-20">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+          <motion.div
+            className="w-28 h-28 border-8 text-4xl animate-spin border-gray-300 flex items-center justify-center rounded-full"
+            animate={{
+              borderColor: colors,
+              color: colors
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "circular",
+              times: [0, 0.2, 0.4, 0.6, 0.8, 1]
+            }}
+          >
+            <svg viewBox="0 0 24 24" height="1em" width="1em" className="animate-ping">
+              <path d="M12.001 4.8c-3.2 0-5.2 1.6-6 4.8 1.2-1.6 2.6-2.2 4.2-1.8.913.228 1.565.89 2.288 1.624C13.666 10.618 15.027 12 18.001 12c3.2 0 5.2-1.6 6-4.8-1.2 1.6-2.6 2.2-4.2 1.8-.913-.228-1.565-.89-2.288-1.624C16.337 6.182 14.976 4.8 12.001 4.8zm-6 7.2c-3.2 0-5.2 1.6-6 4.8 1.2-1.6 2.6-2.2 4.2-1.8.913.228 1.565.89 2.288 1.624 1.177 1.194 2.538 2.576 5.512 2.576 3.2 0 5.2-1.6 6-4.8-1.2 1.6-2.6 2.2-4.2 1.8-.913-.228-1.565-.89-2.288-1.624C10.337 13.382 8.976 12 6.001 12z" fill="currentColor" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </motion.div>
           <p className="mt-4 text-lg">Cargando datos de calidad del aire...</p>
         </div>
       </Layout>

@@ -114,10 +114,36 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
           </div>
           
           <div className="flex items-center gap-2">
-            <div className="px-2 py-0.5 rounded-full flex items-center bg-white/15 text-white backdrop-blur-sm text-xs">
-              <IoPulseOutline className="w-3 h-3 mr-1 text-green-300" />
-              <span>Vivo</span>
-            </div>
+            <motion.div 
+              className="px-2 py-0.5 rounded-full flex items-center bg-white/15 text-white backdrop-blur-sm text-xs"
+              animate={{
+                opacity: [1, 0.5, 1],
+                color: ['#4ADE80', '#FFFFFF', '#4ADE80']
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            >
+              <motion.div 
+                className="w-3 h-3 mr-1"
+                animate={{
+                  scale: [1, 1.1, 1],
+                  color: ['#4ADE80', '#FFFFFF', '#4ADE80']
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
+                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+                  <circle cx="12" cy="12" r="10" />
+                </svg>
+              </motion.div>
+              <span>online</span>
+            </motion.div>
             <motion.button
               whileTap={{ scale: 0.9 }}
               whileHover={{ scale: 1.05 }}
@@ -137,9 +163,20 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="flex items-center gap-2 mb-3 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm"
+            whileHover={{ scale: 1.02 }}
+            className="flex items-center gap-2 mb-3 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm cursor-pointer"
           >
-            {getStatusIcon(data.status)}
+            <motion.div
+              whileHover={{
+                scale: 1.2,
+                transition: {
+                  duration: 0.2
+                }
+              }}
+              className="w-8 h-8 flex items-center justify-center"
+            >
+              {getStatusIcon(data.status)}
+            </motion.div>
             <span className="text-lg font-semibold text-white">
               {getStatusText(data.status)}
             </span>
@@ -148,9 +185,15 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
           <div className="relative flex items-center justify-center mb-2">
             <motion.div
               key={data.aqi}
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 120, damping: 12 }}
+              initial={{ scale: 1 }}
+              animate={{
+                scale: [1, 1.15, 1],
+                transition: {
+                  duration: 6, // 6 segundos para una respiración completa
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }
+              }}
               className="text-7xl font-bold text-white"
               style={{ textShadow: '0px 2px 4px rgba(0,0,0,0.15)' }}
             >
