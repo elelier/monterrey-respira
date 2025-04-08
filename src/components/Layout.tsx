@@ -64,29 +64,91 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen pb-16 md:pb-0">
-  {/* Header - Now sticky and mobile-optimized */}
-  <header className={`sticky top-0 z-30 backdrop-blur-sm border-b border-gray-200 dark:border-slate-700 ${theme ? `bg-gradient-to-r ${theme.gradient}` : 'bg-white/90 dark:bg-slate-900/90'}`}>
-  <div className="container mx-auto py-3 md:py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="flex items-center"
-      >
-        <Link to="/" className="flex items-center group hover:opacity-90 transition-opacity">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center mr-2 sm:mr-3">
-            <img
-              src={getMainLogoIcon()} // ⛰️ ¡Usamos getMainLogoIcon como src!
-              alt="Logo Monterrey Respira" // ✅ ¡Alt text descriptivo!
-              className="w-6 h-6 sm:w-6 sm:h-6" // ✅ ¡Mismas clases de tamaño que el SVG!
-            />
-          </div>
-          <div>
-          <h1 className="text-lg sm:text-2xl font-bold text-white leading-tight">MonterreyRespira</h1>
-          <p className="text-xs sm:text-sm text-slate-200 hidden sm:block">Calidad del Aire en Tiempo Real</p>
-          </div>
-        </Link>
-      </motion.div>
+      {/* Header - Now sticky and mobile-optimized */}
+      <header className={`sticky top-0 z-30 backdrop-blur-sm border-b border-gray-200 dark:border-slate-700 ${theme ? `bg-gradient-to-r ${theme.gradient}` : 'bg-white/90 dark:bg-slate-900/90'}`}>
+        <div className="container mx-auto py-3 md:py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            whileHover={{ 
+              scale: 1.05,
+              transition: { duration: 0.3 }
+            }}
+            whileTap={{ 
+              scale: 1.1,
+              transition: { duration: 0.2 }
+            }}
+            className="flex items-center"
+          >
+            <Link to="/" 
+              className="flex items-center group hover:opacity-90 transition-opacity"
+              onClick={() => {
+                // Efecto de respiración al hacer click
+                const logoElement = document.querySelector('.logo-container');
+                if (logoElement) {
+                  const breathAnimation = {
+                    scale: [1, 1.05, 1],
+                    opacity: [1, 0.95, 1],
+                    transition: {
+                      duration: 4,
+                      repeat: 1,
+                      ease: "easeInOut"
+                    }
+                  };
+                  logoElement.animate(breathAnimation, {
+                    duration: 4000,
+                    fill: "forwards"
+                  });
+                }
+              }}
+            >
+              <motion.div 
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center mr-2 sm:mr-3 logo-container"
+                whileHover={{
+                  scale: 1.1,
+                  transition: { duration: 0.3 }
+                }}
+              >
+                <img
+                  src={getMainLogoIcon()}
+                  alt="Logo Monterrey Respira"
+                  className="w-6 h-6 sm:w-6 sm:h-6"
+                />
+              </motion.div>
+              <div className="logo-container">
+                <h1 className={`text-lg sm:text-2xl font-bold ${theme ? 'text-white' : 'text-black'} leading-tight transition-colors duration-500`}>MonterreyRespira</h1>
+                <p className={`text-xs sm:text-sm ${theme ? 'text-slate-200' : 'text-gray-600'} hidden sm:block transition-colors duration-500`}>Calidad del Aire en Tiempo Real</p>
+              </div>
+            </Link>
+          </motion.div>
+
+          {/* Navegación principal - visible solo en pantallas grandes */}
+          <nav className="hidden md:flex items-center gap-6">
+            <Link 
+              to="/" 
+              className={`px-3 py-2 rounded-md ${location.pathname === '/' ? 'bg-white/20' : 'hover:bg-white/10'} text-white transition-colors`} 
+            >
+              Inicio
+            </Link>
+            <Link 
+              to="/acerca-de" 
+              className={`px-3 py-2 rounded-md ${location.pathname === '/acerca-de' ? 'bg-white/20' : 'hover:bg-white/10'} text-white transition-colors`} 
+            >
+              Acerca de
+            </Link>
+            <Link 
+              to="/datos-y-apis" 
+              className={`px-3 py-2 rounded-md ${location.pathname === '/datos-y-apis' ? 'bg-white/20' : 'hover:bg-white/10'} text-white transition-colors`} 
+            >
+              Datos y APIs
+            </Link>
+            <Link 
+              to="/asociaciones" 
+              className={`px-3 py-2 rounded-md ${location.pathname === '/asociaciones' ? 'bg-white/20' : 'hover:bg-white/10'} text-white transition-colors`} 
+            >
+              Asociaciones
+            </Link>
+          </nav>
 
           <div className="flex items-center gap-2 sm:gap-4">
             {airQualityData && (
@@ -110,7 +172,8 @@ export default function Layout({ children }: LayoutProps) {
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 rounded-md md:hidden focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-            <IoMenuOutline className="w-6 h-6 text-white" />            </button>
+              <IoMenuOutline className="w-6 h-6 text-white" />            
+            </button>
           </div>
         </div>
 
@@ -145,7 +208,7 @@ export default function Layout({ children }: LayoutProps) {
       </main>
 
       <footer className="container mx-auto py-6 md:py-8 px-4 sm:px-6 lg:px-8 text-center text-gray-500 dark:text-gray-400 text-sm">
-        <p className="text-xs sm:text-sm">MonterreyRespira © {new Date().getFullYear()} - Monitoreando la calidad del aire en Monterrey, Nuevo León</p>
+        <p className="text-xs sm:text-sm">MonterreyRespira {new Date().getFullYear()} - Monitoreando la calidad del aire en Monterrey, Nuevo León</p>
         <p className="mt-2 text-xs sm:text-sm hidden md:block">
           <Link
             to="/acerca-de"
@@ -165,7 +228,7 @@ export default function Layout({ children }: LayoutProps) {
             to="/asociaciones"
             className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
           >
-Asociaciones
+            Asociaciones
           </Link>
           {' · '}
           <a

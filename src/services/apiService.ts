@@ -13,17 +13,17 @@ const MONTERREYRESPIRA_API_URL = 'https://81ocg9.buildship.run/latestAirQuality-
 // Solo incluye ciudades que SÍ tienen lat/lon en tu API.
 // Si necesitas la lista COMPLETA de nombres, obténla del resultado de la API en tu componente.
 export const MONTERREY_LOCATIONS_WITH_COORDS = [
-  { city_id: 1, name: 'Santa Catarina', latitude: 25.67325, longitude: -100.45813 },
-  { city_id: 2, name: 'San Pedro Garza Garcia', latitude: 25.65716, longitude: -100.40268 },
-  { city_id: 3, name: 'San Nicolas de los Garza', latitude: 25.74167, longitude: -100.30222 },
-  { city_id: 4, name: 'Parque Industrial Ciudad Mitras', latitude: 25.78861, longitude: -100.44778 },
   { city_id: 5, name: 'Monterrey', latitude: 25.67507, longitude: -100.31847 },
-//  { city_id: 7, name: 'Guadalupe', latitude: 25.67678, longitude: -100.25646 },
+  { city_id: 2, name: 'San Pedro Garza Garcia', latitude: 25.65716, longitude: -100.40268 },
+  { city_id: 12, name: 'Ciudad Apodaca', latitude: 25.79002, longitude: -100.18639 },
+  { city_id: 7, name: 'Guadalupe', latitude: 25.67678, longitude: -100.25646 },
   { city_id: 8, name: 'General Escobedo', latitude: 25.800555555556, longitude: -100.34444444444 },
+  { city_id: 3, name: 'San Nicolas de los Garza', latitude: 25.74167, longitude: -100.30222 },
+  { city_id: 1, name: 'Santa Catarina', latitude: 25.67325, longitude: -100.45813 },
+  { city_id: 4, name: 'Parque Industrial Ciudad Mitras', latitude: 25.78861, longitude: -100.44778 },
   { city_id: 9, name: 'Garcia', latitude: 25.783333333333, longitude: -100.58583333333 },
   { city_id: 10, name: 'Cuidad Benito Juarez', latitude: 25.64724, longitude: -100.09582 },
   { city_id: 11, name: 'Ciudad de Allende', latitude: 25.27673, longitude: -100.01442 },
-  { city_id: 12, name: 'Ciudad Apodaca', latitude: 25.79002, longitude: -100.18639 },
   { city_id: 13, name: 'Cadereyta Jimenez', latitude: 25.58896, longitude: -100.00156 },
 ];
 
