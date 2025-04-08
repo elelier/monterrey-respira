@@ -1,4 +1,5 @@
 import { AirQualityStatus, AirQualityTheme, RecommendationInfo } from '../types';
+import icon01d from '../assets/weather-icons/01d.png'; // ✅ ¡ASEGÚRATE DE QUE ESTOS IMPORTS ESTÉN AQUÍ TAMBIÉN!
 import icon01n from '../assets/weather-icons/01n.png'; // ✅ ¡ASEGÚRATE DE QUE ESTOS IMPORTS ESTÉN AQUÍ TAMBIÉN!
 import icon02d from '../assets/weather-icons/02d.png';
 import icon02n from '../assets/weather-icons/02n.png';
@@ -250,7 +251,8 @@ export const getWeatherIconUrl = (iconCode: string | undefined): string | undefi
 
   // ¡AQUÍ VAMOS A "MAPPING" LOS ICON CODES A LAS VARIABLES QUE IMPORTAMOS!
   const iconMap: Record<string, any> = { // 👈 ¡CAMBIA Record<string, string> A Record<string, any>!
-    '01n': icon01n, // ✅ ¡AHORA SÍ, USAMOS LAS VARIABLES IMPORTADAS!
+    '01d': icon01d,
+    '01n': icon01n,
     '02d': icon02d,
     '02n': icon02n,
     '03d': icon03d,

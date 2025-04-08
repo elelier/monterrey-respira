@@ -1,8 +1,8 @@
 # Arquitectura de MonterreyRespira
 
-## Visión General del Sistema
+## Visión General
 
-MonterreyRespira es una aplicación web moderna que proporciona información en tiempo real sobre la calidad del aire en Monterrey. La arquitectura está diseñada para ser escalable, mantenible y accesible, siguiendo principios de desarrollo web moderno.
+MonterreyRespira es una aplicación web moderna que proporciona información en tiempo real sobre la calidad del aire en Monterrey y su área metropolitana. La arquitectura está diseñada para ser escalable, mantenible y accesible, siguiendo principios de desarrollo web moderno.
 
 ### Arquitectura General
 
@@ -103,11 +103,7 @@ monterrey-respira/
         *   useState para componentes
         *   useEffect para efectos secundarios
         *   useReducer para lógica compleja
-    *   **Optimización:**
-        *   React.memo para componentes
-        *   useCallback para callbacks
-        *   useMemo para cálculos
-        *   Lazy loading para componentes pesados
+        *   Optimización: React.memo para componentes, useCallback para callbacks, useMemo para cálculos, Lazy loading para componentes pesados
 
 *   **Rendimiento y Optimización**
     *   **Caché:**
@@ -137,49 +133,26 @@ monterrey-respira/
         *   Soporte para daltónicos
         *   Tamaño de texto ajustable
 
-### Navegación y Rutas
+### Sistema de Caché y Estado
 
-*   **Rutas Principales:**
-    *   `/` - Dashboard
-    *   `/datos` - Datos y APIs
-    *   `/acerca` - Acerca de
-    *   `/asociaciones` - Asociaciones
-*   **Navegación:**
-    *   Barra de navegación persistente
-    *   Enlaces entre páginas
-    *   Transiciones animadas
-    *   Estado de navegación persistente
+*   **Gestión de Estado Global**
+    *   **AirQualityContext:**
+        *   Datos de calidad del aire
+        *   Estado de selección de ciudad
+        *   Preferencias de usuario
+        *   Configuraciones de visualización
 
-### Componentes Principales
-
-*   **Visualización de Datos**
-    *   **AirQualityCard:**
-        *   Métricas principales
-        *   Indicadores de tendencia
-        *   Estado actual
-        *   Recomendaciones
-    *   **PollutantsChart:**
-        *   Gráficos interactivos
-        *   Datos históricos
-        *   Comparación temporal
-        *   Exportación de datos
-    *   **AirQualityMap:**
-        *   Visualización geoespacial
-        *   Capas de datos
-        *   Zoom y navegación
-        *   Marcadores interactivos
-
-*   **Interfaz de Usuario**
-    *   **Header:**
-        *   Navegación principal
-        *   Estado de conexión
-        *   Tematización dinámica
-        *   Accesibilidad
-    *   **Footer:**
-        *   Enlaces importantes
-        *   Información legal
-        *   Contacto
-        *   Redes sociales
+*   **Sistema de Caché**
+    *   **Caché Local (localStorage):**
+        *   Clave: 'airQualityDataCache'
+        *   Tiempo de expiración: 1 hora
+        *   Timestamp de actualización
+        *   Datos de última lectura
+    *   **Estrategia de Caché:**
+        *   Verificación automática al iniciar
+        *   Actualización automática al expirar
+        *   Almacenamiento de datos frescos
+        *   Manejo de datos expirados
 
 ### Sistema de Temas y Animaciones
 
@@ -248,26 +221,7 @@ monterrey-respira/
         *   Optimización de recursos
         *   Priorización de animaciones
 
-### Sistema de Caché y Estado
 
-*   **Gestión de Estado Global**
-    *   **AirQualityContext:**
-        *   Datos de calidad del aire
-        *   Estado de selección de ciudad
-        *   Preferencias de usuario
-        *   Configuraciones de visualización
-
-*   **Sistema de Caché**
-    *   **Caché Local (localStorage):**
-        *   Clave: 'airQualityDataCache'
-        *   Tiempo de expiración: 1 hora
-        *   Timestamp de actualización
-        *   Datos de última lectura
-    *   **Estrategia de Caché:**
-        *   Verificación automática al iniciar
-        *   Actualización automática al expirar
-        *   Almacenamiento de datos frescos
-        *   Manejo de datos expirados
 
 ### Sistema de Optimización de Rendimiento
 
