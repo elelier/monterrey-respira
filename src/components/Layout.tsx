@@ -4,6 +4,8 @@ import { useAirQuality } from '../context/AirQualityContext';
 import { getMainLogoIcon } from '../utils/airQualityUtils';
 import { Link, useLocation } from 'react-router-dom';
 import { IoHomeOutline, IoInformationCircleOutline, IoLayersOutline, IoLinkOutline, IoMenuOutline } from 'react-icons/io5';
+import { Metadata } from './seo/Metadata';
+import { Analytics } from './seo/Analytics';
 
 interface LayoutProps {
   children: ReactNode;
@@ -63,6 +65,18 @@ export default function Layout({ children }: LayoutProps) {
   };
 
   return (
+    <>
+      <Metadata
+        title="MonterreyRespira - Calidad del Aire en Monterrey"
+        description="Monitoreo en tiempo real de la calidad del aire en Monterrey y su área metropolitana"
+        keywords="calidad del aire, contaminación, Monterrey, ambiente, monitoreo"
+      />
+      <Analytics trackingId={import.meta.env.VITE_GOOGLE_ANALYTICS_ID} />
+      
+      <div className="min-h-screen pb-16 md:pb-0">
+        {/* Resto del código igual */}
+      </div>
+    </>,
     <div className="min-h-screen pb-16 md:pb-0">
       {/* Header - Now sticky and mobile-optimized */}
       <header className={`sticky top-0 z-30 backdrop-blur-sm border-b border-gray-200 dark:border-slate-700 ${theme ? `bg-gradient-to-r ${theme.gradient}` : 'bg-white/90 dark:bg-slate-900/90'}`}>
