@@ -149,7 +149,7 @@ export default function Recommendations({ status, className = '' }: Recommendati
                 ? statusClasses.activeTab
                 : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
             }`}
-            onClick={() => toggleSection('health')}
+                onClick={() => toggleSection('health')}
             aria-expanded={expandedSection === 'health'}
           >
             <span className="flex items-center">

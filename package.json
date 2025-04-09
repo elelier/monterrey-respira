@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@rollup/plugin-node-resolve": "^16.0.1",
+    "@supabase/supabase-js": "^2.49.4",
     "axios": "^1.8.4",
     "chart.js": "^4.4.8",
     "framer-motion": "^12.5.0",

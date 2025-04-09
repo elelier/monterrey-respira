@@ -103,7 +103,7 @@ export default function Dashboard() {
   return (
     <Layout>
       {/* Selector de ciudad */}
-      <div className="mb-6">
+      <div className="mb-6 sticky top-0 z-10 bg-white py-2">
         <CitySelector onCityChange={changeCity} />
       </div>
 

@@ -1,17 +1,20 @@
-import axios from 'axios';
-// Asegúrate que la ruta a tus tipos sea correcta
+import { createClient } from '@supabase/supabase-js';
 import { CityAirQuality, HistoricalData } from '../types';
-// Asegúrate que la ruta a tus utilidades sea correcta (si se usa getAirQualityStatus fuera de este archivo)
-// import { getAirQualityStatus } from '../utils/airQualityUtils';
 
-// URL de la API de MonterreyRespira (Buildship) desde variables de entorno
-// ACTUALIZADO: URL de la API de Buildship
-const MONTERREYRESPIRA_API_URL = 'https://81ocg9.buildship.run/latestAirQuality-bc7943d5c68b';
+// --- CONFIGURACIÓN DE SUPABASE ---
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL; // ¡Usa variables de entorno!
+const SUPABASE_SERVICE_ROLE_KEY = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
 
-// --- ACTUALIZADO: Lista de locaciones basada en DATOS REALES CON COORDENADAS ---
-// Esta lista es útil para selectores de UI o vistas de mapa iniciales.
-// Solo incluye ciudades que SÍ tienen lat/lon en tu API.
-// Si necesitas la lista COMPLETA de nombres, obténla del resultado de la API en tu componente.
+// Verifica que las variables de entorno estén configuradas
+if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+    console.error("Error: Las variables de entorno de Supabase no están configuradas.");
+    throw new Error("La configuración de Supabase no está completa.");
+}
+
+// Crea el cliente de Supabase
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+// ---  LISTA DE LOCACIONES (SIN CAMBIOS - CONSTANTE) ---
 export const MONTERREY_LOCATIONS_WITH_COORDS = [
   { city_id: 5, name: 'Monterrey', latitude: 25.67507, longitude: -100.31847 },
   { city_id: 2, name: 'San Pedro Garza Garcia', latitude: 25.65716, longitude: -100.40268 },
@@ -27,30 +30,30 @@ export const MONTERREY_LOCATIONS_WITH_COORDS = [
   { city_id: 13, name: 'Cadereyta Jimenez', latitude: 25.58896, longitude: -100.00156 },
 ];
 
+// --- NUEVA FUNCIÓN PARA CONSULTAR DATOS DESDE SUPABASE (DIRECTO) ---
 export const fetchLatestMonterreyAirQuality = async (): Promise<CityAirQuality[]> => {
-  if (!MONTERREYRESPIRA_API_URL) {
-    console.error("Error: La variable de entorno VITE_MONTERREYRESPIRA_API_URL no está configurada.");
-    throw new Error("La configuración de la API no está completa.");
-  }
-  try {
-    // console.log(`Fetching data from: ${MONTERREYRESPIRA_API_URL}`);
-    const response = await axios.get<CityAirQuality[]>(MONTERREYRESPIRA_API_URL, { timeout: 15000 });
-    if (!Array.isArray(response.data)) {
-      console.error("Respuesta inesperada de la API:", response.data);
-      throw new Error("La respuesta de la API no tiene el formato esperado (no es un array).");
+    try {
+        // Llama a la función RPC de Supabase (mismo nombre de función)
+        const { data, error } = await supabase
+            .rpc('get_latest_air_quality_per_city'); // 👈  Nombre de tu función en Supabase
+
+        if (error) {
+            console.error("Error al consultar función de Supabase:", error);
+            throw new Error(`Error al obtener datos de Supabase: ${error.message}`);
+        }
+
+        if (!Array.isArray(data)) {
+            console.error("Respuesta inesperada de la función de Supabase:", data);
+            throw new Error("La respuesta de Supabase no tiene el formato esperado (no es un array).");
+        }
+
+        return data as CityAirQuality[]; // Castea el tipo de dato
+    } catch (error: any) {
+        let errorMessage = "Error al obtener los datos de calidad del aire desde Supabase.";
+        if (error instanceof Error) { errorMessage = error.message; }
+        console.error("Detalle del error en fetchLatestMonterreyAirQuality (Supabase):", error);
+        throw new Error(errorMessage);
     }
-    // console.log(`Data received successfully: ${response.data.length} cities.`);
-    return response.data;
-  } catch (error: any) {
-    let errorMessage = "Error al obtener los datos de calidad del aire.";
-    if (axios.isAxiosError(error)) {
-        errorMessage = `Error de red o servidor: ${error.message}`;
-        if (error.response) { errorMessage += ` (Status: ${error.response.status})`; }
-        else if (error.request) { errorMessage += " No se recibió respuesta del servidor."; }
-    } else if (error instanceof Error) { errorMessage = error.message; }
-    console.error("Detalle del error en fetchLatestMonterreyAirQuality:", error);
-    throw new Error(errorMessage);
-  }
 };
 
 // --- DATOS HISTÓRICOS (Simulados - sin cambios) ---
