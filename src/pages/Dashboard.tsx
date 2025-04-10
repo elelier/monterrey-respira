@@ -130,7 +130,7 @@ export default function Dashboard() {
   return (
     <Layout>
       {/* Selector de ciudad */}
-      <div className="mb-6 sticky top-0 z-10 bg-white py-2">
+      <div className="mb-5 sticky top-[84px] z-10 bg-white py-0">
         <CitySelector onCityChange={changeCity} />
       </div>
 
@@ -141,7 +141,7 @@ export default function Dashboard() {
           <AirQualityCard data={airQualityData} />
           {/* Recomendaciones basadas en la calidad del aire */}
           <Recommendations status={airQualityData.status} />
-
+          
 
         </div>
 
