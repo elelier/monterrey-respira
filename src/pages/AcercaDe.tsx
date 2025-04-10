@@ -53,23 +53,7 @@ export default function AcercaDe() {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden">
-            <div className="p-6">
-              <h2 className="text-xl font-semibold mb-4 text-amber-700 dark:text-amber-400">Colaboración</h2>
-              <p className="text-gray-700 dark:text-gray-300 mb-4">
-                Creemos en el poder de la colaboración para enfrentar los retos ambientales. Por eso, trabajamos con diversas asociaciones y organizaciones dedicadas a mejorar la calidad del aire en nuestra ciudad.
-              </p>
-              <p className="text-gray-700 dark:text-gray-300 mb-6">
-                Te invitamos a conocer estas organizaciones y a sumarte a sus esfuerzos para crear un Monterrey con aire más limpio.
-              </p>
-              <Link
-                to="/asociaciones"
-                className="inline-flex items-center px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-md transition-colors"
-              >
-                Conoce nuestras asociaciones aliadas
-              </Link>
-            </div>
-          </div>
+
           <div className="mt-4 text-center">
             <a
               href="https://github.com/elelier/monterrey-respira"
@@ -79,17 +63,6 @@ export default function AcercaDe() {
             >
               <IoLogoGithub className="mr-2 text-xl" />
               ¡Contribuye en GitHub!
-            </a>
-          </div>
-          <div className="mt-4 text-center">
-            <a
-              href="https://ko-fi.com/Y8Y11CCJPV"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center px-6 py-3 text-white bg-amber-500 hover:bg-amber-600 rounded-md shadow-md transition-colors duration-300 ease-in-out"
-            >
-              <img src="https://ko-fi.com/img/cup-border.png" className="mr-2 h-6 w-6 object-contain" alt="Ko-fi" />
-              ¡Apoya el proyecto con un cafecito!
             </a>
           </div>
         </motion.div>

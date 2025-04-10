@@ -251,11 +251,24 @@ export default function Layout({ children }: LayoutProps) {
             rel="noopener noreferrer"
             className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
           >
-            ¡Apoya el proyecto con un cafecito!
           </a>
         </p>
-        <p className="mt-2 text-xs sm:text-sm">Desarrollado con <span aria-label="corazón" role="img">❤️< /span> por <a href="https://www.elelier.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">elelier</a></p>
+        <p className="mt-2 text-xs sm:text-sm">
+          <div className="flex justify-center items-center gap-2">
+            <a
+              href="https://ko-fi.com/Y8Y11CCJPV"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-3 py-1.5 text-sm text-white bg-amber-400 hover:bg-amber-500 rounded-md shadow-sm transition-colors duration-200 ease-in-out"
+            >
+              <img src="https://ko-fi.com/img/cup-border.png" className="mr-1 h-4 w-4 object-contain" alt="Ko-fi" />
+              <span className="text-xs">¡Apoya con un Cafecito!</span>
+            </a>
+          </div>
+          Desarrollado con <span aria-label="corazón" role="img">❤️</span> por <a href="https://www.elelier.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">elelier</a>
+        </p>
       </footer>
+
 
       {/* Mobile bottom navigation */}
       <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-700 md:hidden z-40">

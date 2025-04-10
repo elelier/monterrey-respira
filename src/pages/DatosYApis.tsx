@@ -1,6 +1,7 @@
 import Layout from '../components/Layout';
 import { motion } from 'framer-motion';
 import { useAirQuality } from '../context/AirQualityContext';
+import { IoLogoGithub } from 'react-icons/io5';
 
 export default function DatosYApis() {
   const { theme } = useAirQuality();
@@ -88,7 +89,7 @@ export default function DatosYApis() {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden">
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden mb-8">
             <div className="p-6">
               <h2 className="text-xl font-semibold mb-4 text-amber-700 dark:text-amber-400">Notas Importantes</h2>
               <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg text-amber-800 dark:text-amber-200 mb-4">
@@ -102,6 +103,74 @@ export default function DatosYApis() {
                 <p className="text-sm">
                   Todos los datos presentados en MonterreyRespira son de carácter informativo y educativo. Para decisiones críticas relacionadas con la salud, recomendamos consultar fuentes oficiales y profesionales de la salud.
                 </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden mb-8">
+            <div className="p-6">
+              <h2 className="text-xl font-semibold mb-4 text-amber-700 dark:text-amber-400">Repositorios y Estructura Técnica</h2>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                El proyecto MonterreyRespira está desarrollado de manera abierta y colaborativa, dividido en dos repositorios principales:
+              </p>
+
+              <div className="space-y-6 mt-6">
+                <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-2">Pipeline de Datos</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                    Repositorio que contiene el código del pipeline de datos y procesamiento:
+                  </p>
+                  <a href="https://github.com/elelier/airquality_pipeline" target="_blank" rel="noopener noreferrer" className={`mt-2 inline-block text-sm font-medium ${getThemeTextColor()}`}>
+                    airquality_pipeline →
+                  </a>
+                  <ul className="text-sm space-y-1 text-gray-600 dark:text-gray-300 list-disc pl-5 mt-2">
+                    <li>Integración con APIs de datos</li>
+                    <li>Procesamiento y validación</li>
+                    <li>Base de datos Supabase</li>
+                    <li>Automatización con GitHub Actions</li>
+                  </ul>
+                </div>
+
+                <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-2">Webapp Frontend</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                    Repositorio que contiene la aplicación web:
+                  </p>
+                  <a href="https://github.com/elelier/monterrey-respira" target="_blank" rel="noopener noreferrer" className={`mt-2 inline-block text-sm font-medium ${getThemeTextColor()}`}>
+                    monterrey-respira →
+                  </a>
+                  <ul className="text-sm space-y-1 text-gray-600 dark:text-gray-300 list-disc pl-5 mt-2">
+                    <li>Interfaz de usuario</li>
+                    <li>Visualización de datos</li>
+                    <li>Alertas y notificaciones</li>
+                    <li>Documentación técnica</li>
+                  </ul>
+                </div>
+
+                <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-2">Estructura General</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                    Ambos repositorios trabajan en conjunto para proporcionar una solución completa:
+                  </p>
+                  <ul className="text-sm space-y-1 text-gray-600 dark:text-gray-300 list-disc pl-5 mt-2">
+                    <li>Separación clara de responsabilidades</li>
+                    <li>Desarrollo independiente</li>
+                    <li>Integración continua</li>
+                    <li>Mantenimiento modular</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="mt-4 text-center">
+                <a
+                  href="https://github.com/elelier/monterrey-respira"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-6 py-3 text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow-md transition-colors duration-300 ease-in-out"
+                >
+                  <IoLogoGithub className="mr-2 text-xl" />
+                  ¡Contribuye en GitHub!
+                </a>
               </div>
             </div>
           </div>
