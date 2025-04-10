@@ -2,18 +2,18 @@ import { useAirQuality } from '../context/AirQualityContext';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import AirQualityCard from '../components/AirQualityCard';
-import PollutantsChart from '../components/PollutantsChart';
+//import PollutantsChart from '../components/PollutantsChart';
 import Recommendations from '../components/Recommendations';
-import HistoricalChart from '../components/HistoricalChart';
-import PollutantsInfo from '../components/PollutantsInfo';
+//import HistoricalChart from '../components/HistoricalChart';
+//import PollutantsInfo from '../components/PollutantsInfo';
 import CitySelector from '../components/CitySelector';
-import StationMap from '../components/StationMap';
-import AirQualityHeatmap from '../components/AirQualityHeatmap';
-import PollutantConcentrationMap from '../components/PollutantConcentrationMap';
-import CityMapPlaceholder from '../components/CityMapPlaceholder';
+//import StationMap from '../components/StationMap';
+//import AirQualityHeatmap from '../components/AirQualityHeatmap';
+//import PollutantConcentrationMap from '../components/PollutantConcentrationMap';
+//import CityMapPlaceholder from '../components/CityMapPlaceholder';
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { IoArrowForwardOutline, IoEarthOutline, IoLeafOutline, IoHelpBuoyOutline, IoMapOutline, IoStatsChartOutline, IoFilterOutline } from 'react-icons/io5';
+import { motion } from 'framer-motion';
+import { IoArrowForwardOutline, IoEarthOutline, IoLeafOutline, IoHelpBuoyOutline } from 'react-icons/io5';
 
 export default function Dashboard() {
   const { airQualityData, loading, error, refreshData, selectedCity, changeCity, theme } = useAirQuality();
