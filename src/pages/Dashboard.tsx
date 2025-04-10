@@ -130,8 +130,8 @@ export default function Dashboard() {
   return (
     <Layout>
       {/* Selector de ciudad */}
-      <div className="mb-5 sticky top-[84px] z-10 bg-white py-0">
-        <CitySelector onCityChange={changeCity} />
+      <div className="relative mb-5 sticky top-[65px] z-10 py-5">
+      <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-white/70 to-transparent backdrop-blur-md z-[-1] pointer-events-none" />      <CitySelector onCityChange={changeCity} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
