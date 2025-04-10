@@ -11,7 +11,6 @@ MonterreyRespira es una aplicación web que proporciona información en tiempo r
 - 📈 Gráficos históricos de contaminantes
 - 🔍 Información detallada sobre contaminantes y sus efectos en la salud
 - 📱 Diseño responsive optimizado para dispositivos móviles
-- 🌙 Modo oscuro/claro adaptativo
 - 🌡️ Sistema de alertas basado en la calidad del aire actual
 
 ## 🛠️ Tecnologías
