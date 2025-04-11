@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useAirQuality } from '../context/AirQualityContext';
 import { getMainLogoIcon } from '../utils/airQualityUtils';
 import { Link, useLocation } from 'react-router-dom';
-import { IoHomeOutline, IoInformationCircleOutline, IoLayersOutline, IoLinkOutline, IoMenuOutline } from 'react-icons/io5';
+import { IoHomeOutline, IoInformationCircleOutline, IoLayersOutline, IoLinkOutline, IoMenuOutline, IoShareOutline } from 'react-icons/io5';
 import { Metadata } from './seo/Metadata';
 import { Analytics } from './seo/Analytics';
 
@@ -15,6 +15,17 @@ export default function Layout({ children }: LayoutProps) {
   const { theme, airQualityData } = useAirQuality();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+
+  // Obtener la ciudad actual para el título
+  const currentCity = 'Monterrey';
+
+  // Obtener la imagen de compartición basada en la calidad del aire
+  const getShareImage = () => {
+    if (!theme) return '/images/seo/share-image.png';
+    
+    // Crear un nombre de archivo único basado en la calidad del aire
+    return `/images/seo/share-image-${theme.primary.replace('#', '')}.png`;
+  };
 
   // Aplicar el tema dinámico al body
   useEffect(() => {
@@ -67,9 +78,11 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <>
       <Metadata
-        title="MonterreyRespira - Calidad del Aire en Monterrey"
-        description="Monitoreo en tiempo real de la calidad del aire en Monterrey y su área metropolitana"
-        keywords="calidad del aire, contaminación, Monterrey, ambiente, monitoreo"
+        title={`MonterreyRespira - Calidad del Aire en ${currentCity}`}
+        description={`Monitoreo en tiempo real de la calidad del aire en ${currentCity} y su área metropolitana. Conozca los niveles de contaminantes y obtenga recomendaciones para proteger su salud.`}
+        keywords={`calidad del aire, contaminación, ${currentCity}, ambiente, monitoreo, salud`}
+        image={getShareImage()}
+        type="website"
       />
       <Analytics trackingId={import.meta.env.VITE_GOOGLE_ANALYTICS_ID} />
       
@@ -130,8 +143,8 @@ export default function Layout({ children }: LayoutProps) {
                 />
               </motion.div>
               <div className="logo-container">
-                <h1 className={`text-lg sm:text-2xl font-bold ${theme ? 'text-white' : 'text-black'} leading-tight transition-colors duration-500`}>MonterreyRespira</h1>
-                <p className={`text-xs sm:text-sm ${theme ? 'text-slate-200' : 'text-gray-600'} hidden sm:block transition-colors duration-500`}>Calidad del Aire en Tiempo Real</p>
+                <h1 className={`${theme ? 'text-white' : 'text-black'} text-lg sm:text-2xl font-bold leading-tight transition-colors duration-500`}>MonterreyRespira</h1>
+                <span className={`${theme ? 'text-slate-200' : 'text-gray-600'} text-xs sm:text-sm hidden sm:block transition-colors duration-500`}>Calidad del Aire en Tiempo Real</span>
               </div>
             </Link>
           </motion.div>
@@ -181,6 +194,30 @@ export default function Layout({ children }: LayoutProps) {
                 </span>
               </motion.div>
             )}
+
+            {/* Botón de compartir */}
+            <button
+              onClick={() => {
+                if (navigator.share) {
+                  navigator.share({
+                    title: `MonterreyRespira - Calidad del Aire en ${currentCity}`,
+                    text: `Monitoreo en tiempo real de la calidad del aire en ${currentCity}. Conozca los niveles de contaminantes y obtenga recomendaciones para proteger su salud.`,
+                    url: window.location.href
+                  })
+                  .catch(console.error);
+                } else {
+                  // Copiar URL al portapapeles como alternativa
+                  navigator.clipboard.writeText(window.location.href)
+                    .then(() => {
+                      alert('URL copiada al portapapeles');
+                    })
+                    .catch(console.error);
+                }
+              }}
+              className={`p-2 rounded-md ${theme ? 'hover:bg-white/20' : 'hover:bg-gray-100'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors`}
+            >
+              <IoShareOutline className={`w-5 h-5 ${theme ? 'text-white' : 'text-gray-600'}`} />
+            </button>
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
