@@ -48,7 +48,7 @@ export function getAirQualityStatus(aqi: number): AirQualityStatus {
 
 export function getHumidityIcon(humidity: number): string {
   if (humidity < 40) {
-    return icondry;
+    return iconmidhum;
   } else if (humidity >= 40 && humidity <= 70) {
     return iconmidhum;
   } else {
