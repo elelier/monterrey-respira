@@ -1,101 +1,57 @@
-# Roadmap de MonterreyRespira
+Aquí tienes el contenido listo para reemplazar tu archivo docs/roadmap.md, reflejando fielmente el estado actual del proyecto tras 3 semanas, el avance real y los siguientes pasos recomendados. El formato es claro y profesional, siguiendo el estilo de tu documentación.
 
-Este documento presenta la visión a futuro y las funcionalidades planificadas para MonterreyRespira, organizadas por fases de desarrollo. Nuestra infraestructura se basa en un frontend React desplegado en Netlify y un backend serverless (Buildship + Supabase) para la gestión y provisión de datos.
+Roadmap de MonterreyRespira (Actualizado - Semana 3)
+Este roadmap refleja el estado actual del proyecto tras 3 semanas de desarrollo, con una separación clara entre lo ya integrado y las siguientes prioridades sugeridas.
 
-## Fase 1: Fundación Backend y Mejoras a corto plazo (1-3 meses)
-
-### 1.1 Implementación de Backend de Datos (Buildship + Supabase)
-*   **Objetivo:** Crear una capa intermedia para gestionar APIs externas, mejorar rendimiento y controlar el flujo de datos.
-*   [ ] **Configurar Infraestructura Base:**
-    *   [ ] Crear y configurar proyecto en Supabase (Base de Datos PostgreSQL).
-    *   [ ] Definir y crear esquema inicial de DB para lecturas de calidad del aire.
-    *   [ ] Configurar proyecto en Buildship y conectar a Supabase.
-*   [ ] **Desarrollar Recolección de Datos (Workflow Cron):**
-    *   [ ] Crear workflow programado en Buildship para ejecución periódica (ej. cada 30-60 mins).
-    *   [ ] Implementar llamadas a APIs externas iniciales (ej. OpenAQ, IQAir) dentro del workflow.
-    *   [ ] Añadir lógica de procesamiento/transformación de datos en Buildship.
-    *   [ ] Implementar escritura de datos unificados en la base de datos Supabase.
-*   [ ] **Crear API Propia (Endpoints Buildship):**
-    *   [ ] Desarrollar endpoint API inicial (ej. `/api/latest_readings`) en Buildship para consultar datos desde Supabase.
-    *   [ ] Desarrollar endpoint API para datos históricos básicos (ej. `/api/historical?station_id=X`).
-*   [ ] **Integración Frontend:**
-    *   [ ] Modificar la aplicación React para consumir datos desde los nuevos endpoints de Buildship en lugar de las APIs externas directamente.
-*   [ ] **Mejorar estrategia de manejo de errores de APIs:** (Implementar dentro de los workflows de Buildship).
-
-### 1.2 Optimización de Rendimiento (Apoyado por Backend)
-*   [ ] Implementar lazy loading para componentes pesados (Frontend).
-*   [ ] Optimizar renderizado de mapas (Frontend).
-*   [ ] **Mejorar manejo de caché de datos:**
-    *   [ ] (Backend) Servir datos pre-procesados y cacheados implícitamente desde Supabase.
-    *   [ ] (Frontend) Evaluar e implementar caché adicional en el cliente si es necesario.
-
-### 1.3 Expansión de APIs (Vía Backend)
-*   [ ] **Integrar datos de SIMA (Sistema Integral de Monitoreo Ambiental):** (Añadir como fuente al workflow de recolección en Buildship cuando esté disponible).
-
-### 1.4 Experiencia de Usuario
-*   [ ] Añadir modo para personas daltónicas.
-*   [ ] Implementar preferencias de usuario persistentes (Podría requerir Supabase Auth más adelante).
-*   [ ] Mejorar accesibilidad general (WCAG 2.1 AA).
-
-## Fase 2: Funcionalidades a mediano plazo (4-6 meses)
-
-### 2.1 Sistema de Alertas
-*   *(Dependencia: Backend Buildship/Supabase establecido. Puede requerir Supabase Auth)*
-*   [ ] Implementar sistema de notificaciones push (requerirá lógica adicional, quizás Supabase Edge Functions o similar).
-*   [ ] Añadir alertas por correo electrónico.
-*   [ ] Crear configuración de umbral personalizado para alertas.
-
-### 2.2 Visualización Avanzada
-*   *(Dependencia: Datos históricos acumulándose en Supabase DB)*
-*   [ ] Implementar mapa de calor para visualizar contaminación por zonas (requerirá procesar datos agregados desde Supabase).
-*   [ ] Añadir gráficos comparativos entre ciudades (si se añaden datos de otras ciudades al backend).
-*   [ ] Desarrollar vista de pronóstico de calidad del aire (requerirá integración de modelos o fuentes de pronóstico en el backend).
-
-### 2.3 Participación Ciudadana
-*   [ ] Implementar sistema de reportes ciudadanos (podría usar Supabase para almacenar reportes).
-*   [ ] Añadir sección para compartir en redes sociales.
-*   [ ] Crear galería de imágenes de la ciudad con diferentes niveles de contaminación.
-
-## Fase 3: Visión a largo plazo (7-12 meses)
-
-### 3.1 Plataforma Educativa
-*   [ ] Desarrollar sección de educación ambiental.
-*   [ ] Crear módulo de gamificación para incentivar acciones positivas.
-*   [ ] Implementar calculadora de huella de carbono personal.
-
-### 3.2 Análisis Predictivo
-*   *(Dependencia: Volumen significativo de datos históricos en Supabase DB)*
-*   [ ] Integrar modelos de predicción de calidad del aire (podrían ejecutarse como tareas programadas o funciones serverless consultando Supabase).
-*   [ ] Desarrollar alertas preventivas basadas en patrones y meteorología.
-*   [ ] Visualizar tendencias y patrones a largo plazo.
-
-### 3.3 Expansión Regional
-*   [ ] Expandir la aplicación a otras ciudades de México (requerirá escalar la recolección de datos en el backend).
-*   [ ] Implementar comparativas entre regiones.
-*   [ ] Crear índice de ciudades por calidad del aire.
-
-## Consideraciones Técnicas
-
-### Infraestructura
-*   **Arquitectura Serverless:** Backend (Buildship + Supabase), Frontend (React en Netlify).
-*   **Base de Datos:** Supabase (PostgreSQL) para almacenamiento persistente de datos de calidad del aire.
-*   Implementación de CDN para recursos estáticos (Netlify lo maneja por defecto).
-*   Optimización para dispositivos móviles (PWA).
-
-### Seguridad
-*   Implementar autenticación (ej. Supabase Auth) para funcionalidades avanzadas (preferencias, alertas personalizadas, reportes).
-*   Añadir cifrado de datos sensibles.
-*   Realizar auditorías de seguridad periódicas.
-*   Gestionar API Keys externas de forma segura (usando Buildship Secrets).
-
-## Métricas de Éxito
-*(Sin cambios)*
-- Tiempo de carga < 2 segundos
-- Cobertura de testing > 80%
-- Disponibilidad > 99.9%
-- Crecimiento de usuarios activos > 15% mensual
-- Reducción de rebote < 30%
-
-## Despliegue
-*   **Frontend:** React App desplegado en Netlify. `netlify.toml` configurado.
-*   **Backend:** Workflows y API Endpoints desplegados en Buildship. Base de datos alojada en Supabase. *(Infraestructuras separadas)*
+1. Avance Actual (Semana 3)
+Backend & Pipeline de Datos
+[x] Configuración y despliegue de Supabase como base de datos principal (PostgreSQL).
+[x] Esquema de tablas cities y air_quality_readings creado y documentado.
+[x] Seguridad: RLS habilitado, uso de service_role para el pipeline.
+[x] Pipeline automatizado en Buildship para:
+[x] Sincronización de ciudades monitoreadas con la API de AirVisual.
+[x] Obtención y almacenamiento programado (CRON) de datos de calidad del aire cada hora.
+[x] Manejo de errores y reintentos automáticos.
+[x] Función RPC get_latest_air_quality_per_city implementada y consumida desde el frontend.
+Frontend
+[x] Estructura modular en React + TypeScript, con rutas principales y layout adaptativo.
+[x] Integración con Supabase vía API propia (no consumo directo de APIs externas en frontend).
+[x] Contexto global para calidad del aire: manejo de estado, caché local y refresco.
+[x] Componentes clave implementados:
+[x] Tarjetas y visualizaciones de calidad del aire.
+[x] Mapa interactivo y mapas de calor (heatmap).
+[x] Gráficos históricos y comparativos.
+[x] Sistema de alertas visuales.
+[x] Accesibilidad básica y soporte para temas dinámicos.
+[x] Guía de estilos y arquitectura documentadas y alineadas con el código.
+[x] Tipografía y paleta de colores arquitectónica (Montserrat, Work Sans, colores por estado AQI).
+DevOps y Calidad
+[x] Despliegue automático en Netlify.
+[x] Linting (ESLint), formateo (Prettier) y control de calidad automatizado.
+[x] Documentación técnica y de diseño actualizada.
+2. Siguientes pasos recomendados (Prioridades)
+Backend & Pipeline
+[ ] Optimizar la función RPC para mayor eficiencia si crece el volumen de datos.
+[ ] Implementar endpoint para datos históricos reales.
+[ ] Integrar nuevas fuentes de datos (ej. SIMA) cuando estén disponibles.
+[ ] Mejorar logs y telemetría del pipeline (Buildship).
+Frontend
+[ ] Implementar lazy loading para componentes pesados (mapas, gráficos).
+[ ] Mejorar la experiencia móvil (optimización de UI/UX en dispositivos pequeños).
+[ ] Añadir modo para personas daltónicas y accesibilidad avanzada (WCAG 2.1 AA).
+[ ] Permitir preferencias de usuario persistentes (requiere Supabase Auth).
+[ ] Mejorar sistema de alertas (push/email) y configuración de umbrales personalizados.
+[ ] Añadir sección de participación ciudadana (reportes, galería, compartir en redes).
+[ ] Desarrollar vista de pronóstico de calidad del aire (integrar modelos o APIs de forecast).
+Visualización y Analítica
+[ ] Implementar comparativas entre ciudades.
+[ ] Añadir vistas de tendencias y patrones a largo plazo.
+[ ] Preparar la base para análisis predictivo y visualización avanzada.
+Escalabilidad y Expansión
+[ ] Planificar la expansión a otras ciudades de México.
+[ ] Preparar la infraestructura para soportar mayor volumen y diversidad de datos.
+3. Visión a mediano y largo plazo
+Plataforma educativa ambiental y gamificación.
+Calculadora de huella de carbono personal.
+Modelos de predicción y alertas preventivas.
+Expansión nacional y comparativas regionales.
