@@ -6,6 +6,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { IoHomeOutline, IoInformationCircleOutline, IoLayersOutline, IoLinkOutline, IoMenuOutline, IoShareOutline } from 'react-icons/io5';
 import { Metadata } from './seo/Metadata';
 import { Analytics } from './seo/Analytics';
+import { CookieConsent } from './ads/CookieConsent';
+
 
 interface LayoutProps {
   children: ReactNode;
@@ -85,261 +87,264 @@ export default function Layout({ children }: LayoutProps) {
         type="website"
       />
       <Analytics trackingId={import.meta.env.VITE_GOOGLE_ANALYTICS_ID} />
-      
+
       <div className="min-h-screen pb-16 md:pb-0">
         {/* Resto del código igual */}
       </div>
     </>,
     <div className="min-h-screen pb-16 md:pb-0">
-      {/* Header - Now sticky and mobile-optimized */}
-      <header className={`sticky top-0 z-30 backdrop-blur-sm border-b border-gray-200 dark:border-slate-700 ${theme ? `bg-gradient-to-r ${theme.gradient}` : 'bg-white/90 dark:bg-slate-900/90'}`}>
-        <div className="container mx-auto py-3 md:py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            whileHover={{ 
-              scale: 1.05,
-              transition: { duration: 0.3 }
-            }}
-            whileTap={{ 
-              scale: 1.1,
-              transition: { duration: 0.2 }
-            }}
-            className="flex items-center"
-          >
-            <Link to="/" 
-              className="flex items-center group hover:opacity-90 transition-opacity"
-              onClick={() => {
-                // Efecto de respiración al hacer click
-                const logoElement = document.querySelector('.logo-container');
-                if (logoElement) {
-                  const breathAnimation = {
-                    scale: [1, 1.05, 1],
-                    opacity: [1, 0.95, 1],
-                    transition: {
-                      duration: 4,
-                      repeat: 1,
-                      ease: "easeInOut"
-                    }
-                  };
-                  logoElement.animate(breathAnimation, {
-                    duration: 4000,
-                    fill: "forwards"
-                  });
-                }
+        {/* Header - Now sticky and mobile-optimized */}
+        <header className={`sticky top-0 z-30 backdrop-blur-sm border-b border-gray-200 dark:border-slate-700 ${theme ? `bg-gradient-to-r ${theme.gradient}` : 'bg-white/90 dark:bg-slate-900/90'}`}>
+          <div className="container mx-auto py-3 md:py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              whileHover={{ 
+                scale: 1.05,
+                transition: { duration: 0.3 }
               }}
+              whileTap={{ 
+                scale: 1.1,
+                transition: { duration: 0.2 }
+              }}
+              className="flex items-center"
             >
-              <motion.div 
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center mr-2 sm:mr-3 logo-container"
-                whileHover={{
-                  scale: 1.1,
-                  transition: { duration: 0.3 }
+              <Link to="/" 
+                className="flex items-center group hover:opacity-90 transition-opacity"
+                onClick={() => {
+                  // Efecto de respiración al hacer click
+                  const logoElement = document.querySelector('.logo-container');
+                  if (logoElement) {
+                    const breathAnimation = {
+                      scale: [1, 1.05, 1],
+                      opacity: [1, 0.95, 1],
+                      transition: {
+                        duration: 4,
+                        repeat: 1,
+                        ease: "easeInOut"
+                      }
+                    };
+                    logoElement.animate(breathAnimation, {
+                      duration: 4000,
+                      fill: "forwards"
+                    });
+                  }
                 }}
               >
-                <img
-                  src={getMainLogoIcon()}
-                  alt="Logo Monterrey Respira"
-                  className="w-6 h-6 sm:w-6 sm:h-6"
-                />
-              </motion.div>
-              <div className="logo-container">
-                <h1 className={`${theme ? 'text-white' : 'text-black'} text-lg sm:text-2xl font-bold leading-tight transition-colors duration-500`}>MonterreyRespira</h1>
-                <span className={`${theme ? 'text-slate-200' : 'text-gray-600'} text-xs sm:text-sm hidden sm:block transition-colors duration-500`}>Calidad del Aire en Tiempo Real</span>
-              </div>
-            </Link>
-          </motion.div>
+                <motion.div 
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center mr-2 sm:mr-3 logo-container"
+                  whileHover={{
+                    scale: 1.1,
+                    transition: { duration: 0.3 }
+                  }}
+                >
+                  <img
+                    src={getMainLogoIcon()}
+                    alt="Logo Monterrey Respira"
+                    className="w-6 h-6 sm:w-6 sm:h-6"
+                  />
+                </motion.div>
+                <div className="logo-container">
+                  <h1 className={`${theme ? 'text-white' : 'text-black'} text-lg sm:text-2xl font-bold leading-tight transition-colors duration-500`}>MonterreyRespira</h1>
+                  <span className={`${theme ? 'text-slate-200' : 'text-gray-600'} text-xs sm:text-sm hidden sm:block transition-colors duration-500`}>Calidad del Aire en Tiempo Real</span>
+                </div>
+              </Link>
+            </motion.div>
 
-          {/* Navegación principal - visible solo en pantallas grandes */}
-          <nav className="hidden md:flex items-center gap-6">
-            <Link 
-              to="/" 
-              className={`px-3 py-2 rounded-md ${location.pathname === '/' ? 'bg-white/20' : 'hover:bg-white/10'} text-white transition-colors`} 
-            >
-              Inicio
-            </Link>
-            <Link 
-              to="/acerca-de" 
-              className={`px-3 py-2 rounded-md ${location.pathname === '/acerca-de' ? 'bg-white/20' : 'hover:bg-white/10'} text-white transition-colors`} 
-            >
-              Acerca de
-            </Link>
-            <Link 
-              to="/datos-y-apis" 
-              className={`px-3 py-2 rounded-md ${location.pathname === '/datos-y-apis' ? 'bg-white/20' : 'hover:bg-white/10'} text-white transition-colors`} 
-            >
-              Datos y APIs
-            </Link>
-            <Link 
-              to="/asociaciones" 
-              className={`px-3 py-2 rounded-md ${location.pathname === '/asociaciones' ? 'bg-white/20' : 'hover:bg-white/10'} text-white transition-colors`} 
-            >
-              Asociaciones
-            </Link>
-          </nav>
-
-          <div className="flex items-center gap-2 sm:gap-4">
-            {airQualityData && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className={`hidden sm:flex items-center text-sm px-3 py-1 sm:px-4 sm:py-2 rounded-full ${getHeaderBgClass()}`}
+            {/* Navegación principal - visible solo en pantallas grandes */}
+            <nav className="hidden md:flex items-center gap-6">
+              <Link 
+                to="/" 
+                className={`px-3 py-2 rounded-md ${location.pathname === '/' ? 'bg-white/20' : 'hover:bg-white/10'} text-white transition-colors`} 
               >
-                <span className="font-semibold text-xs sm:text-sm">Actualizado: </span>
-                <span className="ml-1 text-xs sm:text-sm">
-                  {new Date(airQualityData.timestamp).toLocaleTimeString('es-MX', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: true
-                  })}
-                </span>
-              </motion.div>
-            )}
-
-            {/* Botón de compartir */}
-            <button
-              onClick={() => {
-                if (navigator.share) {
-                  navigator.share({
-                    title: `MonterreyRespira - Calidad del Aire en ${currentCity}`,
-                    text: `Monitoreo en tiempo real de la calidad del aire en ${currentCity}. Conozca los niveles de contaminantes y obtenga recomendaciones para proteger su salud.`,
-                    url: window.location.href
-                  })
-                  .catch(console.error);
-                } else {
-                  // Copiar URL al portapapeles como alternativa
-                  navigator.clipboard.writeText(window.location.href)
-                    .then(() => {
-                      alert('URL copiada al portapapeles');
-                    })
-                    .catch(console.error);
-                }
-              }}
-              className={`p-2 rounded-md ${theme ? 'hover:bg-white/20' : 'hover:bg-gray-100'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors`}
-            >
-              <IoShareOutline className={`w-5 h-5 ${theme ? 'text-white' : 'text-gray-600'}`} />
-            </button>
-
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-md md:hidden focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              <IoMenuOutline className="w-6 h-6 text-white" />            
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile menu dropdown */}
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t border-gray-200 dark:border-gray-700"
-          >
-            <nav className="px-4 py-2 rounded-md bg-white text-black">
-              <Link to="/" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
                 Inicio
               </Link>
-              <Link to="/acerca-de" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
+              <Link 
+                to="/acerca-de" 
+                className={`px-3 py-2 rounded-md ${location.pathname === '/acerca-de' ? 'bg-white/20' : 'hover:bg-white/10'} text-white transition-colors`} 
+              >
                 Acerca de
               </Link>
-              <Link to="/datos-y-apis" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
+              <Link 
+                to="/datos-y-apis" 
+                className={`px-3 py-2 rounded-md ${location.pathname === '/datos-y-apis' ? 'bg-white/20' : 'hover:bg-white/10'} text-white transition-colors`} 
+              >
                 Datos y APIs
               </Link>
-              <Link to="/asociaciones" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
+              <Link 
+                to="/asociaciones" 
+                className={`px-3 py-2 rounded-md ${location.pathname === '/asociaciones' ? 'bg-white/20' : 'hover:bg-white/10'} text-white transition-colors`} 
+              >
                 Asociaciones
               </Link>
             </nav>
-          </motion.div>
-        )}
-      </header>
 
-      <main className="container mx-auto py-3 md:py-4 px-4 sm:px-6 lg:px-8">
-        {children}
-      </main>
+            <div className="flex items-center gap-2 sm:gap-4">
+              {airQualityData && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className={`hidden sm:flex items-center text-sm px-3 py-1 sm:px-4 sm:py-2 rounded-full ${getHeaderBgClass()}`}
+                >
+                  <span className="font-semibold text-xs sm:text-sm">Actualizado: </span>
+                  <span className="ml-1 text-xs sm:text-sm">
+                    {new Date(airQualityData.timestamp).toLocaleTimeString('es-MX', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: true
+                    })}
+                  </span>
+                </motion.div>
+              )}
 
-      <footer className="container mx-auto py-6 md:py-8 px-4 sm:px-6 lg:px-8 text-center text-gray-500 dark:text-gray-400 text-sm">
-        <p className="text-xs sm:text-sm">MonterreyRespira {new Date().getFullYear()} - Monitoreando la calidad del aire en Monterrey, Nuevo León</p>
-        <p className="mt-2 text-xs sm:text-sm hidden md:block">
-          <Link
-            to="/acerca-de"
-            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
-          >
-            Acerca de
-          </Link>
-          {' · '}
-          <Link
-            to="/datos-y-apis"
-            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
-          >
-            Datos y APIs
-          </Link>
-          {' · '}
-          <Link
-            to="/asociaciones"
-            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
-          >
-            Asociaciones
-          </Link>
-          {' · '}
-          <a
-            href="https://ko-fi.com/Y8Y11CCJPV"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
-          >
-          </a>
-        </p>
-        <p className="mt-2 text-xs sm:text-sm">
-          <div className="flex justify-center items-center gap-2">
-            <a
-              href="https://ko-fi.com/Y8Y11CCJPV"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center px-3 py-1.5 text-sm text-white bg-amber-400 hover:bg-amber-500 rounded-md shadow-sm transition-colors duration-200 ease-in-out"
-            >
-              <img src="https://ko-fi.com/img/cup-border.png" className="mr-1 h-4 w-4 object-contain" alt="Ko-fi" />
-              <span className="text-xs">¡Apoya con un Cafecito!</span>
-            </a>
+              {/* Botón de compartir */}
+              <button
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({
+                      title: `MonterreyRespira - Calidad del Aire en ${currentCity}`,
+                      text: `Monitoreo en tiempo real de la calidad del aire en ${currentCity}. Conozca los niveles de contaminantes y obtenga recomendaciones para proteger su salud.`,
+                      url: window.location.href
+                    })
+                    .catch(console.error);
+                  } else {
+                    // Copiar URL al portapapeles como alternativa
+                    navigator.clipboard.writeText(window.location.href)
+                      .then(() => {
+                        alert('URL copiada al portapapeles');
+                      })
+                      .catch(console.error);
+                  }
+                }}
+                className={`p-2 rounded-md ${theme ? 'hover:bg-white/20' : 'hover:bg-gray-100'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors`}
+              >
+                <IoShareOutline className={`w-5 h-5 ${theme ? 'text-white' : 'text-gray-600'}`} />
+              </button>
+
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2 rounded-md md:hidden focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                <IoMenuOutline className="w-6 h-6 text-white" />            
+              </button>
+            </div>
           </div>
-          Desarrollado con <span aria-label="corazón" role="img">❤️</span> por <a href="https://www.elelier.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">elelier</a>
-        </p>
-      </footer>
+
+          {/* Mobile menu dropdown */}
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden border-t border-gray-200 dark:border-gray-700"
+            >
+              <nav className="px-4 py-2 rounded-md bg-white text-black">
+                <Link to="/" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
+                  Inicio
+                </Link>
+                <Link to="/acerca-de" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
+                  Acerca de
+                </Link>
+                <Link to="/datos-y-apis" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
+                  Datos y APIs
+                </Link>
+                <Link to="/asociaciones" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
+                  Asociaciones
+                </Link>
+              </nav>
+            </motion.div>
+          )}
+        </header>
+
+        <main className="container mx-auto py-3 md:py-4 px-4 sm:px-6 lg:px-8">
+          {children}
+        </main>
+
+        <footer className="container mx-auto py-6 md:py-8 px-4 sm:px-6 lg:px-8 text-center text-gray-500 dark:text-gray-400 text-sm">
+          <div className="space-y-2">
+            <p className="text-xs sm:text-sm">MonterreyRespira {new Date().getFullYear()} - Monitoreando la calidad del aire en Monterrey, Nuevo León</p>
+            <div className="hidden md:block">
+              <Link
+                to="/acerca-de"
+                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+              >
+                Acerca de
+              </Link>
+              {' · '}
+              <Link
+                to="/datos-y-apis"
+                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+              >
+                Datos y APIs
+              </Link>
+              {' · '}
+              <Link
+                to="/asociaciones"
+                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+              >
+                Asociaciones
+              </Link>
+              {' · '}
+              <a
+                href="https://ko-fi.com/Y8Y11CCJPV"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+              >
+                Apoya con un Cafecito
+              </a>
+            </div>
+            <div className="mt-2">
+              <a
+                href="https://ko-fi.com/Y8Y11CCJPV"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-3 py-1.5 text-sm text-white bg-amber-400 hover:bg-amber-500 rounded-md shadow-sm transition-colors duration-200 ease-in-out"
+              >
+                <img src="https://ko-fi.com/img/cup-border.png" className="mr-1 h-4 w-4 object-contain" alt="Ko-fi" />
+                <span className="text-xs">¡Apoya con un Cafecito!</span>
+              </a>
+            </div>
+            <p className="mt-2 text-xs sm:text-sm">
+              Desarrollado con <span aria-label="corazón" role="img">❤️</span> por <a href="https://www.elelier.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">elelier</a>
+            </p>
+          </div>
+        </footer>
 
 
-      {/* Mobile bottom navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-700 md:hidden z-40">
-        <div className="grid grid-cols-4 h-16">
-          <Link
-            to="/"
-            className={`flex flex-col items-center justify-center ${location.pathname === '/' ? getBottomNavActiveClass() : 'text-gray-500'}`}
-          >
-            <IoHomeOutline className="text-xl mb-1" />
-            <span className="text-xs">Inicio</span>
-          </Link>
-          <Link
-            to="/acerca-de"
-            className={`flex flex-col items-center justify-center ${location.pathname === '/acerca-de' ? getBottomNavActiveClass() : 'text-gray-500'}`}
-          >
-            <IoInformationCircleOutline className="text-xl mb-1" />
-            <span className="text-xs">Acerca de</span>
-          </Link>
-          <Link
-            to="/datos-y-apis"
-            className={`flex flex-col items-center justify-center ${location.pathname === '/datos-y-apis' ? getBottomNavActiveClass() : 'text-gray-500'}`}
-          >
-            <IoLayersOutline className="text-xl mb-1" />
-            <span className="text-xs">Datos</span>
-          </Link>
-          <Link
-            to="/asociaciones"
-            className={`flex flex-col items-center justify-center ${location.pathname === '/asociaciones' ? getBottomNavActiveClass() : 'text-gray-500'}`}
-          >
-            <IoLinkOutline className="text-xl mb-1" />
-            <span className="text-xs">Enlaces</span>
-          </Link>
+        {/* Mobile bottom navigation */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-700 md:hidden z-40">
+          <div className="grid grid-cols-4 h-16">
+            <Link
+              to="/"
+              className={`flex flex-col items-center justify-center ${location.pathname === '/' ? getBottomNavActiveClass() : 'text-gray-500'}`}
+            >
+              <IoHomeOutline className="text-xl mb-1" />
+              <span className="text-xs">Inicio</span>
+            </Link>
+            <Link
+              to="/acerca-de"
+              className={`flex flex-col items-center justify-center ${location.pathname === '/acerca-de' ? getBottomNavActiveClass() : 'text-gray-500'}`}
+            >
+              <IoInformationCircleOutline className="text-xl mb-1" />
+              <span className="text-xs">Acerca de</span>
+            </Link>
+            <Link
+              to="/datos-y-apis"
+              className={`flex flex-col items-center justify-center ${location.pathname === '/datos-y-apis' ? getBottomNavActiveClass() : 'text-gray-500'}`}
+            >
+              <IoLayersOutline className="text-xl mb-1" />
+              <span className="text-xs">Datos</span>
+            </Link>
+            <Link
+              to="/asociaciones"
+              className={`flex flex-col items-center justify-center ${location.pathname === '/asociaciones' ? getBottomNavActiveClass() : 'text-gray-500'}`}
+            >
+              <IoLinkOutline className="text-xl mb-1" />
+              <span className="text-xs">Enlaces</span>
+            </Link>
+          </div>
         </div>
       </div>
-    </div>
   );
 }
