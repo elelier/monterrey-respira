@@ -251,6 +251,9 @@ export default function Layout({ children }: LayoutProps) {
                 <Link to="/asociaciones" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
                   Asociaciones
                 </Link>
+                <Link to="/politica-de-privacidad" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
+                  Política de Privacidad
+                </Link>
               </nav>
             </motion.div>
           )}
@@ -283,6 +286,13 @@ export default function Layout({ children }: LayoutProps) {
                 className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
               >
                 Asociaciones
+              </Link>
+              {' · '}
+              <Link
+                to="/politica-de-privacidad"
+                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+              >
+                Política de Privacidad
               </Link>
               {' · '}
               <a
