@@ -107,36 +107,35 @@ const CitySelector = ({ onCityChange, className = '' }: CitySelectorProps) => {
             <div className="p-2 border-b border-gray-100 dark:border-gray-700">
               <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Selecciona una ciudad</p>
             </div>
-            {/* START OF CRITICAL BLOCK - EXACTLY AS PER PROMPT */}
             <div className="max-h-60 overflow-y-auto">
-              {locations && locations.length > 0 ? (
-                locations.map((city) => (
-                  // The existing motion.div for the city item, starting with:
-                  <motion.div
-                    key={city.name}
-                    className={`px-4 py-3 hover:bg-purple-50 cursor-pointer transition-colors dark:hover:bg-purple-900/10 ${
-                      selectedCityName === city.name ? 'bg-purple-100 dark:bg-purple-900/20' : ''
-                    }`}
-                    role="option"
-                    aria-selected={selectedCityName === city.name}
-                  >
-                    <div className="flex items-center">
-                      <img
-                        src={PinIcon}
-                        alt="Pin"
-                        className={`h-4 w-4 mr-2 ${selectedCityName === city.name ? 'text-purple-600' : 'text-gray-400'}`}
-                      />
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">{city.name}</p>
-                    </div>
-                  </motion.div>
-                )) // End of map
-              ) : ( // Else branch of ternary
-                <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
-                  No cities available.
-                </div>
-              )} 
-            </div> 
-            {/* END OF CRITICAL BLOCK */}
+              {locations.map((city) => (
+                <motion.div
+                  key={city.name} // Assuming city.name is unique, otherwise use city.city_id if available
+                  className={`px-4 py-3 hover:bg-purple-50 cursor-pointer transition-colors dark:hover:bg-purple-900/10 ${
+                    selectedCityName === city.name ? 'bg-purple-100 dark:bg-purple-900/20' : ''
+                  }`}
+                  onClick={() => handleCityChange(city)}
+                  whileTap={{ scale: 0.98 }}
+                  role="option"
+                  aria-selected={selectedCityName === city.name}
+                  ref={(el) => el && cityRefs.current.set(city.name, el)} // Ensure city.name is string
+                >
+                  <div className="flex items-center">
+                    <img
+                      src={PinIcon}
+                      alt="Pin"
+                      className={`h-4 w-4 mr-2 ${selectedCityName === city.name ? 'text-purple-600' : 'text-gray-400'}`}
+                    />
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{city.name}</p>
+                  </div>
+                </motion.div>
+              ))
+            ) : (
+              <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                No cities available.
+              </div>
+            )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
