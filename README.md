@@ -1,6 +1,6 @@
 # MonterreyRespira
 
-![MonterreyRespira Logo](public/logo.svg)
+![MonterreyRespira Logo](public/mty.png)
 
 MonterreyRespira es una aplicación web que proporciona información en tiempo real sobre la calidad del aire en Monterrey y su área metropolitana. Diseñada para ayudar a los ciudadanos a comprender y monitorear la calidad del aire que respiran diariamente.
 

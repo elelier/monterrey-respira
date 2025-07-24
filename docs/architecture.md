@@ -13,14 +13,13 @@ MonterreyRespira es una aplicación web moderna que proporciona información en 
 - Optimización para rendimiento
 
 **Backend (Serverless):**
-- Buildship para lógica de negocio
-- Supabase para persistencia
+- Supabase como base de datos y backend principal
+- Funciones RPC para lógica de negocio
 - Cron jobs para actualización de datos
 
 **Flujo de Datos:**
 1. **Usuario:** Interactúa con la UI React
-2. **Frontend:** Solicita datos a Buildship
-3. **API Backend:** Consulta Supabase
+2. **Frontend:** Solicita datos directamente a Supabase
 4. **Base de Datos:** Almacena datos de calidad del aire
 5. **Pipeline de Datos:** Actualiza datos periódicamente
 6. **API Externa:** Obtiene datos de AirVisual
@@ -78,7 +77,7 @@ monterrey-respira/
 │ │   ├── Data/       # Página de datos
 │ │   └── About/      # Página sobre el proyecto
 │ ├── services/      # Integración con APIs
-│ │   ├── api/       # Llamadas a Buildship
+│ │   ├── supabase/  # Integración directa con Supabase
 │ │   └── utils/      # Funciones auxiliares
 │ ├── types/         # Tipos TypeScript
 │ │   ├── api/       # Tipos de API
@@ -376,20 +375,20 @@ monterrey-respira/
 
 ## Arquitectura Backend (Detalle - Serverless)
 
-El backend es completamente serverless, aprovechando Buildship para la lógica y Supabase para la persistencia.
+El backend es completamente serverless, aprovechando Supabase tanto para la lógica como para la persistencia.
 
-*   **Orquestación (Buildship):** Un workflow principal disparado por un `Schedule Trigger` (CRON) maneja todo el ciclo de vida de la actualización de datos. Ver [Pipeline de Datos](./data-pipeline.md) para el detalle paso a paso.
-*   **API (Buildship):** Un `API Endpoint Trigger` expone los datos procesados al frontend. Actualmente, el endpoint principal es `GET /latest-air-quality`. Ver [API de Lectura](./data-pipeline.md#5-api-de-lectura-para-frontend-get-latest-air-quality).
+*   **Orquestación (Supabase):** Un sistema de tareas programadas (Cron Jobs) en Supabase maneja todo el ciclo de vida de la actualización de datos. Ver [Pipeline de Datos](./data-pipeline.md) para el detalle paso a paso.
+*   **API (Supabase):** Funciones RPC expuestas directamente al frontend. El endpoint principal es la función RPC `get_latest_air_quality_per_city`. Ver [API de Lectura](./data-pipeline.md#5-api-de-lectura-para-frontend-get-latest-air-quality).
 *   **Base de Datos (Supabase):**
     *   Utiliza PostgreSQL.
     *   Esquema definido con tablas `cities` y `air_quality_readings`. Ver [Diseño de Base de Datos](./data-pipeline.md#3-diseño-de-base-de-datos-supabase).
     *   Se aprovechan funciones SQL (`get_latest_air_quality_per_city`) para consultas eficientes.
-    *   Row Level Security (RLS) está habilitado; Buildship opera con la `service_role` key para bypass RLS.
+    *   Row Level Security (RLS) está habilitado; el frontend opera con la `anon` role y usa funciones RPC seguras.
 
 ## Flujo de Datos (Combinado)
 
 1.  **Actualización Periódica (Backend):**
-    *   Buildship Cron se activa.
+    *   Cron Job en Supabase se activa.
     *   Obtiene lista de ciudades activas de Supabase.
     *   Para cada ciudad (priorizando fallidas/antiguas):
         *   Verifica si necesita actualización (intervalo > X min o último intento fallido).
@@ -406,11 +405,9 @@ El backend es completamente serverless, aprovechando Buildship para la lógica y
         *   Usa los datos del caché
         *   Actualiza el estado y renderiza la UI
     *   Si no hay datos en caché o están expirados:
-        *   Llama a `GET /latest-air-quality` en Buildship
-        *   Buildship Endpoint ejecuta la función SQL `get_latest_air_quality_per_city` en Supabase
+        *   Llama directamente a la función RPC `get_latest_air_quality_per_city` en Supabase
         *   Supabase devuelve la lectura más reciente por cada ciudad activa
-        *   Buildship devuelve el JSON al Frontend
         *   React actualiza el estado y renderiza la UI con los datos frescos
         *   Los nuevos datos se almacenan en `localStorage` con un timestamp
 
-Este enfoque separa las preocupaciones, permite que el frontend sea rápido (solo lee datos pre-procesados), y hace que el backend sea robusto y resiliente a fallos temporales de la API externa.
+Este enfoque simplifica la arquitectura al eliminar la capa intermedia de Buildship, permitiendo que el frontend acceda directamente a Supabase, lo que mejora la eficiencia y reduce la latencia.

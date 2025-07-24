@@ -268,7 +268,7 @@ export default function PollutantConcentrationMap({ centralData, className = '' 
         break;
       case 'pm10':
         thresholds = [
-          [0, '0-54 - Buena'],
+          [0, '0-55 - Buena'],
           [55, '55-154 - Moderada'],
           [155, '155-254 - Insalubre SG'],
           [255, '255-354 - Insalubre'],
