@@ -1,7 +1,9 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { AirQualityData, AirQualityTheme, CityAirQualityData } from '../types'; // Importa CityAirQualityData
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
+import { AirQualityData, AirQualityTheme, CityAirQualityData } from '../types';
 import { getAirQualityTheme, getAirQualityStatus } from '../utils/airQualityUtils';
 import { fetchLatestMonterreyAirQuality, MONTERREY_LOCATIONS_WITH_COORDS } from '../services/apiService';
+
+type CityOption = (typeof MONTERREY_LOCATIONS_WITH_COORDS)[number];
 
 interface AirQualityContextType {
   airQualityData: AirQualityData | null;
@@ -9,15 +11,15 @@ interface AirQualityContextType {
   error: string | null;
   theme: AirQualityTheme | null;
   refreshData: () => Promise<void>;
-  selectedCity: { name: string; latitude: number; longitude: number };
-  changeCity: (city: { name: string; latitude: number; longitude: number }) => void;
+  selectedCity: CityOption;
+  changeCity: (city: CityOption) => void;
 }
 
 const AirQualityContext = createContext<AirQualityContextType | undefined>(undefined);
 
 export function useAirQuality() {
   const context = useContext(AirQualityContext);
-  console.log("useAirQuality context:", context);
+  console.log('useAirQuality context:', context);
   if (context === undefined) {
     throw new Error('useAirQuality must be used within an AirQualityProvider');
   }
@@ -28,127 +30,143 @@ interface AirQualityProviderProps {
   children: ReactNode;
 }
 
-const CACHE_KEY = 'airQualityDataCache'; // Clave para el caché en localStorage
-const CACHE_EXPIRATION_TIME = 60 * 60 * 1000; // 1 hora en milisegundos
+const CACHE_KEY = 'airQualityDataCache';
+const CACHE_EXPIRATION_TIME = 60 * 60 * 1000;
 
 export function AirQualityProvider({ children }: AirQualityProviderProps) {
+  const locations = useMemo(() => MONTERREY_LOCATIONS_WITH_COORDS, []);
+  const defaultCity = locations[0];
+
+  if (!defaultCity) {
+    throw new Error('No hay ciudades configuradas para el selector de aire.');
+  }
+
   const [airQualityData, setAirQualityData] = useState<AirQualityData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [theme, setTheme] = useState<AirQualityTheme | null>(null);
-  const [selectedCity, setSelectedCity] = useState(MONTERREY_LOCATIONS_WITH_COORDS[0]);
+  const [selectedCity, setSelectedCity] = useState<CityOption>(defaultCity);
 
   const fetchAirQualityData = async () => {
-    const cachedData = localStorage.getItem(CACHE_KEY); // Obtener datos del caché
-    const cachedTime = localStorage.getItem(`${CACHE_KEY}_timestamp`); // Obtener hora del caché
+    const cachedData = localStorage.getItem(CACHE_KEY);
+    const cachedTime = localStorage.getItem(`${CACHE_KEY}_timestamp`);
 
     console.log('Checking Cache...');
 
-    if (cachedData && cachedTime) { // Si hay datos en caché
+    if (cachedData && cachedTime) {
       const timeElapsed = Date.now() - Number(cachedTime);
-      console.log('Cache Time:', new Date(Number(cachedTime)).toLocaleString()); // Mostrar hora del caché {{ edit: 2 }}
-      console.log('Time Elapsed:', timeElapsed / (60 * 60 * 1000), 'hours'); // Mostrar tiempo transcurrido en horas {{ edit: 2 }}
+      console.log('Cache Time:', new Date(Number(cachedTime)).toLocaleString());
+      console.log('Time Elapsed:', timeElapsed / (60 * 60 * 1000), 'hours');
 
-      if (timeElapsed < CACHE_EXPIRATION_TIME) { // Si el caché es reciente (menos de 1 hora)
-        console.log('Data from Cache - Cache is valid'); // Mensaje más claro {{ edit: 2 }}
-        const parsedCacheData = JSON.parse(cachedData); // Parsear datos del caché
-        // Transformar datos cacheados al formato AirQualityData
-        const transformedCacheData = transformApiResponse(parsedCacheData, selectedCity.name); // {{ edit }}
-        setAirQualityData(transformedCacheData); // Usar datos del caché
+      if (timeElapsed < CACHE_EXPIRATION_TIME) {
+        console.log('Data from Cache - Cache is valid');
+        const parsedCacheData: CityAirQualityData[] = JSON.parse(cachedData);
+        const transformedCacheData = transformApiResponse(parsedCacheData, selectedCity);
+        setAirQualityData(transformedCacheData);
         setTheme(getAirQualityTheme(transformedCacheData.status));
         setLoading(false);
-        return; // Salir de la función, no hacer petición a la API
-      } else {
-        console.log('Cache Expired - Fetching new data from API'); // Mensaje más claro {{ edit: 2 }}
+        return;
       }
+
+      console.log('Cache Expired - Fetching new data from API');
     } else {
-      console.log('No Cache Found - Fetching data from API'); // Mensaje si no hay caché {{ edit: 2 }}
+      console.log('No Cache Found - Fetching data from API');
     }
 
     try {
       setLoading(true);
-      const cityDataArray = await fetchLatestMonterreyAirQuality(); // Obtener datos de la API (TODAS las ciudades) // {{ edit: remove selectedCity argument }}
+      const cityDataArray = await fetchLatestMonterreyAirQuality();
 
       if (Array.isArray(cityDataArray) && cityDataArray.length > 0) {
-        localStorage.setItem(CACHE_KEY, JSON.stringify(cityDataArray)); // Guardar datos en caché
-        localStorage.setItem(`${CACHE_KEY}_timestamp`, Date.now().toString()); // Guardar hora en caché
-        console.log('Cache Updated - New data from API'); // Mensaje al actualizar el caché {{ edit: 2 }}
+        localStorage.setItem(CACHE_KEY, JSON.stringify(cityDataArray));
+        localStorage.setItem(`${CACHE_KEY}_timestamp`, Date.now().toString());
+        console.log('Cache Updated - New data from API');
 
-        // Transformar datos de la API al formato AirQualityData
-        const transformedData = transformApiResponse(cityDataArray, selectedCity.name); // {{ edit }}
-        setAirQualityData(transformedData); // Usar datos transformados
+        const transformedData = transformApiResponse(cityDataArray, selectedCity);
+        setAirQualityData(transformedData);
         setTheme(getAirQualityTheme(transformedData.status));
+        setError(null);
       } else {
         setError('No se pudieron cargar los datos de calidad del aire');
       }
-      setError(null);
-      } catch (err) {
-          console.error('Error fetching air quality data:', err);
-          setError('No se pudieron cargar los datos de calidad del aire');
-      } finally {
-          setLoading(false);
-      }
+    } catch (err) {
+      console.error('Error fetching air quality data:', err);
+      setError('No se pudieron cargar los datos de calidad del aire');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Función para transformar la respuesta de la API al formato AirQualityData
-  const transformApiResponse = (cityDataArray: CityAirQualityData[], cityName: string): AirQualityData => { // {{ edit }}
-    const cityData = cityDataArray.find(city => city.city_name === cityName); // Encontrar datos de la ciudad seleccionada
+  const transformApiResponse = (cityDataArray: CityAirQualityData[], city: CityOption): AirQualityData => {
+    const cityData = cityDataArray.find((item) => item.city_id === city.city_id);
 
     if (!cityData) {
-      console.warn(`No se encontraron datos para la ciudad: ${cityName} en la respuesta de la API`);
-      // Puedes retornar datos por defecto o manejar este caso como prefieras
+      console.warn(`No se encontraron datos para la ciudad con id ${city.city_id} (${city.name}) en la respuesta de la API`);
       return {
-        aqi: 0, status: 'unknown', pm25: 0, pm10: 0, o3: 0, no2: 0, so2: 0, co: 0, temperature: 0, humidity: 0, wind: { speed: 0, direction: 0 }, timestamp: new Date().toISOString(), location: { name: cityName, latitude: 0, longitude: 0 }
+        aqi: 0,
+        status: 'unknown',
+        pm25: 0,
+        pm10: 0,
+        o3: 0,
+        no2: 0,
+        so2: 0,
+        co: 0,
+        temperature: 0,
+        humidity: 0,
+        wind: { speed: 0, direction: 0 },
+        timestamp: new Date().toISOString(),
+        location: { name: city.name, latitude: city.latitude, longitude: city.longitude },
       };
     }
 
-
-      return {
-        aqi: cityData.aqi_us,
-        status: getAirQualityStatus(cityData.aqi_us),
-        pm25: 0, pm10: 0, o3: 0, no2: 0, so2: 0, co: 0,
-        temperature: cityData.temperature_c,
-        humidity: cityData.humidity_percent,
-        wind: {
-          speed: cityData.wind_speed_ms,
-          direction: cityData.wind_direction_deg,
-        },
-        timestamp: cityData.reading_timestamp,
-        location: {
-          name: cityData.city_name,
-          latitude: cityData.latitude,
-          longitude: cityData.longitude,
-        },
-        weather_icon: cityData.weather_icon,
-        main_pollutant_us: cityData.main_pollutant_us,
-      };
+    return {
+      aqi: cityData.aqi_us,
+      status: getAirQualityStatus(cityData.aqi_us),
+      pm25: 0,
+      pm10: 0,
+      o3: 0,
+      no2: 0,
+      so2: 0,
+      co: 0,
+      temperature: cityData.temperature_c,
+      humidity: cityData.humidity_percent,
+      wind: {
+        speed: cityData.wind_speed_ms,
+        direction: cityData.wind_direction_deg,
+      },
+      timestamp: cityData.reading_timestamp,
+      location: {
+        name: cityData.city_name ?? city.name,
+        latitude: cityData.latitude,
+        longitude: cityData.longitude,
+      },
+      weather_icon: cityData.weather_icon,
+      main_pollutant_us: cityData.main_pollutant_us,
+    };
   };
 
-
-  // Función para cambiar la ciudad seleccionada
-  const changeCity = (city: { name: string; latitude: number; longitude: number }) => {
+  const changeCity = (city: CityOption) => {
     setSelectedCity(city);
   };
 
-  // Actualizar los datos cuando cambia la ciudad seleccionada
   useEffect(() => {
     fetchAirQualityData();
-  }, [selectedCity]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCity.city_id]);
 
   useEffect(() => {
-    // Actualizar datos cada 5 minutos (o cuando expire el caché)
-    const intervalId = setInterval(fetchAirQualityData, 5 * 60 * 1000); // Cada 5 minutos
+    const intervalId = setInterval(fetchAirQualityData, 5 * 60 * 1000);
     return () => clearInterval(intervalId);
   }, []);
 
-  const value = {
+  const value: AirQualityContextType = {
     airQualityData,
     loading,
     error,
     theme,
     refreshData: fetchAirQualityData,
     selectedCity,
-    changeCity
+    changeCity,
   };
 
   return <AirQualityContext.Provider value={value}>{children}</AirQualityContext.Provider>;
