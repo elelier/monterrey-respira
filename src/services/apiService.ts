@@ -3,16 +3,16 @@ import { CityAirQuality, HistoricalData } from '../types';
 
 // --- CONFIGURACIÓN DE SUPABASE ---
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL; // ¡Usa variables de entorno!
-const SUPABASE_SERVICE_ROLE_KEY = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // Verifica que las variables de entorno estén configuradas
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
     console.error("Error: Las variables de entorno de Supabase no están configuradas.");
     throw new Error("La configuración de Supabase no está completa.");
 }
 
 // Crea el cliente de Supabase
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ---  LISTA DE LOCACIONES (SIN CAMBIOS - CONSTANTE) ---
 export const MONTERREY_LOCATIONS_WITH_COORDS = [
