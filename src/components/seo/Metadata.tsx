@@ -6,15 +6,16 @@ interface MetadataProps {
   description: string;
   keywords?: string;
   image?: string;
+  type?: string;
 }
 
-export const Metadata: React.FC<MetadataProps> = ({
+export const Metadata = ({
   title,
   description,
   keywords,
   image,
-}) => {
-  const defaultImage = '/logo.svg';
+  type = 'website',
+}: MetadataProps) => {
   const defaultKeywords = 'calidad del aire, contaminación, Monterrey, ambiente';
 
   return (
@@ -28,6 +29,7 @@ export const Metadata: React.FC<MetadataProps> = ({
           <meta name="twitter:image" content={image} />
         </>
       )}
+      <meta property="og:type" content={type} />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta name="twitter:title" content={title} />
