@@ -2,41 +2,47 @@ export interface CityAirQualityData {
   city_id: number;
   city_name: string;
   api_name: string;
-  latitude: number;
-  longitude: number;
+  latitude: number | null;
+  longitude: number | null;
   reading_timestamp: string;
-  aqi_us: number;
-  main_pollutant_us: string;
-  temperature_c: number;
-  humidity_percent: number;
-  wind_speed_ms: number;
-  wind_direction_deg: number;
-  weather_icon: string;
-  last_successful_update_at: string;
+  aqi_us: number | null;
+  main_pollutant_us: string | null;
+  temperature_c: number | null;
+  humidity_percent: number | null;
+  wind_speed_ms: number | null;
+  wind_direction_deg: number | null;
+  weather_icon: string | null;
+  last_successful_update_at: string | null;
 }
 
+export type AirQualityDataQuality = 'fresh' | 'degraded';
+
 export interface AirQualityData {
-  aqi: number;
+  aqi: number | null;
   status: AirQualityStatus;
-  pm25: number;
-  pm10: number;
-  o3: number;
-  no2: number;
-  so2: number;
-  co: number;
-  temperature: number;
-  humidity: number;
+  dataQuality: AirQualityDataQuality;
+  degradationReason?: string;
+  pm25: number | null;
+  pm10: number | null;
+  o3: number | null;
+  no2: number | null;
+  so2: number | null;
+  co: number | null;
+  temperature: number | null;
+  humidity: number | null;
   wind: {
-    speed: number;
-    direction: number;
+    speed: number | null;
+    direction: number | null;
   };
   timestamp: string;
+  last_successful_update_at?: string | null;
   location: {
     name: string;
-    latitude: number;
-    longitude: number;
+    latitude: number | null;
+    longitude: number | null;
   };
-  weather_icon?: string;
+  weather_icon?: string | null;
+  main_pollutant_us?: string | null;
 }
 
 export type AirQualityStatus =
