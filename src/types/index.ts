@@ -28,6 +28,7 @@ export interface AirQualityData {
   no2: number | null;
   so2: number | null;
   co: number | null;
+  iaqi?: Partial<Record<'pm25' | 'pm10' | 'o3' | 'no2' | 'so2' | 'co', { v: number }>>;
   temperature: number | null;
   humidity: number | null;
   wind: {
