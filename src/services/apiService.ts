@@ -1,15 +1,22 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { CityAirQualityData, HistoricalData } from '../types';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  console.error('Error: Las variables de entorno de Supabase no están configuradas.');
-  throw new Error('La configuración de Supabase no está completa.');
-}
+let supabaseClient: SupabaseClient | null = null;
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const getSupabaseClient = () => {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    throw new Error('La configuración pública de Supabase no está disponible para este deployment.');
+  }
+
+  if (!supabaseClient) {
+    supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+
+  return supabaseClient;
+};
 
 export const MONTERREY_LOCATIONS_WITH_COORDS = [
   { city_id: 9, name: 'Monterrey', latitude: 25.67507, longitude: -100.31847 },
@@ -25,6 +32,7 @@ export const MONTERREY_LOCATIONS_WITH_COORDS = [
 
 export const fetchLatestMonterreyAirQuality = async (): Promise<CityAirQualityData[]> => {
   try {
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase.rpc('get_latest_air_quality_per_city');
 
     if (error) {
