@@ -18,29 +18,29 @@ export interface CityAirQualityData {
 export type AirQualityDataQuality = 'fresh' | 'degraded';
 
 export interface AirQualityData {
-  aqi: number | null;
+  aqi: number;
   status: AirQualityStatus;
   dataQuality: AirQualityDataQuality;
   degradationReason?: string;
-  pm25: number | null;
-  pm10: number | null;
-  o3: number | null;
-  no2: number | null;
-  so2: number | null;
-  co: number | null;
+  pm25: number;
+  pm10: number;
+  o3: number;
+  no2: number;
+  so2: number;
+  co: number;
   iaqi?: Partial<Record<'pm25' | 'pm10' | 'o3' | 'no2' | 'so2' | 'co', { v: number }>>;
-  temperature: number | null;
-  humidity: number | null;
+  temperature: number;
+  humidity: number;
   wind: {
-    speed: number | null;
-    direction: number | null;
+    speed: number;
+    direction: number;
   };
   timestamp: string;
   last_successful_update_at?: string | null;
   location: {
     name: string;
-    latitude: number | null;
-    longitude: number | null;
+    latitude: number;
+    longitude: number;
   };
   weather_icon?: string | null;
   main_pollutant_us?: string | null;
