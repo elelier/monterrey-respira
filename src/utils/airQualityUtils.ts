@@ -1,6 +1,6 @@
 import { AirQualityStatus, AirQualityTheme, RecommendationInfo } from '../types';
-import icon01d from '../assets/weather-icons/01d.png'; // ✅ ¡ASEGÚRATE DE QUE ESTOS IMPORTS ESTÉN AQUÍ TAMBIÉN!
-import icon01n from '../assets/weather-icons/01n.png'; // ✅ ¡ASEGÚRATE DE QUE ESTOS IMPORTS ESTÉN AQUÍ TAMBIÉN!
+import icon01d from '../assets/weather-icons/01d.png';
+import icon01n from '../assets/weather-icons/01n.png';
 import icon02d from '../assets/weather-icons/02d.png';
 import icon02n from '../assets/weather-icons/02n.png';
 import icon03d from '../assets/weather-icons/03d.png';
@@ -14,23 +14,26 @@ import icon04n from '../assets/weather-icons/04n.png';
 import icon50d from '../assets/weather-icons/50d.png';
 import iconmidhum from '../assets/icons/mid-hum.png';
 import iconhighhum from '../assets/icons/high-hum.png';
-import icondry from '../assets/icons/dry.png';
-import iconlowwind from '../assets/icons/low-wind.png'
-import iconmidwind from '../assets/icons/mid-wind.png'
-import iconwindstorm from '../assets/icons/wind-storm.png'
-import icontornado from '../assets/icons/tornado.png'
-import iconradioactive from '../assets/icons/radioactive.png'
+import iconlowwind from '../assets/icons/low-wind.png';
+import iconmidwind from '../assets/icons/mid-wind.png';
+import iconwindstorm from '../assets/icons/wind-storm.png';
+import icontornado from '../assets/icons/tornado.png';
+import iconradioactive from '../assets/icons/radioactive.png';
 import iconmty from '../assets/icons/mty.png';
 
 export function getMainPollutantIcon(): string {
-  return iconradioactive; 
+  return iconradioactive;
 }
 
-export function getMainLogoIcon(): string { 
-  return iconmty; 
+export function getMainLogoIcon(): string {
+  return iconmty;
 }
 
-export function getAirQualityStatus(aqi: number): AirQualityStatus {
+export function getAirQualityStatus(aqi: number | null | undefined): AirQualityStatus {
+  if (aqi === null || aqi === undefined) {
+    return 'unknown';
+  }
+
   if (aqi <= 50) {
     return 'good';
   } else if (aqi <= 100) {
@@ -56,9 +59,12 @@ export function getHumidityIcon(humidity: number): string {
   }
 }
 
-export function getWindIcon(windSpeedMs: number | undefined, windDirectionDeg: number | undefined): { icon: string, rotation?: number } {
-  if (windSpeedMs === undefined || windDirectionDeg === undefined) {
-    return { icon: '' }; // O un ícono por defecto si quieres
+export function getWindIcon(
+  windSpeedMs: number | null | undefined,
+  windDirectionDeg: number | null | undefined,
+): { icon: string; rotation?: number } {
+  if (windSpeedMs === null || windSpeedMs === undefined || windDirectionDeg === null || windDirectionDeg === undefined) {
+    return { icon: '' };
   }
 
   let icon = '';
@@ -128,6 +134,14 @@ export const getAirQualityTheme = (status: AirQualityStatus): AirQualityTheme =>
         background: '#fff1f2',
         text: '#9f1239',
         gradient: 'from-rose-700 to-rose-800',
+      };
+    case 'unknown':
+      return {
+        primary: '#64748b',
+        secondary: '#475569',
+        background: '#f8fafc',
+        text: '#334155',
+        gradient: 'from-slate-400 to-slate-500',
       };
   }
 };
@@ -242,15 +256,33 @@ export const getRecommendations = (status: AirQualityStatus): RecommendationInfo
           description: 'Si sales, usa cubrebocas N95 y limita tu tiempo de exposición al mínimo.',
         },
       ];
+    case 'unknown':
+      return [
+        {
+          icon: 'IoHelpCircle',
+          title: 'Dato no disponible',
+          description: 'No hay una lectura confiable para esta ciudad en este momento.',
+        },
+        {
+          icon: 'IoRefresh',
+          title: 'Intenta actualizar',
+          description: 'Puedes refrescar la consulta o revisar otra ciudad monitoreada.',
+        },
+        {
+          icon: 'IoInformationCircle',
+          title: 'Consulta fuentes oficiales',
+          description: 'Si necesitas tomar una decisión sensible, revisa también fuentes oficiales.',
+        },
+      ];
   }
 };
-export const getWeatherIconUrl = (iconCode: string | undefined): string | undefined => {
+
+export const getWeatherIconUrl = (iconCode: string | null | undefined): string | undefined => {
   if (!iconCode) {
     return undefined;
   }
 
-  // ¡AQUÍ VAMOS A "MAPPING" LOS ICON CODES A LAS VARIABLES QUE IMPORTAMOS!
-  const iconMap: Record<string, any> = { // 👈 ¡CAMBIA Record<string, string> A Record<string, any>!
+  const iconMap: Record<string, string> = {
     '01d': icon01d,
     '01n': icon01n,
     '02d': icon02d,
@@ -267,7 +299,7 @@ export const getWeatherIconUrl = (iconCode: string | undefined): string | undefi
     '50d': icon50d,
   };
 
-  return iconMap[iconCode]; // ¡REGRESA LA URL DE LA IMAGEN IMPORTADA!
+  return iconMap[iconCode];
 };
 
 export const getAQIDescription = (status: AirQualityStatus): string => {
@@ -284,17 +316,21 @@ export const getAQIDescription = (status: AirQualityStatus): string => {
       return 'Advertencias sanitarias de condiciones de emergencia. Es más probable que toda la población se vea afectada.';
     case 'hazardous':
       return 'Alerta sanitaria: todos pueden experimentar efectos más graves para la salud. Se recomienda evitar cualquier actividad al aire libre.';
+    case 'unknown':
+      return 'No hay una lectura confiable disponible para esta ciudad en este momento.';
   }
 };
 
 export const getPollutantInfo = (pollutant: string): { name: string; description: string } => {
   switch (pollutant) {
     case 'pm25':
+    case 'p2':
       return {
         name: 'PM2.5',
         description: 'Partículas finas con un diámetro de 2.5 micrómetros o menos, que pueden penetrar profundamente en los pulmones.',
       };
     case 'pm10':
+    case 'p1':
       return {
         name: 'PM10',
         description: 'Partículas inhalables con un diámetro de 10 micrómetros o menos, que pueden entrar en los pulmones.',
@@ -323,16 +359,6 @@ export const getPollutantInfo = (pollutant: string): { name: string; description
       return {
         name: pollutant,
         description: 'Contaminante atmosférico que puede afectar la salud y el medio ambiente.',
-      };
-      case 'p2': // ✅ ¡CASE 'p2' para PM2.5!
-      return {
-        name: 'PM2.5',
-        description: 'Partículas finas con un diámetro de 2.5 micrómetros o menos, que pueden penetrar profundamente en los pulmones.',
-      };
-    case 'p1': // ✅ ¡CASE 'p1' para PM10!
-      return {
-        name: 'PM10',
-        description: 'Partículas inhalables con un diámetro de 10 micrómetros o menos, que pueden entrar en los pulmones.',
       };
   }
 };

@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { AirQualityData, HistoricalData, Station } from '../types';
 import { getAirQualityStatus } from '../utils/airQualityUtils';
 
@@ -55,9 +54,6 @@ const MONTERREY_STATIONS: Station[] = [
 // En un entorno real, estos datos vendrían de APIs externas
 export const getCurrentAirQuality = async (): Promise<AirQualityData> => {
   try {
-    // Simulamos una llamada a la API
-    // const response = await axios.get(`https://api.waqi.info/feed/monterrey/?token=YOUR_TOKEN_HERE`);
-
     // Para la demostración, generamos datos simulados
     const aqi = Math.floor(Math.random() * 200) + 30; // AQI entre 30 y 230
     const status = getAirQualityStatus(aqi);
@@ -65,6 +61,7 @@ export const getCurrentAirQuality = async (): Promise<AirQualityData> => {
     return {
       aqi,
       status,
+      dataQuality: 'fresh',
       pm25: Math.floor(Math.random() * 50) + 5,
       pm10: Math.floor(Math.random() * 80) + 10,
       o3: Math.floor(Math.random() * 60) + 20,
@@ -91,12 +88,10 @@ export const getCurrentAirQuality = async (): Promise<AirQualityData> => {
 };
 
 export const getHistoricalData = async (): Promise<HistoricalData[]> => {
-  // En una implementación real, esto vendría de una API
   const data: HistoricalData[] = [];
   const today = new Date();
 
-  // Generar datos para los últimos 7 días
-  for (let i = 6; i >= 0; i--) {
+  for (let i = 6; i >= 0; i -= 1) {
     const date = new Date(today);
     date.setDate(today.getDate() - i);
     const dateString = date.toISOString().split('T')[0];
@@ -113,15 +108,13 @@ export const getHistoricalData = async (): Promise<HistoricalData[]> => {
 };
 
 export const getStations = async (): Promise<Station[]> => {
-  // En una implementación real, esto vendría de una API
-  return MONTERREY_STATIONS.map(station => ({
+  return MONTERREY_STATIONS.map((station) => ({
     ...station,
-    aqi: Math.floor(Math.random() * 200) + 30, // Actualizar con valores aleatorios para simular cambios
-    status: getAirQualityStatus(station.aqi), // Recalcular el estado
+    aqi: Math.floor(Math.random() * 200) + 30,
+    status: getAirQualityStatus(station.aqi),
   }));
 };
 
-// Función para obtener datos en tiempo real (simulado para este ejemplo)
 export const getRealtimeData = async (): Promise<AirQualityData> => {
   return getCurrentAirQuality();
 };

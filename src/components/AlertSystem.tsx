@@ -43,33 +43,33 @@ export default function AlertSystem() {
     userAlerts.forEach(alert => {
       if (!alert.active) return;
 
-      let currentValue: number | undefined;
+      let currentValue: number | null | undefined;
 
       switch (alert.type) {
         case 'aqi':
           currentValue = airQualityData.aqi;
           break;
         case 'pm25':
-          currentValue = airQualityData.iaqi?.pm25?.v;
+          currentValue = airQualityData.iaqi?.pm25?.v ?? airQualityData.pm25;
           break;
         case 'pm10':
-          currentValue = airQualityData.iaqi?.pm10?.v;
+          currentValue = airQualityData.iaqi?.pm10?.v ?? airQualityData.pm10;
           break;
         case 'o3':
-          currentValue = airQualityData.iaqi?.o3?.v;
+          currentValue = airQualityData.iaqi?.o3?.v ?? airQualityData.o3;
           break;
         case 'no2':
-          currentValue = airQualityData.iaqi?.no2?.v;
+          currentValue = airQualityData.iaqi?.no2?.v ?? airQualityData.no2;
           break;
         case 'so2':
-          currentValue = airQualityData.iaqi?.so2?.v;
+          currentValue = airQualityData.iaqi?.so2?.v ?? airQualityData.so2;
           break;
         case 'co':
-          currentValue = airQualityData.iaqi?.co?.v;
+          currentValue = airQualityData.iaqi?.co?.v ?? airQualityData.co;
           break;
       }
 
-      if (currentValue !== undefined && currentValue >= alert.threshold) {
+      if (currentValue !== null && currentValue !== undefined && currentValue >= alert.threshold) {
         triggeredAlerts.push(alert.id);
       }
     });

@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { AirQualityData, AirQualityTheme, CityAirQualityData } from '../types';
-import { getAirQualityTheme, getAirQualityStatus } from '../utils/airQualityUtils';
+import { getAirQualityStatus, getAirQualityTheme } from '../utils/airQualityUtils';
 import { fetchLatestMonterreyAirQuality, MONTERREY_LOCATIONS_WITH_COORDS } from '../services/apiService';
 
 type CityOption = (typeof MONTERREY_LOCATIONS_WITH_COORDS)[number];
@@ -19,19 +19,98 @@ const AirQualityContext = createContext<AirQualityContextType | undefined>(undef
 
 export function useAirQuality() {
   const context = useContext(AirQualityContext);
-  console.log('useAirQuality context:', context);
+
   if (context === undefined) {
     throw new Error('useAirQuality must be used within an AirQualityProvider');
   }
+
   return context;
 }
 
 interface AirQualityProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 const CACHE_KEY = 'airQualityDataCache';
 const CACHE_EXPIRATION_TIME = 60 * 60 * 1000;
+
+function buildDegradedAirQualityData(city: CityOption, reason: string): AirQualityData {
+  return {
+    aqi: 0,
+    status: 'unknown',
+    dataQuality: 'degraded',
+    degradationReason: reason,
+    pm25: 0,
+    pm10: 0,
+    o3: 0,
+    no2: 0,
+    so2: 0,
+    co: 0,
+    temperature: 0,
+    humidity: 0,
+    wind: {
+      speed: 0,
+      direction: 0,
+    },
+    timestamp: new Date().toISOString(),
+    last_successful_update_at: null,
+    location: {
+      name: city.name,
+      latitude: city.latitude,
+      longitude: city.longitude,
+    },
+    weather_icon: null,
+    main_pollutant_us: null,
+  };
+}
+
+function transformApiResponse(
+  cityDataArray: CityAirQualityData[],
+  city: CityOption,
+): AirQualityData {
+  const cityData = cityDataArray.find((item) => item.city_id === city.city_id);
+
+  if (!cityData) {
+    return buildDegradedAirQualityData(
+      city,
+      `La ciudad ${city.name} no aparece en la respuesta de calidad del aire.`,
+    );
+  }
+
+  if (cityData.aqi_us === null) {
+    return buildDegradedAirQualityData(
+      city,
+      `La ciudad ${city.name} no tiene AQI valido en la respuesta actual.`,
+    );
+  }
+
+  return {
+    aqi: cityData.aqi_us,
+    status: getAirQualityStatus(cityData.aqi_us),
+    dataQuality: 'fresh',
+    pm25: 0,
+    pm10: 0,
+    o3: 0,
+    no2: 0,
+    so2: 0,
+    co: 0,
+    temperature: cityData.temperature_c ?? 0,
+    humidity: cityData.humidity_percent ?? 0,
+    wind: {
+      speed: cityData.wind_speed_ms ?? 0,
+      direction: cityData.wind_direction_deg ?? 0,
+    },
+    timestamp: cityData.reading_timestamp,
+    last_successful_update_at: cityData.last_successful_update_at,
+    location: {
+      name: cityData.city_name ?? city.name,
+      latitude: cityData.latitude ?? city.latitude,
+      longitude: cityData.longitude ?? city.longitude,
+    },
+    weather_icon: cityData.weather_icon,
+    main_pollutant_us: cityData.main_pollutant_us,
+  };
+}
 
 export function AirQualityProvider({ children }: AirQualityProviderProps) {
   const locations = useMemo(() => MONTERREY_LOCATIONS_WITH_COORDS, []);
@@ -47,30 +126,32 @@ export function AirQualityProvider({ children }: AirQualityProviderProps) {
   const [theme, setTheme] = useState<AirQualityTheme | null>(null);
   const [selectedCity, setSelectedCity] = useState<CityOption>(defaultCity);
 
-  const fetchAirQualityData = async () => {
+  const applyTransformedData = useCallback((cityDataArray: CityAirQualityData[], city: CityOption) => {
+    const transformedData = transformApiResponse(cityDataArray, city);
+    setAirQualityData(transformedData);
+    setTheme(getAirQualityTheme(transformedData.status));
+    setError(null);
+  }, []);
+
+  const fetchAirQualityData = useCallback(async () => {
     const cachedData = localStorage.getItem(CACHE_KEY);
     const cachedTime = localStorage.getItem(`${CACHE_KEY}_timestamp`);
 
-    console.log('Checking Cache...');
-
     if (cachedData && cachedTime) {
       const timeElapsed = Date.now() - Number(cachedTime);
-      console.log('Cache Time:', new Date(Number(cachedTime)).toLocaleString());
-      console.log('Time Elapsed:', timeElapsed / (60 * 60 * 1000), 'hours');
 
       if (timeElapsed < CACHE_EXPIRATION_TIME) {
-        console.log('Data from Cache - Cache is valid');
-        const parsedCacheData: CityAirQualityData[] = JSON.parse(cachedData);
-        const transformedCacheData = transformApiResponse(parsedCacheData, selectedCity);
-        setAirQualityData(transformedCacheData);
-        setTheme(getAirQualityTheme(transformedCacheData.status));
-        setLoading(false);
-        return;
+        try {
+          const parsedCacheData = JSON.parse(cachedData) as CityAirQualityData[];
+          applyTransformedData(parsedCacheData, selectedCity);
+          setLoading(false);
+          return;
+        } catch (cacheError) {
+          console.warn('No se pudo leer cache local de calidad del aire:', cacheError);
+          localStorage.removeItem(CACHE_KEY);
+          localStorage.removeItem(`${CACHE_KEY}_timestamp`);
+        }
       }
-
-      console.log('Cache Expired - Fetching new data from API');
-    } else {
-      console.log('No Cache Found - Fetching data from API');
     }
 
     try {
@@ -80,70 +161,29 @@ export function AirQualityProvider({ children }: AirQualityProviderProps) {
       if (Array.isArray(cityDataArray) && cityDataArray.length > 0) {
         localStorage.setItem(CACHE_KEY, JSON.stringify(cityDataArray));
         localStorage.setItem(`${CACHE_KEY}_timestamp`, Date.now().toString());
-        console.log('Cache Updated - New data from API');
-
-        const transformedData = transformApiResponse(cityDataArray, selectedCity);
-        setAirQualityData(transformedData);
-        setTheme(getAirQualityTheme(transformedData.status));
-        setError(null);
+        applyTransformedData(cityDataArray, selectedCity);
       } else {
-        setError('No se pudieron cargar los datos de calidad del aire');
+        const degradedData = buildDegradedAirQualityData(
+          selectedCity,
+          'Supabase devolvio una respuesta vacia para la RPC de calidad del aire.',
+        );
+        setAirQualityData(degradedData);
+        setTheme(getAirQualityTheme('unknown'));
+        setError('No se pudieron cargar datos frescos de calidad del aire.');
       }
     } catch (err) {
       console.error('Error fetching air quality data:', err);
-      setError('No se pudieron cargar los datos de calidad del aire');
+      const degradedData = buildDegradedAirQualityData(
+        selectedCity,
+        'No se pudo consultar la RPC de calidad del aire.',
+      );
+      setAirQualityData(degradedData);
+      setTheme(getAirQualityTheme('unknown'));
+      setError('No se pudieron cargar datos frescos de calidad del aire.');
     } finally {
       setLoading(false);
     }
-  };
-
-  const transformApiResponse = (cityDataArray: CityAirQualityData[], city: CityOption): AirQualityData => {
-    const cityData = cityDataArray.find((item) => item.city_id === city.city_id);
-
-    if (!cityData) {
-      console.warn(`No se encontraron datos para la ciudad con id ${city.city_id} (${city.name}) en la respuesta de la API`);
-      return {
-        aqi: 0,
-        status: 'unknown',
-        pm25: 0,
-        pm10: 0,
-        o3: 0,
-        no2: 0,
-        so2: 0,
-        co: 0,
-        temperature: 0,
-        humidity: 0,
-        wind: { speed: 0, direction: 0 },
-        timestamp: new Date().toISOString(),
-        location: { name: city.name, latitude: city.latitude, longitude: city.longitude },
-      };
-    }
-
-    return {
-      aqi: cityData.aqi_us,
-      status: getAirQualityStatus(cityData.aqi_us),
-      pm25: 0,
-      pm10: 0,
-      o3: 0,
-      no2: 0,
-      so2: 0,
-      co: 0,
-      temperature: cityData.temperature_c,
-      humidity: cityData.humidity_percent,
-      wind: {
-        speed: cityData.wind_speed_ms,
-        direction: cityData.wind_direction_deg,
-      },
-      timestamp: cityData.reading_timestamp,
-      location: {
-        name: cityData.city_name ?? city.name,
-        latitude: cityData.latitude,
-        longitude: cityData.longitude,
-      },
-      weather_icon: cityData.weather_icon,
-      main_pollutant_us: cityData.main_pollutant_us,
-    };
-  };
+  }, [applyTransformedData, selectedCity]);
 
   const changeCity = (city: CityOption) => {
     setSelectedCity(city);
@@ -151,13 +191,12 @@ export function AirQualityProvider({ children }: AirQualityProviderProps) {
 
   useEffect(() => {
     fetchAirQualityData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCity.city_id]);
+  }, [fetchAirQualityData]);
 
   useEffect(() => {
-    const intervalId = setInterval(fetchAirQualityData, 5 * 60 * 1000);
-    return () => clearInterval(intervalId);
-  }, []);
+    const intervalId = window.setInterval(fetchAirQualityData, 5 * 60 * 1000);
+    return () => window.clearInterval(intervalId);
+  }, [fetchAirQualityData]);
 
   const value: AirQualityContextType = {
     airQualityData,
