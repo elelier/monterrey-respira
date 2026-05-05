@@ -16,9 +16,8 @@ import { motion } from 'framer-motion';
 import { IoArrowForwardOutline, IoEarthOutline, IoLeafOutline, IoHelpBuoyOutline } from 'react-icons/io5';
 
 export default function Dashboard() {
-  const { airQualityData, loading, error, refreshData, selectedCity, changeCity, theme } = useAirQuality();
-  const [useStaticMap, setUseStaticMap] = useState(false);
-  const [activeMapView, setActiveMapView] = useState<'standard' | 'heatmap' | 'pollutant'>('standard');
+  const { airQualityData, loading, error, refreshData, changeCity, theme } = useAirQuality();
+  const [, setUseStaticMap] = useState(false);
 
   // Manejar errores en la carga del mapa
   useEffect(() => {
@@ -65,6 +64,17 @@ export default function Dashboard() {
       default: return 'border-blue-500';
     }
   };
+
+  const freshnessLabel = airQualityData?.dataQuality === 'fresh'
+    ? 'Última medición disponible'
+    : 'Dato no verificado';
+
+  const formattedTimestamp = airQualityData
+    ? new Date(airQualityData.timestamp).toLocaleString('es-MX', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      })
+    : 'Cargando...';
 
   if (loading && !airQualityData) {
     // Definir los colores en orden
@@ -134,6 +144,12 @@ export default function Dashboard() {
       <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-white/70 to-transparent backdrop-blur-md z-[-1] pointer-events-none" />      <CitySelector onCityChange={changeCity} />
       </div>
 
+      {error && (
+        <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800" role="status">
+          {error}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Primera columna */}
         <div className="lg:col-span-2 flex flex-col gap-6">
@@ -141,12 +157,7 @@ export default function Dashboard() {
           <AirQualityCard data={airQualityData} />
           {/* Recomendaciones basadas en la calidad del aire */}
           <Recommendations status={airQualityData.status} />
-          
-
         </div>
-
-        {/* Segunda columna */}
-        
       </div>
 
       {/* CTA para asociaciones */}
@@ -231,7 +242,7 @@ export default function Dashboard() {
           </Link>
         </div>
       </div>
-      
+
       {/* Sección de fuentes de datos */}
       <div className="mt-6 bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
         <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Fuentes de Datos</h2>
@@ -241,7 +252,7 @@ export default function Dashboard() {
 
           <ul className="list-disc pl-5 mt-3 space-y-2">
             <li>
-              <strong>IQAir (AirVisual):</strong> Proporciona datos en tiempo real de la calidad del aire en todo el mundo.
+              <strong>IQAir (AirVisual):</strong> Proporciona datos de calidad del aire en todo el mundo.
               <a href="https://www.iqair.com/air-pollution-data-api" target="_blank" rel="noopener noreferrer" className={`ml-1 hover:underline ${getStatusBorderClass().replace('border-', 'text-')}`}>Ver API</a>
             </li>
             <li>
@@ -251,7 +262,7 @@ export default function Dashboard() {
           </ul>
 
           <p className={`mt-4 p-3 rounded-lg ${getStatusButtonClass().replace('bg-', 'bg-').replace('hover:bg-', 'bg-').replace('text-white', 'bg-opacity-10 ' + getStatusBorderClass().replace('border-', 'text-'))}`}>
-            <strong>Última actualización:</strong> {airQualityData ? new Date(airQualityData.timestamp).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }) : 'Cargando...'}
+            <strong>{freshnessLabel}:</strong> {formattedTimestamp}
           </p>
         </div>
       </div>
