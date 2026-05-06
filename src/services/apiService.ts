@@ -4,11 +4,35 @@ import { CityAirQualityData, HistoricalData } from '../types';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+export type AirQualityServiceErrorCode =
+  | 'supabase_config_missing'
+  | 'supabase_rpc_error'
+  | 'supabase_unexpected_response'
+  | 'unknown_fetch_error';
+
+export class AirQualityServiceError extends Error {
+  code: AirQualityServiceErrorCode;
+
+  constructor(code: AirQualityServiceErrorCode, message: string, cause?: unknown) {
+    super(message);
+    this.name = 'AirQualityServiceError';
+    this.code = code;
+    this.cause = cause;
+  }
+}
+
+export function isAirQualityServiceError(error: unknown): error is AirQualityServiceError {
+  return error instanceof AirQualityServiceError;
+}
+
 let supabaseClient: SupabaseClient | null = null;
 
 const getSupabaseClient = () => {
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-    throw new Error('La configuración pública de Supabase no está disponible para este deployment.');
+    throw new AirQualityServiceError(
+      'supabase_config_missing',
+      'Falta VITE_SUPABASE_URL o VITE_SUPABASE_ANON_KEY en el deployment público.',
+    );
   }
 
   if (!supabaseClient) {
@@ -37,22 +61,34 @@ export const fetchLatestMonterreyAirQuality = async (): Promise<CityAirQualityDa
 
     if (error) {
       console.error('Error al consultar función de Supabase:', error);
-      throw new Error(`Error al obtener datos de Supabase: ${error.message}`);
+      throw new AirQualityServiceError(
+        'supabase_rpc_error',
+        `No se pudo consultar get_latest_air_quality_per_city: ${error.message}`,
+        error,
+      );
     }
 
     if (!Array.isArray(data)) {
       console.error('Respuesta inesperada de la función de Supabase:', data);
-      throw new Error('La respuesta de Supabase no tiene el formato esperado (no es un array).');
+      throw new AirQualityServiceError(
+        'supabase_unexpected_response',
+        'La respuesta de Supabase no tiene el formato esperado (no es un array).',
+        data,
+      );
     }
 
     return data as CityAirQualityData[];
   } catch (error: unknown) {
+    if (isAirQualityServiceError(error)) {
+      throw error;
+    }
+
     const errorMessage = error instanceof Error
       ? error.message
       : 'Error al obtener los datos de calidad del aire desde Supabase.';
 
     console.error('Detalle del error en fetchLatestMonterreyAirQuality (Supabase):', error);
-    throw new Error(errorMessage);
+    throw new AirQualityServiceError('unknown_fetch_error', errorMessage, error);
   }
 };
 
