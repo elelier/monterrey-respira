@@ -1,7 +1,11 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { AirQualityData, AirQualityTheme, CityAirQualityData } from '../types';
 import { getAirQualityStatus, getAirQualityTheme } from '../utils/airQualityUtils';
-import { fetchLatestMonterreyAirQuality, MONTERREY_LOCATIONS_WITH_COORDS } from '../services/apiService';
+import {
+  fetchLatestMonterreyAirQuality,
+  isAirQualityServiceError,
+  MONTERREY_LOCATIONS_WITH_COORDS,
+} from '../services/apiService';
 
 type CityOption = (typeof MONTERREY_LOCATIONS_WITH_COORDS)[number];
 
@@ -33,6 +37,23 @@ interface AirQualityProviderProps {
 
 const CACHE_KEY = 'airQualityDataCache';
 const CACHE_EXPIRATION_TIME = 60 * 60 * 1000;
+
+function getRpcFailureReason(error: unknown): string {
+  if (!isAirQualityServiceError(error)) {
+    return 'No se pudo consultar la fuente pública de calidad del aire.';
+  }
+
+  switch (error.code) {
+    case 'supabase_config_missing':
+      return 'El deployment público no tiene configurada la conexión de Supabase.';
+    case 'supabase_rpc_error':
+      return 'Supabase rechazó o no pudo ejecutar la RPC pública de calidad del aire.';
+    case 'supabase_unexpected_response':
+      return 'La RPC de calidad del aire respondió con un formato inesperado.';
+    default:
+      return 'No se pudo consultar la fuente pública de calidad del aire.';
+  }
+}
 
 function buildDegradedAirQualityData(city: CityOption, reason: string): AirQualityData {
   return {
@@ -173,10 +194,7 @@ export function AirQualityProvider({ children }: AirQualityProviderProps) {
       }
     } catch (err) {
       console.error('Error fetching air quality data:', err);
-      const degradedData = buildDegradedAirQualityData(
-        selectedCity,
-        'No se pudo consultar la RPC de calidad del aire.',
-      );
+      const degradedData = buildDegradedAirQualityData(selectedCity, getRpcFailureReason(err));
       setAirQualityData(degradedData);
       setTheme(getAirQualityTheme('unknown'));
       setError('No se pudieron cargar datos frescos de calidad del aire.');
