@@ -12,12 +12,13 @@ export type AirQualityServiceErrorCode =
 
 export class AirQualityServiceError extends Error {
   code: AirQualityServiceErrorCode;
+  originalError?: unknown;
 
-  constructor(code: AirQualityServiceErrorCode, message: string, cause?: unknown) {
+  constructor(code: AirQualityServiceErrorCode, message: string, originalError?: unknown) {
     super(message);
     this.name = 'AirQualityServiceError';
     this.code = code;
-    this.cause = cause;
+    this.originalError = originalError;
   }
 }
 
