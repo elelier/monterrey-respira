@@ -17,6 +17,18 @@ export interface CityAirQualityData {
 
 export type AirQualityDataQuality = 'fresh' | 'degraded';
 
+export type CityDataAvailability = 'available' | 'missing' | 'invalid-aqi';
+
+export interface CitySelectorOption {
+  city_id: number;
+  name: string;
+  latitude: number;
+  longitude: number;
+  availability: CityDataAvailability;
+  disabledReason?: string;
+  readingTimestamp?: string;
+}
+
 export interface AirQualityData {
   aqi: number;
   status: AirQualityStatus;
