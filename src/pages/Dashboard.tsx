@@ -16,7 +16,16 @@ import { motion } from 'framer-motion';
 import { IoArrowForwardOutline, IoEarthOutline, IoLeafOutline, IoHelpBuoyOutline } from 'react-icons/io5';
 
 export default function Dashboard() {
-  const { airQualityData, loading, error, refreshData, changeCity, theme } = useAirQuality();
+  const {
+    airQualityData,
+    loading,
+    error,
+    refreshData,
+    changeCity,
+    theme,
+    selectedCity,
+    cityOptions,
+  } = useAirQuality();
   const [, setUseStaticMap] = useState(false);
 
   // Manejar errores en la carga del mapa
@@ -67,7 +76,7 @@ export default function Dashboard() {
 
   const freshnessLabel = airQualityData?.dataQuality === 'fresh'
     ? 'Última medición disponible'
-    : 'Dato no verificado';
+    : 'Última lectura no disponible';
 
   const formattedTimestamp = airQualityData
     ? new Date(airQualityData.timestamp).toLocaleString('es-MX', {
@@ -105,7 +114,7 @@ export default function Dashboard() {
             }}
           >
             <svg viewBox="0 0 24 24" height="1em" width="1em" className="animate-ping">
-              <path d="M12.001 4.8c-3.2 0-5.2 1.6-6 4.8 1.2-1.6 2.6-2.2 4.2-1.8.913.228 1.565.89 2.288 1.624C13.666 10.618 15.027 12 18.001 12c3.2 0 5.2-1.6 6-4.8-1.2 1.6-2.6 2.2-4.2 1.8-.913-.228-1.565-.89-2.288-1.624C16.337 6.182 14.976 4.8 12.001 4.8zm-6 7.2c-3.2 0-5.2 1.6-6 4.8 1.2-1.6 2.6-2.2 4.2-1.8.913.228 1.565.89 2.288 1.624 1.177 1.194 2.538 2.576 5.512 2.576 3.2 0 5.2-1.6 6-4.8-1.2 1.6-2.6 2.2-4.2 1.8-.913-.228-1.565-.89-2.288-1.624C10.337 13.382 8.976 12 6.001 12z" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
+              <path d="M12.001 4.8c-3.2 0-5.2 1.6-6 4.8 1.2-1.6 2.6-2.2 4.2-1.8.913.228 1.565.89 2.288 1.624C13.666 10.618 15.027 12 18.001 12c3.2 0 5.2-1.6 6-4.8-1.2 1.6-2.6 2.2-4.2 1.8-.913-.228-1.565-.89-2.288-1.624C16.337 6.182 14.976 4.8 12.001 4.8zm-6 7.2c-3.2 0-5.2 1.6-6 4.8 1.2-1.6 2.6-2.2 4.2-1.8.913.228 1.565.89 2.288 1.624 1.177 1.194 2.538 2.576 5.512 2.576 3.2 0 5.2-1.6 6-4.8-1.2 1.6-2.6 2.2-4.2 1.8-.913-.228 1.565-.89 2.288-1.624C10.337 13.382 8.976 12 6.001 12z" fill="currentColor" stroke="currentColor" strokeWidth="2"/>
             </svg>
           </motion.div>
           <p className="mt-4 text-lg">Cargando datos de calidad del aire...</p>
@@ -140,9 +149,20 @@ export default function Dashboard() {
   return (
     <Layout>
       {/* Selector de ciudad */}
-      <div className="relative mb-5 sticky top-[65px] z-10 py-5">
-      <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-white/70 to-transparent backdrop-blur-md z-[-1] pointer-events-none" />      <CitySelector onCityChange={changeCity} />
+      <div className="relative sticky top-[65px] z-10 mb-5 py-5">
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-[-1] h-12 bg-gradient-to-b from-white/70 to-transparent backdrop-blur-md" />
+        <CitySelector
+          onCityChange={changeCity}
+          selectedCity={selectedCity}
+          cityOptions={cityOptions}
+        />
       </div>
+
+      {airQualityData.dataQuality === 'degraded' && airQualityData.degradationReason && (
+        <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800" role="status">
+          {airQualityData.degradationReason}
+        </div>
+      )}
 
       {error && (
         <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800" role="status">
@@ -199,7 +219,7 @@ export default function Dashboard() {
                 </div>
                 <h3 className="text-lg font-semibold mb-3" style={{ color: theme?.text }}>Monitoreo Ambiental</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Accede a datos en tiempo real y aprende a interpretar los índices de calidad del aire y su impacto en la salud.
+                  Accede a datos de monitoreo ambiental y aprende a interpretar los índices de calidad del aire y su impacto en la salud.
                 </p>
               </div>
             </motion.div>
