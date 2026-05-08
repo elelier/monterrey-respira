@@ -8,6 +8,7 @@ import Recommendations from '../components/Recommendations';
 //import PollutantsInfo from '../components/PollutantsInfo';
 import CitySelector from '../components/CitySelector';
 import AirQualityMap from '../components/AirQualityMap';
+import CityHistoricalTrend from '../components/CityHistoricalTrend';
 //import StationMap from '../components/StationMap';
 //import AirQualityHeatmap from '../components/AirQualityHeatmap';
 //import PollutantConcentrationMap from '../components/PollutantConcentrationMap';
@@ -157,6 +158,7 @@ export default function Dashboard() {
         <div className="lg:col-span-2 flex flex-col gap-6">
           {/* Tarjeta principal de calidad del aire */}
           <AirQualityCard data={airQualityData} />
+          <CityHistoricalTrend cityId={selectedCity.city_id} cityName={selectedCity.name} />
           {/* Recomendaciones basadas en la calidad del aire */}
           <Recommendations status={airQualityData.status} />
         </div>
