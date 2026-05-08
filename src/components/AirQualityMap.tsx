@@ -8,14 +8,19 @@ import { getAirQualityStatus, getAirQualityTheme } from '../utils/airQualityUtil
 const MONTERREY_METRO_CENTER: [number, number] = [25.6866, -100.3161];
 const MONTERREY_METRO_ZOOM = 10;
 
-const AQI_LEGEND: { label: string; range: string; status: AirQualityStatus }[] = [
-  { label: 'Buena', range: '0-50', status: 'good' },
-  { label: 'Moderada', range: '51-100', status: 'moderate' },
-  { label: 'Dañina a sensibles', range: '101-150', status: 'unhealthy-sensitive' },
-  { label: 'Dañina', range: '151-200', status: 'unhealthy' },
-  { label: 'Muy dañina', range: '201-300', status: 'very-unhealthy' },
-  { label: 'Peligrosa', range: '301+', status: 'hazardous' },
-  { label: 'Sin lectura', range: 'N/D', status: 'unknown' },
+const AQI_LEGEND: { label: string; shortLabel: string; range: string; status: AirQualityStatus }[] = [
+  { label: 'Buena', shortLabel: 'Buena', range: '0-50', status: 'good' },
+  { label: 'Moderada', shortLabel: 'Mod.', range: '51-100', status: 'moderate' },
+  {
+    label: 'Dañina a sensibles',
+    shortLabel: 'Sensibles',
+    range: '101-150',
+    status: 'unhealthy-sensitive',
+  },
+  { label: 'Dañina', shortLabel: 'Dañina', range: '151-200', status: 'unhealthy' },
+  { label: 'Muy dañina', shortLabel: 'Muy dañina', range: '201-300', status: 'very-unhealthy' },
+  { label: 'Peligrosa', shortLabel: 'Peligrosa', range: '301+', status: 'hazardous' },
+  { label: 'Sin lectura', shortLabel: 'Sin lectura', range: 'N/D', status: 'unknown' },
 ];
 
 const STATUS_LABELS: Record<AirQualityStatus, string> = {
@@ -37,19 +42,18 @@ function hasValidCoordinates(row: CityAirQualityData) {
   );
 }
 
-function formatTimestamp(timestamp: string | null | undefined) {
+function formatTime(timestamp: string | null | undefined) {
   if (!timestamp) {
-    return 'No disponible';
+    return 'N/D';
   }
 
   const parsedDate = new Date(timestamp);
 
   if (Number.isNaN(parsedDate.getTime())) {
-    return 'No disponible';
+    return 'N/D';
   }
 
   return parsedDate.toLocaleString('es-MX', {
-    dateStyle: 'medium',
     timeStyle: 'short',
   });
 }
@@ -104,6 +108,10 @@ export default function AirQualityMap() {
   const { cityRows, cityOptions, selectedCity, changeCity } = useAirQuality();
   const rowsWithCoordinates = cityRows.filter(hasValidCoordinates);
   const rowsWithoutCoordinates = cityRows.length - rowsWithCoordinates.length;
+  const selectedRow = rowsWithCoordinates.find((row) => row.city_id === selectedCity.city_id)
+    ?? rowsWithCoordinates[0];
+  const selectedStatus = getAirQualityStatus(selectedRow?.aqi_us);
+  const selectedTheme = getAirQualityTheme(selectedStatus);
 
   if (cityRows.length === 0) {
     return (
@@ -141,27 +149,24 @@ export default function AirQualityMap() {
   return (
     <section
       aria-labelledby="aqi-map-title"
-      className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-800"
+      className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-lg dark:border-slate-700 dark:bg-slate-800 sm:p-5"
     >
-      <div className="p-5">
-        <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
-          <div>
-            <h2 id="aqi-map-title" className="text-xl font-bold text-gray-900 dark:text-white">
-              Mapa metropolitano AQI
-            </h2>
-            <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
-              Toca un municipio para ver sus detalles y actualizar la tarjeta principal.
-            </p>
-          </div>
-          {rowsWithoutCoordinates > 0 && (
-            <p className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-800">
-              {rowsWithoutCoordinates} municipio(s) sin coordenadas en RPC.
-            </p>
-          )}
-        </div>
+      <div>
+        <h2 id="aqi-map-title" className="text-xl font-bold text-gray-900 dark:text-white">
+          Mapa metropolitano AQI
+        </h2>
+        <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
+          Toca un municipio para ver sus detalles y actualizar la tarjeta principal.
+        </p>
       </div>
 
-      <div className="h-[360px] w-full md:h-[430px]">
+      {rowsWithoutCoordinates > 0 && (
+        <p className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+          {rowsWithoutCoordinates} municipio(s) sin coordenadas en RPC.
+        </p>
+      )}
+
+      <div className="h-[330px] w-full overflow-hidden rounded-2xl md:h-[430px]">
         <MapContainer
           center={MONTERREY_METRO_CENTER}
           className="h-full w-full"
@@ -195,31 +200,17 @@ export default function AirQualityMap() {
                 }}
                 radius={getMarkerRadius(row)}
               >
-                <Popup>
-                  <div className="max-w-[220px] text-sm text-slate-800">
-                    <p className="text-base font-semibold">{row.city_name}</p>
-                    <dl className="mt-2 space-y-1">
-                      <div>
-                        <dt className="inline font-semibold">AQI: </dt>
-                        <dd className="inline">{row.aqi_us ?? 'No disponible'}</dd>
-                      </div>
-                      <div>
-                        <dt className="inline font-semibold">Categoría: </dt>
-                        <dd className="inline">{STATUS_LABELS[status]}</dd>
-                      </div>
-                      <div>
-                        <dt className="inline font-semibold">Contaminante: </dt>
-                        <dd className="inline">{getPollutantLabel(row.main_pollutant_us)}</dd>
-                      </div>
-                      <div>
-                        <dt className="inline font-semibold">Medición tomada: </dt>
-                        <dd className="inline">{formatTimestamp(row.reading_timestamp)}</dd>
-                      </div>
-                      <div>
-                        <dt className="inline font-semibold">Actualizado en MtyRespira: </dt>
-                        <dd className="inline">{formatTimestamp(row.last_successful_update_at)}</dd>
-                      </div>
-                    </dl>
+                <Popup keepInView maxWidth={210} minWidth={150}>
+                  <div className="max-w-[170px] text-xs text-slate-800">
+                    <p className="text-sm font-semibold leading-tight">{row.city_name}</p>
+                    <p className="mt-1 font-semibold">
+                      AQI {row.aqi_us ?? 'N/D'} · {STATUS_LABELS[status]}
+                    </p>
+                    <p className="mt-1">{getPollutantLabel(row.main_pollutant_us)}</p>
+                    <p className="mt-1 text-slate-600">
+                      Medición {formatTime(row.reading_timestamp)} · Act.{' '}
+                      {formatTime(row.last_successful_update_at)}
+                    </p>
                   </div>
                 </Popup>
               </CircleMarker>
@@ -228,26 +219,77 @@ export default function AirQualityMap() {
         </MapContainer>
       </div>
 
-      <div className="border-t border-slate-200 p-5 dark:border-slate-700">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Leyenda AQI US</h3>
-        <ul className="mt-3 grid grid-cols-1 gap-2 text-xs text-gray-700 dark:text-gray-300 sm:grid-cols-2 lg:grid-cols-4">
+      {selectedRow && (
+        <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          <h3 className="text-lg font-bold leading-tight text-gray-900 dark:text-white">
+            {selectedRow.city_name}
+          </h3>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <span
+              className="rounded-lg border px-2.5 py-1 text-lg font-bold"
+              style={{ borderColor: selectedTheme.primary, color: selectedTheme.text }}
+            >
+              AQI {selectedRow.aqi_us ?? 'N/D'}
+            </span>
+            <span
+              className="rounded-lg border px-2.5 py-1 text-sm font-semibold"
+              style={{ borderColor: selectedTheme.primary, color: selectedTheme.text }}
+            >
+              {STATUS_LABELS[selectedStatus]}
+            </span>
+          </div>
+
+          <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-slate-200 pt-4 text-sm dark:border-slate-700 sm:grid-cols-4">
+            <div>
+              <dt className="text-gray-500 dark:text-gray-400">Contaminante</dt>
+              <dd className="font-semibold text-gray-900 dark:text-white">
+                {getPollutantLabel(selectedRow.main_pollutant_us)}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-gray-500 dark:text-gray-400">Medición</dt>
+              <dd className="font-semibold text-gray-900 dark:text-white">
+                {formatTime(selectedRow.reading_timestamp)}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-gray-500 dark:text-gray-400">Actualizado</dt>
+              <dd className="font-semibold text-gray-900 dark:text-white">
+                {formatTime(selectedRow.last_successful_update_at)}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-gray-500 dark:text-gray-400">Fuente</dt>
+              <dd className="font-semibold text-gray-900 dark:text-white">MtyRespira</dd>
+            </div>
+          </dl>
+        </article>
+      )}
+
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <h3 className="text-base font-bold text-gray-900 dark:text-white">Escala AQI (US)</h3>
+        <div className="mt-3 grid grid-cols-2 gap-2 text-center text-xs sm:grid-cols-4 lg:grid-cols-7">
           {AQI_LEGEND.map((item) => {
             const theme = getAirQualityTheme(item.status);
 
             return (
-              <li className="flex items-center gap-2" key={item.status}>
-                <span
-                  aria-hidden="true"
-                  className="h-3 w-3 rounded-full border border-slate-500/30"
+              <div key={item.status}>
+                <div
+                  className="rounded-lg px-2 py-1.5 font-bold text-white"
                   style={{ backgroundColor: theme.primary }}
-                />
-                <span>
-                  <strong>{item.label}</strong> · {item.range}
-                </span>
-              </li>
+                >
+                  {item.range}
+                </div>
+                <p className="mt-1 font-medium text-gray-700 dark:text-gray-300">
+                  {item.shortLabel}
+                </p>
+              </div>
             );
           })}
-        </ul>
+        </div>
+        <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
+          AQI: Índice de Calidad del Aire bajo escala US EPA.
+        </p>
       </div>
     </section>
   );
