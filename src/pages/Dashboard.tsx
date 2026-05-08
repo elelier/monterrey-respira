@@ -131,7 +131,7 @@ export default function Dashboard() {
   return (
     <Layout>
       {/* Selector de ciudad */}
-      <div className="relative sticky top-[65px] z-10 mb-5 py-5">
+      <div className="relative sticky top-[65px] z-[1000] mb-5 py-5">
         <div className="pointer-events-none absolute inset-x-0 top-0 z-[-1] h-12 bg-gradient-to-b from-white/70 to-transparent backdrop-blur-md" />
         <CitySelector
           onCityChange={changeCity}
@@ -162,7 +162,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="mt-6">
+      <div className="relative z-0 mt-6">
         <AirQualityMap />
       </div>
 
