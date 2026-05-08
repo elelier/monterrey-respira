@@ -1,5 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { CityAirQualityData, HistoricalData } from '../types';
+import { AirQualityHistoryRow, CityAirQualityData } from '../types';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -93,25 +93,46 @@ export const fetchLatestMonterreyAirQuality = async (): Promise<CityAirQualityDa
   }
 };
 
-export const getFallbackHistoricalData = (): HistoricalData[] => {
-  console.warn('Usando datos históricos SIMULADOS. Implementar fetch real cuando esté disponible.');
-  const historicalData: HistoricalData[] = [];
-  const today = new Date();
-
-  for (let i = 6; i >= 0; i -= 1) {
-    const date = new Date(today);
-    date.setDate(today.getDate() - i);
-    const dateString = date.toISOString().split('T')[0];
-    const pm25 = Math.floor(Math.random() * 141) + 10;
-    const pm10 = Math.floor(Math.random() * 161) + 20;
-
-    historicalData.push({
-      date: dateString,
-      aqi: Math.max(pm25, pm10),
-      pm25,
-      pm10,
+export const fetchAirQualityHistoryForCity = async (
+  cityId: number,
+  hours: number,
+): Promise<AirQualityHistoryRow[]> => {
+  try {
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase.rpc('get_air_quality_history_for_city', {
+      p_city_id: cityId,
+      p_hours: hours,
     });
-  }
 
-  return historicalData;
+    if (error) {
+      console.warn('No se pudo consultar histórico de calidad del aire:', error);
+      throw new AirQualityServiceError(
+        'supabase_rpc_error',
+        `No se pudo consultar get_air_quality_history_for_city: ${error.message}`,
+        error,
+      );
+    }
+
+    if (!Array.isArray(data)) {
+      console.warn('Respuesta inesperada de histórico de calidad del aire:', data);
+      throw new AirQualityServiceError(
+        'supabase_unexpected_response',
+        'La respuesta de histórico de Supabase no tiene el formato esperado.',
+        data,
+      );
+    }
+
+    return data as AirQualityHistoryRow[];
+  } catch (error: unknown) {
+    if (isAirQualityServiceError(error)) {
+      throw error;
+    }
+
+    const errorMessage = error instanceof Error
+      ? error.message
+      : 'Error al obtener histórico de calidad del aire desde Supabase.';
+
+    console.warn('Detalle del error en fetchAirQualityHistoryForCity (Supabase):', error);
+    throw new AirQualityServiceError('unknown_fetch_error', errorMessage, error);
+  }
 };
