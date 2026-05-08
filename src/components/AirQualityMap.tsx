@@ -213,11 +213,11 @@ export default function AirQualityMap() {
                         <dd className="inline">{getPollutantLabel(row.main_pollutant_us)}</dd>
                       </div>
                       <div>
-                        <dt className="inline font-semibold">Medición: </dt>
+                        <dt className="inline font-semibold">Medición tomada: </dt>
                         <dd className="inline">{formatTimestamp(row.reading_timestamp)}</dd>
                       </div>
                       <div>
-                        <dt className="inline font-semibold">Datos actualizados: </dt>
+                        <dt className="inline font-semibold">Actualizado en MtyRespira: </dt>
                         <dd className="inline">{formatTimestamp(row.last_successful_update_at)}</dd>
                       </div>
                     </dl>
