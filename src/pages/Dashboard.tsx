@@ -7,11 +7,11 @@ import Recommendations from '../components/Recommendations';
 //import HistoricalChart from '../components/HistoricalChart';
 //import PollutantsInfo from '../components/PollutantsInfo';
 import CitySelector from '../components/CitySelector';
+import AirQualityMap from '../components/AirQualityMap';
 //import StationMap from '../components/StationMap';
 //import AirQualityHeatmap from '../components/AirQualityHeatmap';
 //import PollutantConcentrationMap from '../components/PollutantConcentrationMap';
 //import CityMapPlaceholder from '../components/CityMapPlaceholder';
-import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { IoArrowForwardOutline, IoEarthOutline, IoLeafOutline, IoHelpBuoyOutline } from 'react-icons/io5';
 
@@ -26,24 +26,6 @@ export default function Dashboard() {
     selectedCity,
     cityOptions,
   } = useAirQuality();
-  const [, setUseStaticMap] = useState(false);
-
-  // Manejar errores en la carga del mapa
-  useEffect(() => {
-    const handleMapError = (event: ErrorEvent) => {
-      // Si hay un error relacionado con Leaflet o mapas, cambiamos al placeholder
-      if (event.message.includes('Leaflet') || event.filename?.includes('leaflet')) {
-        console.warn('Error con el mapa: ', event.message);
-        setUseStaticMap(true);
-      }
-    };
-
-    window.addEventListener('error', handleMapError);
-
-    return () => {
-      window.removeEventListener('error', handleMapError);
-    };
-  }, []);
 
   // Obtener estilos de color basados en la calidad del aire
   const getStatusButtonClass = () => {
@@ -178,6 +160,10 @@ export default function Dashboard() {
           {/* Recomendaciones basadas en la calidad del aire */}
           <Recommendations status={airQualityData.status} />
         </div>
+      </div>
+
+      <div className="mt-6">
+        <AirQualityMap />
       </div>
 
       {/* CTA para asociaciones */}
