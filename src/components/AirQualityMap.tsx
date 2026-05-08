@@ -150,8 +150,7 @@ export default function AirQualityMap() {
               Mapa metropolitano AQI
             </h2>
             <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
-              Pins generados desde la RPC actual. Haz clic en un municipio para actualizar la
-              tarjeta principal.
+              Toca un municipio para ver sus detalles y actualizar la tarjeta principal.
             </p>
           </div>
           {rowsWithoutCoordinates > 0 && (
