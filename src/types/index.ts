@@ -25,7 +25,21 @@ export interface AirQualityHistoryRow {
   humidity_percent: number | null;
 }
 
+export interface AirQualityDailyHistoryRow {
+  city_id: number;
+  city_name: string;
+  reading_date: string;
+  avg_aqi_us: number | null;
+  max_aqi_us: number | null;
+  avg_temperature_c: number | null;
+  avg_humidity_percent: number | null;
+  dominant_pollutant_us: string | null;
+  reading_count: number;
+}
+
 export type AirQualityTrend = 'rising' | 'falling' | 'stable' | 'insufficient-data';
+
+export type AirQualityHistoryMetric = 'aqi_us' | 'temperature_c' | 'humidity_percent';
 
 export type AirQualityDataQuality = 'fresh' | 'degraded';
 
