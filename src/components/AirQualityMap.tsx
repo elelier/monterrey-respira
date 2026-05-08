@@ -217,7 +217,7 @@ export default function AirQualityMap() {
                         <dd className="inline">{formatTimestamp(row.reading_timestamp)}</dd>
                       </div>
                       <div>
-                        <dt className="inline font-semibold">Último éxito pipeline: </dt>
+                        <dt className="inline font-semibold">Datos actualizados: </dt>
                         <dd className="inline">{formatTimestamp(row.last_successful_update_at)}</dd>
                       </div>
                     </dl>
