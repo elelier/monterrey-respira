@@ -24,7 +24,7 @@ interface ChartPoint {
   aqi: number;
 }
 
-const RANGE_OPTIONS: Array<{ label: string; value: HistoryRange }> = [
+const RANGE_OPTIONS: { label: string; value: HistoryRange }[] = [
   { label: '24h', value: 24 },
   { label: '7d', value: 168 },
 ];
