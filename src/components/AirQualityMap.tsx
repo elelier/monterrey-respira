@@ -8,7 +8,7 @@ import { getAirQualityStatus, getAirQualityTheme } from '../utils/airQualityUtil
 const MONTERREY_METRO_CENTER: [number, number] = [25.6866, -100.3161];
 const MONTERREY_METRO_ZOOM = 10;
 
-const AQI_LEGEND: Array<{ label: string; range: string; status: AirQualityStatus }> = [
+const AQI_LEGEND: { label: string; range: string; status: AirQualityStatus }[] = [
   { label: 'Buena', range: '0-50', status: 'good' },
   { label: 'Moderada', range: '51-100', status: 'moderate' },
   { label: 'Dañina a sensibles', range: '101-150', status: 'unhealthy-sensitive' },
