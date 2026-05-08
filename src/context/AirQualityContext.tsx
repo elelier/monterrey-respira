@@ -23,6 +23,7 @@ interface AirQualityContextType {
   refreshData: () => Promise<void>;
   selectedCity: CityOption;
   cityOptions: CitySelectorOption[];
+  cityRows: CityAirQualityData[];
   changeCity: (city: CityOption) => void;
 }
 
@@ -316,6 +317,7 @@ export function AirQualityProvider({ children }: AirQualityProviderProps) {
     refreshData,
     selectedCity,
     cityOptions,
+    cityRows: cityDataArray,
     changeCity,
   };
 
