@@ -15,6 +15,18 @@ export interface CityAirQualityData {
   last_successful_update_at: string | null;
 }
 
+export interface AirQualityHistoryRow {
+  city_id: number;
+  city_name: string;
+  reading_timestamp: string;
+  aqi_us: number | null;
+  main_pollutant_us: string | null;
+  temperature_c: number | null;
+  humidity_percent: number | null;
+}
+
+export type AirQualityTrend = 'rising' | 'falling' | 'stable' | 'insufficient-data';
+
 export type AirQualityDataQuality = 'fresh' | 'degraded';
 
 export type CityDataAvailability = 'available' | 'missing' | 'invalid-aqi';
