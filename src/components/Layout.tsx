@@ -12,12 +12,14 @@ interface LayoutProps {
 }
 
 export default function Layout({ children }: LayoutProps) {
-  const { theme, airQualityData } = useAirQuality();
+  const { theme, airQualityData, selectedCity } = useAirQuality();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
-  // Obtener la ciudad actual para el título
-  const currentCity = 'Monterrey';
+  // Obtener la ciudad actual para el título y compartir.
+  const currentCity = selectedCity.name;
+  const shareTitle = `MonterreyRespira - Calidad del Aire en ${currentCity}`;
+  const shareDescription = `Consulta la calidad del aire en ${currentCity} con MtyRespira. Revisa AQI, contaminante principal y recomendaciones de salud.`;
 
   // Obtener la imagen de compartición basada en la calidad del aire
   const getShareImage = () => {
@@ -78,8 +80,8 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <>
       <Metadata
-        title={`MonterreyRespira - Calidad del Aire en ${currentCity}`}
-        description={`Monitoreo de la calidad del aire disponible en ${currentCity} y su area metropolitana. Conozca los niveles de contaminantes y obtenga recomendaciones para proteger su salud.`}
+        title={shareTitle}
+        description={shareDescription}
         keywords={`calidad del aire, contaminación, ${currentCity}, ambiente, monitoreo, salud`}
         image={getShareImage()}
         type="website"
@@ -195,8 +197,8 @@ export default function Layout({ children }: LayoutProps) {
                 onClick={() => {
                   if (navigator.share) {
                     navigator.share({
-                      title: `MonterreyRespira - Calidad del Aire en ${currentCity}`,
-                      text: `Monitoreo de la calidad del aire disponible en ${currentCity}. Conozca los niveles de contaminantes y obtenga recomendaciones para proteger su salud.`,
+                      title: shareTitle,
+                      text: shareDescription,
                       url: window.location.href
                     })
                     .catch(console.error);
