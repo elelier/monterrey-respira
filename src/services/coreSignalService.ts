@@ -5,24 +5,28 @@ import {
 } from '../utils/coverageUtils';
 
 const CORE_DB_SUPABASE_URL = import.meta.env.VITE_CORE_DB_SUPABASE_URL;
-const CORE_DB_SUPABASE_ANON_KEY = import.meta.env.VITE_CORE_DB_SUPABASE_ANON_KEY;
+const CORE_DB_SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_CORE_DB_SUPABASE_PUBLISHABLE_KEY;
+const CORE_SPACE_KEY = import.meta.env.VITE_CORE_SPACE_KEY;
+const CORE_APP_KEY = import.meta.env.VITE_CORE_APP_KEY;
 
-const MTYRESPIRA_SPACE_KEY = 'mtyrespira';
-const MTYRESPIRA_APP_KEY = 'mtyrespira-web';
 const OUT_OF_COVERAGE_SIGNAL_KIND = 'out_of_coverage_geolocation';
 
 let coreDbClient: SupabaseClient | null = null;
 
 function getCoreDbClient() {
-  if (!CORE_DB_SUPABASE_URL || !CORE_DB_SUPABASE_ANON_KEY) {
+  if (!CORE_DB_SUPABASE_URL || !CORE_DB_SUPABASE_PUBLISHABLE_KEY) {
     return null;
   }
 
   if (!coreDbClient) {
-    coreDbClient = createClient(CORE_DB_SUPABASE_URL, CORE_DB_SUPABASE_ANON_KEY);
+    coreDbClient = createClient(CORE_DB_SUPABASE_URL, CORE_DB_SUPABASE_PUBLISHABLE_KEY);
   }
 
   return coreDbClient;
+}
+
+function hasCoreSignalKeys() {
+  return Boolean(CORE_SPACE_KEY && CORE_APP_KEY);
 }
 
 function getOptionalBrowserLanguage() {
@@ -67,8 +71,8 @@ export function buildOutOfCoverageDemandSignalPayload({
   }
 
   return {
-    space_key: MTYRESPIRA_SPACE_KEY,
-    app_key: MTYRESPIRA_APP_KEY,
+    space_key: CORE_SPACE_KEY,
+    app_key: CORE_APP_KEY,
     kind: OUT_OF_COVERAGE_SIGNAL_KIND,
     title: 'Out-of-coverage geolocation demand',
     summary: 'User geolocation was outside the MtyRespira supported area.',
@@ -80,7 +84,7 @@ export function buildOutOfCoverageDemandSignalPayload({
 export async function submitOutOfCoverageDemandSignal(input: OutOfCoverageDemandSignalInput) {
   const supabase = getCoreDbClient();
 
-  if (!supabase) {
+  if (!supabase || !hasCoreSignalKeys()) {
     return { ok: false, skipped: true, reason: 'core_db_config_missing' };
   }
 
