@@ -43,6 +43,8 @@ export type AirQualityHistoryMetric = 'aqi_us' | 'temperature_c' | 'humidity_per
 
 export type AirQualityDataQuality = 'fresh' | 'degraded';
 
+export type MeasurementFreshness = 'fresh' | 'degraded' | 'stale' | 'unknown';
+
 export type CityDataAvailability = 'available' | 'missing' | 'invalid-aqi';
 
 export interface CitySelectorOption {
@@ -60,6 +62,7 @@ export interface AirQualityData {
   status: AirQualityStatus;
   dataQuality: AirQualityDataQuality;
   degradationReason?: string;
+  measurementFreshness: MeasurementFreshness;
   pm25: number;
   pm10: number;
   o3: number;

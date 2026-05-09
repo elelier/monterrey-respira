@@ -40,16 +40,16 @@ export default function DatosYApis() {
 
               <div className="space-y-6 mt-6">
                 <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2">IQAir (AirVisual)</h3>
+                  <h3 className="font-semibold mb-2">WAQI/AQICN</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-                    Plataforma global que proporciona datos sobre calidad del aire en tiempo real mediante una red de estaciones de monitoreo y sensores distribuidos por todo el mundo.
+                    Proveedor activo para lecturas AQI de estaciones verificadas en el area metropolitana.
                   </p>
                   <ul className="text-sm space-y-1 text-gray-600 dark:text-gray-300 list-disc pl-5">
-                    <li>Ofrece datos precisos sobre PM2.5, PM10, temperatura y humedad.</li>
+                    <li>Entrega AQI, contaminante dominante y campos meteorologicos cuando la estacion los publica.</li>
                     <li>Proporciona el Índice de Calidad del Aire (AQI) según estándares de la EPA.</li>
                     <li>Actualización de datos cada hora.</li>
                   </ul>
-                  <a href="https://www.iqair.com/air-pollution-data-api" target="_blank" rel="noopener noreferrer" className={`mt-2 inline-block text-sm font-medium ${getThemeTextColor()}`}>
+                  <a href="https://aqicn.org/api/" target="_blank" rel="noopener noreferrer" className={`mt-2 inline-block text-sm font-medium ${getThemeTextColor()}`}>
                     Documentación de la API →
                   </a>
                 </div>
@@ -80,7 +80,7 @@ export default function DatosYApis() {
                 La información recopilada de estas diversas fuentes es procesada mediante algoritmos para ofrecer datos precisos y coherentes:
               </p>
               <ol className="list-decimal pl-6 space-y-2 text-gray-700 dark:text-gray-300">
-                <li>Recolección de datos en tiempo real de múltiples fuentes.</li>
+                <li>Recolección de mediciones disponibles de múltiples fuentes.</li>
                 <li>Verificación y validación de datos para eliminar lecturas erróneas o atípicas.</li>
                 <li>Integración de datos de diferentes fuentes para proporcionar una visión completa.</li>
                 <li>Generación de recomendaciones basadas en los niveles actuales de contaminación.</li>
@@ -93,9 +93,9 @@ export default function DatosYApis() {
             <div className="p-6">
               <h2 className="text-xl font-semibold mb-4 text-amber-700 dark:text-amber-400">Notas Importantes</h2>
               <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg text-amber-800 dark:text-amber-200 mb-4">
-                <h3 className="font-semibold mb-2">Datos en Tiempo Real vs. Datos Simulados</h3>
+                <h3 className="font-semibold mb-2">Datos disponibles vs. datos simulados</h3>
                 <p className="text-sm">
-                  En algunas ocasiones, cuando no es posible acceder a las APIs en tiempo real debido a limitaciones técnicas o restricciones de acceso, MonterreyRespira puede mostrar datos simulados basados en patrones históricos y tendencias típicas. Estos datos se marcan claramente como "simulados" en la interfaz.
+                  En algunas ocasiones, cuando no es posible acceder a mediciones recientes debido a limitaciones técnicas o restricciones de acceso, MonterreyRespira puede mostrar datos simulados basados en patrones históricos y tendencias típicas. Estos datos se marcan claramente como "simulados" en la interfaz.
                 </p>
               </div>
               <div className="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-lg text-emerald-800 dark:text-emerald-200">

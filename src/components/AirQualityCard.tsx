@@ -165,6 +165,27 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
 
   const freshnessLabel = data.dataQuality === 'fresh' ? 'última medición' : 'dato no verificado';
 
+  const measurementFreshnessLabel = (() => {
+    switch (data.measurementFreshness) {
+      case 'stale':
+        return 'Ultima medicion disponible';
+      case 'degraded':
+        return 'Medicion con retraso';
+      case 'unknown':
+        return 'Hora no verificada';
+      default:
+        return freshnessLabel || 'Ultima medicion disponible';
+    }
+  })();
+
+  const pipelineTime = data.last_successful_update_at
+    ? new Date(data.last_successful_update_at).toLocaleTimeString('es-MX', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+      })
+    : null;
+
   return (
     <motion.div
       layout
@@ -181,7 +202,7 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
 
           <div className="flex items-center gap-2">
             <div className="flex items-center rounded-full bg-white/15 px-2 py-0.5 text-xs text-white backdrop-blur-sm">
-              <span>{freshnessLabel}</span>
+              <span>{measurementFreshnessLabel}</span>
             </div>
             <motion.button
               whileTap={{ scale: 0.9 }}
@@ -254,8 +275,13 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
           </div>
 
           <p className="mx-auto mt-1 max-w-xs text-sm font-medium text-white/90">
-            {data.degradationReason ?? getAQIDescription(data.status)}
+            {getAQIDescription(data.status)}
           </p>
+          {data.measurementFreshness === 'degraded' && pipelineTime && (
+            <p className="mx-auto mt-2 max-w-sm rounded-lg bg-white/15 px-3 py-2 text-xs font-medium text-white/95 backdrop-blur-sm">
+              Pipeline actualizado: {pipelineTime}
+            </p>
+          )}
         </div>
       </div>
 

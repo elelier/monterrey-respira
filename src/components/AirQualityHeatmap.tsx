@@ -369,7 +369,7 @@ export default function AirQualityHeatmap({ centralData, className = '' }: AirQu
           </p>
           <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
             <strong>Nota:</strong> Los datos mostrados son simulados con fines demostrativos. En una implementación real,
-            se obtendrían datos en tiempo real de estaciones de monitoreo.
+            se obtendrían datos disponibles de estaciones de monitoreo.
           </p>
           <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
             <strong>Interpretación:</strong> El mapa muestra datos de monitoreo combinados con interpolación espacial para estimar la

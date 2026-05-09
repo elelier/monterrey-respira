@@ -302,7 +302,7 @@ export default function CityHistoricalTrend({ cityId, cityName }: CityHistorical
             Histórico basado en mediciones disponibles; puede haber huecos.
           </p>
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            AirVisual expone AQI y contaminante dominante; no concentraciones históricas por partícula en esta integración.
+            WAQI/AQICN expone AQI y contaminante dominante; no concentraciones historicas por particula en esta integracion.
           </p>
         </div>
 

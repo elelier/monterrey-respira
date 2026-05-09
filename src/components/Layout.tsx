@@ -79,7 +79,7 @@ export default function Layout({ children }: LayoutProps) {
     <>
       <Metadata
         title={`MonterreyRespira - Calidad del Aire en ${currentCity}`}
-        description={`Monitoreo en tiempo real de la calidad del aire en ${currentCity} y su área metropolitana. Conozca los niveles de contaminantes y obtenga recomendaciones para proteger su salud.`}
+        description={`Monitoreo de la calidad del aire disponible en ${currentCity} y su area metropolitana. Conozca los niveles de contaminantes y obtenga recomendaciones para proteger su salud.`}
         keywords={`calidad del aire, contaminación, ${currentCity}, ambiente, monitoreo, salud`}
         image={getShareImage()}
         type="website"
@@ -137,7 +137,7 @@ export default function Layout({ children }: LayoutProps) {
                 </motion.div>
                 <div className="logo-container">
                   <h1 className={`${theme ? 'text-white' : 'text-black'} text-lg sm:text-2xl font-bold leading-tight transition-colors duration-500`}>MonterreyRespira</h1>
-                  <span className={`${theme ? 'text-slate-200' : 'text-gray-600'} text-xs sm:text-sm hidden sm:block transition-colors duration-500`}>Calidad del Aire en Tiempo Real</span>
+                  <span className={`${theme ? 'text-slate-200' : 'text-gray-600'} text-xs sm:text-sm hidden sm:block transition-colors duration-500`}>Calidad del aire disponible</span>
                 </div>
               </Link>
             </motion.div>
@@ -177,7 +177,9 @@ export default function Layout({ children }: LayoutProps) {
                   animate={{ opacity: 1 }}
                   className={`hidden sm:flex items-center text-sm px-3 py-1 sm:px-4 sm:py-2 rounded-full ${getHeaderBgClass()}`}
                 >
-                  <span className="font-semibold text-xs sm:text-sm">Actualizado: </span>
+                  <span className="font-semibold text-xs sm:text-sm">
+                    Medicion:
+                  </span>
                   <span className="ml-1 text-xs sm:text-sm">
                     {new Date(airQualityData.timestamp).toLocaleTimeString('es-MX', {
                       hour: '2-digit',
@@ -194,7 +196,7 @@ export default function Layout({ children }: LayoutProps) {
                   if (navigator.share) {
                     navigator.share({
                       title: `MonterreyRespira - Calidad del Aire en ${currentCity}`,
-                      text: `Monitoreo en tiempo real de la calidad del aire en ${currentCity}. Conozca los niveles de contaminantes y obtenga recomendaciones para proteger su salud.`,
+                      text: `Monitoreo de la calidad del aire disponible en ${currentCity}. Conozca los niveles de contaminantes y obtenga recomendaciones para proteger su salud.`,
                       url: window.location.href
                     })
                     .catch(console.error);
