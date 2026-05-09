@@ -215,9 +215,9 @@ const CitySelector = ({
           return;
         }
 
-        handleCityChange(nearestCity);
         setGeolocationStatus('success');
         setGeolocationMessage(`Ubicación detectada: ${nearestCity.name}`);
+        handleCityChange(nearestCity);
       },
       (error) => {
         setGeolocationStatus('error');
