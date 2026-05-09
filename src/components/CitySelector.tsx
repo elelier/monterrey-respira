@@ -2,8 +2,10 @@ import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IoChevronDownOutline, IoLocateOutline, IoSearchOutline } from 'react-icons/io5';
 import { MONTERREY_LOCATIONS_WITH_COORDS } from '../services/apiService';
+import { submitOutOfCoverageDemandSignal } from '../services/coreSignalService';
 import { CitySelectorOption } from '../types';
 import PinIcon from '../assets/icons/pin.png';
+import { findNearestSupportedCity, isOutOfCoverage } from '../utils/coverageUtils';
 
 type CityOption = (typeof MONTERREY_LOCATIONS_WITH_COORDS)[number];
 
@@ -18,7 +20,7 @@ interface CitySelectorProps {
 
 const GEOLOCATION_TIMEOUT_MS = 10000;
 const GEOLOCATION_SUCCESS_MESSAGE_MS = 3500;
-const EARTH_RADIUS_KM = 6371;
+const OUT_OF_COVERAGE_MESSAGE = 'Estás fuera del área cubierta por MtyRespira. Puedes elegir un municipio manualmente.';
 
 function normalizeSearchText(value: string) {
   return value
@@ -26,26 +28,6 @@ function normalizeSearchText(value: string) {
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim();
-}
-
-function toRadians(value: number) {
-  return (value * Math.PI) / 180;
-}
-
-function getDistanceInKm(
-  origin: GeolocationCoordinates,
-  destination: { latitude: number; longitude: number },
-) {
-  const latDelta = toRadians(destination.latitude - origin.latitude);
-  const lonDelta = toRadians(destination.longitude - origin.longitude);
-  const originLat = toRadians(origin.latitude);
-  const destinationLat = toRadians(destination.latitude);
-
-  const haversine = Math.sin(latDelta / 2) ** 2
-    + Math.cos(originLat) * Math.cos(destinationLat) * Math.sin(lonDelta / 2) ** 2;
-  const centralAngle = 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
-
-  return EARTH_RADIUS_KM * centralAngle;
 }
 
 function getGeolocationErrorMessage(error?: GeolocationPositionError) {
@@ -181,20 +163,6 @@ const CitySelector = ({
     setSearchQuery('');
   };
 
-  const findNearestAvailableCity = (coords: GeolocationCoordinates) => {
-    return resolvedCityOptions
-      .filter((city) => city.availability === 'available')
-      .filter((city) => city.latitude !== null && city.longitude !== null)
-      .map((city) => ({
-        city,
-        distance: getDistanceInKm(coords, {
-          latitude: city.latitude,
-          longitude: city.longitude,
-        }),
-      }))
-      .sort((left, right) => left.distance - right.distance)[0]?.city;
-  };
-
   const handleUseLocation = () => {
     setGeolocationMessage(null);
 
@@ -209,18 +177,45 @@ const CitySelector = ({
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const nearestCity = findNearestAvailableCity(position.coords);
+        const nearest = findNearestSupportedCity(
+          position.coords.latitude,
+          position.coords.longitude,
+          locations,
+        );
 
-        if (!nearestCity) {
+        if (!nearest) {
           setGeolocationStatus('error');
           setGeolocationMessage('No pudimos detectar una ciudad con coordenadas disponibles. Puedes elegir tu municipio manualmente.');
           setIsOpen(true);
           return;
         }
 
+        if (isOutOfCoverage(nearest.distanceKm)) {
+          setGeolocationStatus('error');
+          setGeolocationMessage(OUT_OF_COVERAGE_MESSAGE);
+          setIsOpen(true);
+          void submitOutOfCoverageDemandSignal({
+            nearestSupportedCity: nearest.city.name,
+            roundedDistanceKm: nearest.roundedDistanceKm,
+            distanceBucket: nearest.distanceBucket,
+          }).catch((error: unknown) => {
+            console.warn('No se pudo registrar señal anónima fuera de cobertura:', error);
+          });
+          return;
+        }
+
+        const nearestCity = resolvedCityOptions.find((city) => city.city_id === nearest.city.city_id);
+
+        if (!nearestCity || nearestCity.availability !== 'available') {
+          setGeolocationStatus('error');
+          setGeolocationMessage(`${nearest.city.name} fue detectado, pero no tiene lectura reciente disponible.`);
+          setIsOpen(true);
+          return;
+        }
+
+        handleCityChange(nearestCity);
         setGeolocationStatus('success');
         setGeolocationMessage(`Ubicación detectada: ${nearestCity.name}`);
-        handleCityChange(nearestCity);
       },
       (error) => {
         setGeolocationStatus('error');
