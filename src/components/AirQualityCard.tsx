@@ -168,7 +168,7 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
   const measurementFreshnessLabel = (() => {
     switch (data.measurementFreshness) {
       case 'stale':
-        return 'Medicion ambiental retrasada';
+        return 'Ultima medicion disponible';
       case 'degraded':
         return 'Medicion con retraso';
       case 'unknown':
@@ -277,10 +277,9 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
           <p className="mx-auto mt-1 max-w-xs text-sm font-medium text-white/90">
             {getAQIDescription(data.status)}
           </p>
-          {data.degradationReason && (
+          {data.measurementFreshness === 'degraded' && pipelineTime && (
             <p className="mx-auto mt-2 max-w-sm rounded-lg bg-white/15 px-3 py-2 text-xs font-medium text-white/95 backdrop-blur-sm">
-              {data.degradationReason}
-              {pipelineTime ? ` Pipeline actualizado: ${pipelineTime}` : ''}
+              Pipeline actualizado: {pipelineTime}
             </p>
           )}
         </div>

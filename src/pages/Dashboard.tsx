@@ -64,7 +64,7 @@ export default function Dashboard() {
   const sourceFreshnessLabel = (() => {
     switch (airQualityData?.measurementFreshness) {
       case 'stale':
-        return 'Medicion ambiental retrasada';
+        return 'Ultima medicion disponible';
       case 'degraded':
         return 'Medicion ambiental con retraso';
       case 'unknown':
@@ -161,7 +161,9 @@ export default function Dashboard() {
         />
       </div>
 
-      {airQualityData.dataQuality === 'degraded' && airQualityData.degradationReason && (
+      {airQualityData.dataQuality === 'degraded'
+        && airQualityData.measurementFreshness !== 'stale'
+        && airQualityData.degradationReason && (
         <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800" role="status">
           {airQualityData.degradationReason}
         </div>

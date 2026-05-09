@@ -130,7 +130,7 @@ function getMeasurementFreshnessReason(
 ): string | undefined {
   switch (freshness) {
     case 'stale':
-      return `Medicion ambiental retrasada para ${cityName}. El pipeline puede estar actualizado, pero la ultima medicion disponible es antigua.`;
+      return `Ultima medicion disponible para ${cityName}.`;
     case 'degraded':
       return `La medicion ambiental de ${cityName} tiene retraso frente a la cadencia esperada.`;
     case 'unknown':

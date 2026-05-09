@@ -178,7 +178,7 @@ export default function Layout({ children }: LayoutProps) {
                   className={`hidden sm:flex items-center text-sm px-3 py-1 sm:px-4 sm:py-2 rounded-full ${getHeaderBgClass()}`}
                 >
                   <span className="font-semibold text-xs sm:text-sm">
-                    {airQualityData.measurementFreshness === 'stale' ? 'Medicion retrasada: ' : 'Medicion: '}
+                    Medicion:
                   </span>
                   <span className="ml-1 text-xs sm:text-sm">
                     {new Date(airQualityData.timestamp).toLocaleTimeString('es-MX', {
