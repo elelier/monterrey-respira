@@ -21,6 +21,8 @@ interface CitySelectorProps {
 const GEOLOCATION_TIMEOUT_MS = 10000;
 const GEOLOCATION_SUCCESS_MESSAGE_MS = 3500;
 const OUT_OF_COVERAGE_MESSAGE = 'Estás fuera del área cubierta por MtyRespira. Puedes elegir un municipio manualmente.';
+const NO_CONFIGURED_CITIES_MESSAGE = 'No pudimos detectar una ciudad con coordenadas disponibles. Puedes elegir tu municipio manualmente.';
+const OUT_OF_COVERAGE_SIGNAL_FAILED_MESSAGE = 'Failed to submit out-of-coverage demand signal:';
 
 function normalizeSearchText(value: string) {
   return value
@@ -185,7 +187,7 @@ const CitySelector = ({
 
         if (!nearest) {
           setGeolocationStatus('error');
-          setGeolocationMessage('No pudimos detectar una ciudad con coordenadas disponibles. Puedes elegir tu municipio manualmente.');
+          setGeolocationMessage(NO_CONFIGURED_CITIES_MESSAGE);
           setIsOpen(true);
           return;
         }
@@ -199,7 +201,7 @@ const CitySelector = ({
             roundedDistanceKm: nearest.roundedDistanceKm,
             distanceBucket: nearest.distanceBucket,
           }).catch((error: unknown) => {
-            console.warn('No se pudo registrar señal anónima fuera de cobertura:', error);
+            console.warn(OUT_OF_COVERAGE_SIGNAL_FAILED_MESSAGE, error);
           });
           return;
         }
