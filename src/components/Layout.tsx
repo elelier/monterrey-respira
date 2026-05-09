@@ -2,6 +2,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAirQuality } from '../context/AirQualityContext';
 import { getMainLogoIcon, getPollutantInfo } from '../utils/airQualityUtils';
+import { AQI_STATUS_SHARE_LABELS } from '../utils/aqiDesignTokens';
 import { Link, useLocation } from 'react-router-dom';
 import { IoHomeOutline, IoInformationCircleOutline, IoLayersOutline, IoLinkOutline, IoMenuOutline, IoShareOutline } from 'react-icons/io5';
 import { Metadata } from './seo/Metadata';
@@ -17,15 +18,6 @@ interface LayoutProps {
 const CITY_SHARE_SIGNAL_FAILED_MESSAGE = 'No se pudo registrar señal anónima de compartir ciudad:';
 const SOCIAL_PREVIEW_TITLE = 'MonterreyRespira - Calidad del aire en la Zona Metropolitana';
 const SOCIAL_PREVIEW_DESCRIPTION = 'Consulta AQI, contaminante principal y recomendaciones por municipio.';
-const AIR_QUALITY_STATUS_SHARE_LABELS: Record<AirQualityStatus, string> = {
-  good: 'Buena',
-  moderate: 'Moderada',
-  'unhealthy-sensitive': 'Dañina para grupos sensibles',
-  unhealthy: 'Dañina',
-  'very-unhealthy': 'Muy dañina',
-  hazardous: 'Peligrosa',
-  unknown: 'No disponible',
-};
 
 const hasShareableAqi = (aqi: number | null | undefined, status: AirQualityStatus): aqi is number => {
   return status !== 'unknown' && typeof aqi === 'number' && Number.isFinite(aqi);
@@ -50,7 +42,7 @@ const buildCitySnapshotShareDescription = (
   const pollutantLabel = formatMainPollutantForShare(airQualityData.main_pollutant_us);
   const snapshotParts = [
     `AQI ${airQualityData.aqi}`,
-    AIR_QUALITY_STATUS_SHARE_LABELS[airQualityData.status],
+    AQI_STATUS_SHARE_LABELS[airQualityData.status],
     pollutantLabel,
   ].filter(Boolean);
 
