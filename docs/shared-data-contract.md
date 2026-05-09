@@ -40,9 +40,9 @@ supabase.rpc('get_latest_air_quality_per_city')
 
 Compatibility rule: do not rename it, remove output fields, change timestamp semantics, or change one-row-per-active-city behavior without a coordinated rollout.
 
-## Additive history RPC
+## Additive raw history RPC
 
-The frontend may consume this additive Supabase RPC for historical city trends:
+The frontend may consume this additive Supabase RPC for raw historical city trends up to 31 days:
 
 ```ts
 supabase.rpc('get_air_quality_history_for_city', {
@@ -86,16 +86,101 @@ as $$
   join public.cities c on c.id = r.city_id
   where c.id = p_city_id
     and c.is_active = true
-    and r.reading_timestamp >= now() - make_interval(hours => greatest(1, least(coalesce(p_hours, 24), 24 * 14)))
+    and r.reading_timestamp >= now() - make_interval(hours => greatest(1, least(coalesce(p_hours, 24), 24 * 31)))
   order by r.reading_timestamp asc;
 $$;
 
 grant execute on function public.get_air_quality_history_for_city(bigint, integer) to anon, authenticated;
 ```
 
+## Additive daily aggregate history RPC
+
+The frontend may consume this additive Supabase RPC for 6 month daily aggregates:
+
+```ts
+supabase.rpc('get_daily_air_quality_history_for_city', {
+  p_city_id: cityId,
+  p_days: days,
+})
+```
+
+Manual SQL to create or replace the function:
+
+```sql
+create or replace function public.get_daily_air_quality_history_for_city(
+  p_city_id bigint,
+  p_days integer default 183
+)
+returns table (
+  city_id bigint,
+  city_name text,
+  reading_date date,
+  avg_aqi_us numeric,
+  max_aqi_us smallint,
+  avg_temperature_c numeric,
+  avg_humidity_percent numeric,
+  dominant_pollutant_us text,
+  reading_count bigint
+)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  with base as (
+    select
+      c.id as city_id,
+      c.name as city_name,
+      r.reading_timestamp::date as reading_date,
+      r.aqi_us,
+      r.main_pollutant_us,
+      r.temperature_c,
+      r.humidity_percent
+    from public.air_quality_readings r
+    join public.cities c on c.id = r.city_id
+    where c.id = p_city_id
+      and c.is_active = true
+      and r.reading_timestamp >= now() - make_interval(days => greatest(1, least(coalesce(p_days, 183), 366)))
+  ), pollutant_counts as (
+    select
+      city_id,
+      reading_date,
+      main_pollutant_us,
+      count(*) as pollutant_count,
+      row_number() over (
+        partition by city_id, reading_date
+        order by count(*) desc, main_pollutant_us asc
+      ) as pollutant_rank
+    from base
+    where main_pollutant_us is not null
+    group by city_id, reading_date, main_pollutant_us
+  )
+  select
+    b.city_id,
+    max(b.city_name) as city_name,
+    b.reading_date,
+    round(avg(b.aqi_us)::numeric, 1) as avg_aqi_us,
+    max(b.aqi_us) as max_aqi_us,
+    round(avg(b.temperature_c)::numeric, 1) as avg_temperature_c,
+    round(avg(b.humidity_percent)::numeric, 1) as avg_humidity_percent,
+    max(pc.main_pollutant_us) filter (where pc.pollutant_rank = 1) as dominant_pollutant_us,
+    count(*) as reading_count
+  from base b
+  left join pollutant_counts pc
+    on pc.city_id = b.city_id
+   and pc.reading_date = b.reading_date
+   and pc.pollutant_rank = 1
+  group by b.city_id, b.reading_date
+  order by b.reading_date asc;
+$$;
+
+grant execute on function public.get_daily_air_quality_history_for_city(bigint, integer) to anon, authenticated;
+```
+
 Rollback SQL:
 
 ```sql
+drop function if exists public.get_daily_air_quality_history_for_city(bigint, integer);
 drop function if exists public.get_air_quality_history_for_city(bigint, integer);
 ```
 
@@ -124,9 +209,9 @@ The frontend expects an array compatible with this shape:
 ]
 ```
 
-## Canonical history RPC payload
+## Canonical raw history RPC payload
 
-The history RPC returns rows ordered by `reading_timestamp` ascending:
+The raw history RPC returns rows ordered by `reading_timestamp` ascending:
 
 ```jsonc
 [
@@ -142,6 +227,26 @@ The history RPC returns rows ordered by `reading_timestamp` ascending:
 ]
 ```
 
+## Canonical daily history RPC payload
+
+The daily history RPC returns rows ordered by `reading_date` ascending:
+
+```jsonc
+[
+  {
+    "city_id": 9,
+    "city_name": "Monterrey",
+    "reading_date": "2026-01-01",
+    "avg_aqi_us": 75.4,
+    "max_aqi_us": 92,
+    "avg_temperature_c": 23.1,
+    "avg_humidity_percent": 45.2,
+    "dominant_pollutant_us": "p2",
+    "reading_count": 24
+  }
+]
+```
+
 ## Field contract
 
 | Field | TypeScript expectation | Nullability rule | Notes |
@@ -152,10 +257,16 @@ The history RPC returns rows ordered by `reading_timestamp` ascending:
 | `latitude` | `number \| null` | nullable | Frontend falls back to static city coordinates if null. |
 | `longitude` | `number \| null` | nullable | Frontend falls back to static city coordinates if null. |
 | `reading_timestamp` | `string` | required | Source measurement time. Treat as UTC. |
-| `aqi_us` | `number \| null` | nullable | If null, frontend must degrade to `unknown`. History chart excludes null AQI rows. |
-| `main_pollutant_us` | `string \| null` | nullable | UI shows `N/D` if missing. |
+| `reading_date` | `string` | required for daily aggregate RPC | Daily bucket date derived from `reading_timestamp`. |
+| `aqi_us` | `number \| null` | nullable | If null, frontend must degrade to `unknown`. History chart excludes null metric rows. |
+| `avg_aqi_us` | `number \| null` | nullable | Daily aggregate average. |
+| `max_aqi_us` | `number \| null` | nullable | Daily aggregate max. |
+| `main_pollutant_us` | `string \| null` | nullable | Dominant pollutant marker, not pollutant concentration. |
+| `dominant_pollutant_us` | `string \| null` | nullable | Daily dominant pollutant marker, not pollutant concentration. |
 | `temperature_c` | `number \| null` | nullable | UI shows `N/D` if missing. |
+| `avg_temperature_c` | `number \| null` | nullable | Daily aggregate average. |
 | `humidity_percent` | `number \| null` | nullable | UI shows `N/D` if missing. |
+| `avg_humidity_percent` | `number \| null` | nullable | Daily aggregate average. |
 | `wind_speed_ms` | `number \| null` | nullable | UI shows `N/D` if missing. |
 | `wind_direction_deg` | `number \| null` | nullable | UI hides icon rotation if missing. |
 | `weather_icon` | `string \| null` | nullable | UI hides weather icon if missing. |
@@ -177,6 +288,22 @@ Rules:
 - The UI must not imply stronger freshness than the hourly producer cadence.
 - If data is missing, stale, nullable in critical fields, or contract-invalid, the frontend must fail closed to an explicit degraded/unknown state.
 - Historical charts are based only on stored measurements available in `air_quality_readings`; gaps are allowed and must not be filled with invented zeroes.
+- 24h, 7d, and 30d use raw readings by `reading_timestamp`.
+- 6m uses daily aggregates to avoid heavy mobile chart rendering.
+
+## Pollutant data limitation
+
+The current AirVisual integration exposes and stores AQI and dominant pollutant keys from `current.pollution` (`aqius`, `mainus`, `aqicn`, `maincn`, `ts`). It does not provide confirmed historical concentration series for PM2.5, PM10, O3, NO2, SO2, or CO in the current contract.
+
+Allowed:
+
+- Show `main_pollutant_us` or `dominant_pollutant_us` as dominant pollutant metadata.
+- Show distribution/frequency of dominant pollutant values.
+
+Prohibited:
+
+- Do not graph PM2.5, PM10, O3, NO2, SO2, or CO as concentration series unless new columns or a confirmed provider contract exist.
+- Do not infer pollutant concentrations from AQI or dominant pollutant markers.
 
 ## Degradation rules
 
