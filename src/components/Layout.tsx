@@ -14,16 +14,17 @@ interface LayoutProps {
 }
 
 const CITY_SHARE_SIGNAL_FAILED_MESSAGE = 'No se pudo registrar señal anónima de compartir ciudad:';
+const SOCIAL_PREVIEW_TITLE = 'MonterreyRespira - Calidad del aire en la Zona Metropolitana';
+const SOCIAL_PREVIEW_DESCRIPTION = 'Consulta AQI, contaminante principal y recomendaciones por municipio.';
 
 export default function Layout({ children }: LayoutProps) {
   const { theme, airQualityData, selectedCity } = useAirQuality();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
-  // Obtener la ciudad actual para el título y compartir.
+  // Obtener la ciudad actual para el mensaje de compartir.
   const currentCity = selectedCity.name;
-  const shareTitle = `MonterreyRespira - Calidad del Aire en ${currentCity}`;
-  const shareDescription = `Consulta la calidad del aire en ${currentCity} con MtyRespira. Revisa AQI, contaminante principal y recomendaciones de salud.`;
+  const shareDescription = `Calidad del aire en ${currentCity}:\nRevisa AQI, contaminante principal y recomendaciones en MtyRespira.`;
 
   const submitShareSignal = (shareMethod: CityShareMethod) => {
     void submitCityShareSignal({
@@ -98,9 +99,9 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <>
       <Metadata
-        title={shareTitle}
-        description={shareDescription}
-        keywords={`calidad del aire, contaminación, ${currentCity}, ambiente, monitoreo, salud`}
+        title={SOCIAL_PREVIEW_TITLE}
+        description={SOCIAL_PREVIEW_DESCRIPTION}
+        keywords={`calidad del aire, contaminación, ${currentCity}, zona metropolitana, ambiente, monitoreo, salud`}
         image={getShareImage()}
         type="website"
       />
@@ -215,7 +216,7 @@ export default function Layout({ children }: LayoutProps) {
                 onClick={() => {
                   if (navigator.share) {
                     navigator.share({
-                      title: shareTitle,
+                      title: SOCIAL_PREVIEW_TITLE,
                       text: shareDescription,
                       url: window.location.href
                     })
