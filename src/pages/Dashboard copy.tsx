@@ -247,7 +247,7 @@ export default function Dashboard() {
                 </div>
                 <h3 className="text-lg font-semibold mb-3 text-amber-800 dark:text-amber-300">Monitoreo Ambiental</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Accede a datos en tiempo real y aprende a interpretar los índices de calidad del aire y su impacto en la salud.
+                  Accede a datos disponibles y aprende a interpretar los índices de calidad del aire y su impacto en la salud.
                 </p>
               </div>
             </motion.div>
@@ -305,7 +305,7 @@ export default function Dashboard() {
 
           <ul className="list-disc pl-5 mt-3 space-y-2">
             <li>
-              <strong>IQAir (AirVisual):</strong> Proporciona datos en tiempo real de la calidad del aire en todo el mundo.
+              <strong>WAQI/AQICN:</strong> Proporciona lecturas AQI de estaciones verificadas.
               <a href="https://www.iqair.com/air-pollution-data-api" target="_blank" rel="noopener noreferrer" className={`ml-1 hover:underline ${getStatusBorderClass().replace('border-', 'text-')}`}>Ver API</a>
             </li>
             <li>

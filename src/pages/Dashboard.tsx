@@ -61,12 +61,32 @@ export default function Dashboard() {
     ? 'Última medición disponible'
     : 'Última lectura no disponible';
 
+  const sourceFreshnessLabel = (() => {
+    switch (airQualityData?.measurementFreshness) {
+      case 'stale':
+        return 'Medicion ambiental retrasada';
+      case 'degraded':
+        return 'Medicion ambiental con retraso';
+      case 'unknown':
+        return 'Hora de medicion no verificada';
+      default:
+        return freshnessLabel || 'Ultima medicion disponible';
+    }
+  })();
+
   const formattedTimestamp = airQualityData
     ? new Date(airQualityData.timestamp).toLocaleString('es-MX', {
         dateStyle: 'medium',
         timeStyle: 'short',
       })
     : 'Cargando...';
+
+  const formattedPipelineUpdate = airQualityData?.last_successful_update_at
+    ? new Date(airQualityData.last_successful_update_at).toLocaleString('es-MX', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      })
+    : null;
 
   if (loading && !airQualityData) {
     // Definir los colores en orden
@@ -260,8 +280,8 @@ export default function Dashboard() {
 
           <ul className="list-disc pl-5 mt-3 space-y-2">
             <li>
-              <strong>IQAir (AirVisual):</strong> Proporciona datos de calidad del aire en todo el mundo.
-              <a href="https://www.iqair.com/air-pollution-data-api" target="_blank" rel="noopener noreferrer" className={`ml-1 hover:underline ${getStatusBorderClass().replace('border-', 'text-')}`}>Ver API</a>
+              <strong>WAQI/AQICN:</strong> Proveedor activo para lecturas AQI de estaciones verificadas.
+              <a href="https://aqicn.org/api/" target="_blank" rel="noopener noreferrer" className={`ml-1 hover:underline ${getStatusBorderClass().replace('border-', 'text-')}`}>Ver API</a>
             </li>
             <li>
               <strong>Sistema Integral de Monitoreo Ambiental (SIMA):</strong> Red de estaciones de monitoreo que cubre la zona metropolitana de Monterrey.
@@ -270,7 +290,10 @@ export default function Dashboard() {
           </ul>
 
           <p className={`mt-4 p-3 rounded-lg ${getStatusButtonClass().replace('bg-', 'bg-').replace('hover:bg-', 'bg-').replace('text-white', 'bg-opacity-10 ' + getStatusBorderClass().replace('border-', 'text-'))}`}>
-            <strong>{freshnessLabel}:</strong> {formattedTimestamp}
+            <strong>{sourceFreshnessLabel}:</strong> {formattedTimestamp}
+            {formattedPipelineUpdate ? (
+              <span className="block">Pipeline actualizado: {formattedPipelineUpdate}</span>
+            ) : null}
           </p>
         </div>
       </div>

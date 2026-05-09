@@ -45,6 +45,8 @@ interface AirQualityProviderProps {
 
 const CACHE_KEY = 'airQualityDataCache';
 const CACHE_EXPIRATION_TIME = 60 * 60 * 1000;
+const MEASUREMENT_DEGRADED_HOURS = 2;
+const MEASUREMENT_STALE_HOURS = 6;
 
 function getRpcFailureReason(error: unknown): string {
   if (!isAirQualityServiceError(error)) {
@@ -69,6 +71,7 @@ function buildDegradedAirQualityData(city: CityOption, reason: string): AirQuali
     status: 'unknown',
     dataQuality: 'degraded',
     degradationReason: reason,
+    measurementFreshness: 'unknown',
     pm25: 0,
     pm10: 0,
     o3: 0,
@@ -91,6 +94,50 @@ function buildDegradedAirQualityData(city: CityOption, reason: string): AirQuali
     weather_icon: null,
     main_pollutant_us: null,
   };
+}
+
+function getMeasurementAgeHours(readingTimestamp: string): number | null {
+  const readingTime = new Date(readingTimestamp).getTime();
+
+  if (Number.isNaN(readingTime)) {
+    return null;
+  }
+
+  return (Date.now() - readingTime) / (60 * 60 * 1000);
+}
+
+function getMeasurementFreshness(readingTimestamp: string): AirQualityData['measurementFreshness'] {
+  const ageHours = getMeasurementAgeHours(readingTimestamp);
+
+  if (ageHours === null) {
+    return 'unknown';
+  }
+
+  if (ageHours > MEASUREMENT_STALE_HOURS) {
+    return 'stale';
+  }
+
+  if (ageHours > MEASUREMENT_DEGRADED_HOURS) {
+    return 'degraded';
+  }
+
+  return 'fresh';
+}
+
+function getMeasurementFreshnessReason(
+  freshness: AirQualityData['measurementFreshness'],
+  cityName: string,
+): string | undefined {
+  switch (freshness) {
+    case 'stale':
+      return `Medicion ambiental retrasada para ${cityName}. El pipeline puede estar actualizado, pero la ultima medicion disponible es antigua.`;
+    case 'degraded':
+      return `La medicion ambiental de ${cityName} tiene retraso frente a la cadencia esperada.`;
+    case 'unknown':
+      return `No se pudo validar la hora de medicion ambiental para ${cityName}.`;
+    default:
+      return undefined;
+  }
 }
 
 function getCityAvailability(row: CityAirQualityData | undefined): CityDataAvailability {
@@ -152,10 +199,18 @@ function transformApiResponse(
     );
   }
 
+  const measurementFreshness = getMeasurementFreshness(cityData.reading_timestamp);
+  const measurementFreshnessReason = getMeasurementFreshnessReason(
+    measurementFreshness,
+    cityData.city_name ?? city.name,
+  );
+
   return {
     aqi: cityData.aqi_us,
     status: getAirQualityStatus(cityData.aqi_us),
-    dataQuality: 'fresh',
+    dataQuality: measurementFreshness === 'fresh' ? 'fresh' : 'degraded',
+    degradationReason: measurementFreshnessReason,
+    measurementFreshness,
     pm25: 0,
     pm10: 0,
     o3: 0,

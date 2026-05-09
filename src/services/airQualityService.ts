@@ -62,6 +62,7 @@ export const getCurrentAirQuality = async (): Promise<AirQualityData> => {
       aqi,
       status,
       dataQuality: 'fresh',
+      measurementFreshness: 'fresh',
       pm25: Math.floor(Math.random() * 50) + 5,
       pm10: Math.floor(Math.random() * 80) + 10,
       o3: Math.floor(Math.random() * 60) + 20,
