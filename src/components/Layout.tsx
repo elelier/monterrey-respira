@@ -6,18 +6,39 @@ import { Link, useLocation } from 'react-router-dom';
 import { IoHomeOutline, IoInformationCircleOutline, IoLayersOutline, IoLinkOutline, IoMenuOutline, IoShareOutline } from 'react-icons/io5';
 import { Metadata } from './seo/Metadata';
 import { Analytics } from './seo/Analytics';
+import { getCitySlug } from '../utils/cityRoutingUtils';
+import { CityShareMethod, submitCityShareSignal } from '../services/coreSignalService';
 
 interface LayoutProps {
   children: ReactNode;
 }
 
+const CITY_SHARE_SIGNAL_FAILED_MESSAGE = 'No se pudo registrar señal anónima de compartir ciudad:';
+const SOCIAL_PREVIEW_TITLE = 'MonterreyRespira - Calidad del aire en la Zona Metropolitana';
+const SOCIAL_PREVIEW_DESCRIPTION = 'Consulta AQI, contaminante principal y recomendaciones por municipio.';
+
 export default function Layout({ children }: LayoutProps) {
-  const { theme, airQualityData } = useAirQuality();
+  const { theme, airQualityData, selectedCity } = useAirQuality();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
-  // Obtener la ciudad actual para el título
-  const currentCity = 'Monterrey';
+  // Obtener la ciudad actual para el mensaje de compartir.
+  const currentCity = selectedCity.name;
+  const shareDescription = `Calidad del aire en ${currentCity}:\nRevisa AQI, contaminante principal y recomendaciones en MtyRespira.`;
+
+  const submitShareSignal = (shareMethod: CityShareMethod) => {
+    void submitCityShareSignal({
+      cityId: selectedCity.city_id,
+      cityName: selectedCity.name,
+      citySlug: getCitySlug(selectedCity),
+      route: window.location.pathname,
+      shareMethod,
+      aqiUs: airQualityData?.aqi ?? null,
+      measurementFreshness: airQualityData?.measurementFreshness ?? 'unknown',
+    }).catch((error: unknown) => {
+      console.warn(CITY_SHARE_SIGNAL_FAILED_MESSAGE, error);
+    });
+  };
 
   // Obtener la imagen de compartición basada en la calidad del aire
   const getShareImage = () => {
@@ -78,9 +99,9 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <>
       <Metadata
-        title={`MonterreyRespira - Calidad del Aire en ${currentCity}`}
-        description={`Monitoreo de la calidad del aire disponible en ${currentCity} y su area metropolitana. Conozca los niveles de contaminantes y obtenga recomendaciones para proteger su salud.`}
-        keywords={`calidad del aire, contaminación, ${currentCity}, ambiente, monitoreo, salud`}
+        title={SOCIAL_PREVIEW_TITLE}
+        description={SOCIAL_PREVIEW_DESCRIPTION}
+        keywords={`calidad del aire, contaminación, ${currentCity}, zona metropolitana, ambiente, monitoreo, salud`}
         image={getShareImage()}
         type="website"
       />
@@ -195,15 +216,23 @@ export default function Layout({ children }: LayoutProps) {
                 onClick={() => {
                   if (navigator.share) {
                     navigator.share({
-                      title: `MonterreyRespira - Calidad del Aire en ${currentCity}`,
-                      text: `Monitoreo de la calidad del aire disponible en ${currentCity}. Conozca los niveles de contaminantes y obtenga recomendaciones para proteger su salud.`,
+                      title: SOCIAL_PREVIEW_TITLE,
+                      text: shareDescription,
                       url: window.location.href
                     })
-                    .catch(console.error);
+                      .then(() => submitShareSignal('native_share'))
+                      .catch((error: unknown) => {
+                        if (error instanceof DOMException && error.name === 'AbortError') {
+                          return;
+                        }
+
+                        console.error(error);
+                      });
                   } else {
                     // Copiar URL al portapapeles como alternativa
                     navigator.clipboard.writeText(window.location.href)
                       .then(() => {
+                        submitShareSignal('clipboard_fallback');
                         alert('URL copiada al portapapeles');
                       })
                       .catch(console.error);
