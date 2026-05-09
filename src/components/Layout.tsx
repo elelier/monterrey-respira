@@ -6,10 +6,14 @@ import { Link, useLocation } from 'react-router-dom';
 import { IoHomeOutline, IoInformationCircleOutline, IoLayersOutline, IoLinkOutline, IoMenuOutline, IoShareOutline } from 'react-icons/io5';
 import { Metadata } from './seo/Metadata';
 import { Analytics } from './seo/Analytics';
+import { getCitySlug } from '../utils/cityRoutingUtils';
+import { CityShareMethod, submitCityShareSignal } from '../services/coreSignalService';
 
 interface LayoutProps {
   children: ReactNode;
 }
+
+const CITY_SHARE_SIGNAL_FAILED_MESSAGE = 'No se pudo registrar señal anónima de compartir ciudad:';
 
 export default function Layout({ children }: LayoutProps) {
   const { theme, airQualityData, selectedCity } = useAirQuality();
@@ -20,6 +24,20 @@ export default function Layout({ children }: LayoutProps) {
   const currentCity = selectedCity.name;
   const shareTitle = `MonterreyRespira - Calidad del Aire en ${currentCity}`;
   const shareDescription = `Consulta la calidad del aire en ${currentCity} con MtyRespira. Revisa AQI, contaminante principal y recomendaciones de salud.`;
+
+  const submitShareSignal = (shareMethod: CityShareMethod) => {
+    void submitCityShareSignal({
+      cityId: selectedCity.city_id,
+      cityName: selectedCity.name,
+      citySlug: getCitySlug(selectedCity),
+      route: window.location.pathname,
+      shareMethod,
+      aqiUs: airQualityData?.aqi ?? null,
+      measurementFreshness: airQualityData?.measurementFreshness ?? 'unknown',
+    }).catch((error: unknown) => {
+      console.warn(CITY_SHARE_SIGNAL_FAILED_MESSAGE, error);
+    });
+  };
 
   // Obtener la imagen de compartición basada en la calidad del aire
   const getShareImage = () => {
@@ -201,11 +219,19 @@ export default function Layout({ children }: LayoutProps) {
                       text: shareDescription,
                       url: window.location.href
                     })
-                    .catch(console.error);
+                      .then(() => submitShareSignal('native_share'))
+                      .catch((error: unknown) => {
+                        if (error instanceof DOMException && error.name === 'AbortError') {
+                          return;
+                        }
+
+                        console.error(error);
+                      });
                   } else {
                     // Copiar URL al portapapeles como alternativa
                     navigator.clipboard.writeText(window.location.href)
                       .then(() => {
+                        submitShareSignal('clipboard_fallback');
                         alert('URL copiada al portapapeles');
                       })
                       .catch(console.error);
