@@ -1,17 +1,67 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { IoChevronDownOutline } from 'react-icons/io5';
+import { IoChevronDownOutline, IoLocateOutline, IoSearchOutline } from 'react-icons/io5';
 import { MONTERREY_LOCATIONS_WITH_COORDS } from '../services/apiService';
 import { CitySelectorOption } from '../types';
 import PinIcon from '../assets/icons/pin.png';
 
 type CityOption = (typeof MONTERREY_LOCATIONS_WITH_COORDS)[number];
 
+type GeolocationStatus = 'idle' | 'loading' | 'success' | 'error';
+
 interface CitySelectorProps {
   onCityChange: (city: CityOption) => void;
   selectedCity?: CityOption;
   cityOptions?: CitySelectorOption[];
   className?: string;
+}
+
+const GEOLOCATION_TIMEOUT_MS = 10000;
+const EARTH_RADIUS_KM = 6371;
+
+function normalizeSearchText(value: string) {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
+
+function toRadians(value: number) {
+  return (value * Math.PI) / 180;
+}
+
+function getDistanceInKm(
+  origin: GeolocationCoordinates,
+  destination: { latitude: number; longitude: number },
+) {
+  const latDelta = toRadians(destination.latitude - origin.latitude);
+  const lonDelta = toRadians(destination.longitude - origin.longitude);
+  const originLat = toRadians(origin.latitude);
+  const destinationLat = toRadians(destination.latitude);
+
+  const haversine = Math.sin(latDelta / 2) ** 2
+    + Math.cos(originLat) * Math.cos(destinationLat) * Math.sin(lonDelta / 2) ** 2;
+  const centralAngle = 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+
+  return EARTH_RADIUS_KM * centralAngle;
+}
+
+function getGeolocationErrorMessage(error?: GeolocationPositionError) {
+  if (!error) {
+    return 'No pudimos detectar tu ubicación. Puedes elegir tu municipio manualmente.';
+  }
+
+  switch (error.code) {
+    case error.PERMISSION_DENIED:
+      return 'No pudimos detectar tu ubicación. Puedes elegir tu municipio manualmente.';
+    case error.POSITION_UNAVAILABLE:
+      return 'Tu ubicación no está disponible por ahora. Puedes elegir tu municipio manualmente.';
+    case error.TIMEOUT:
+      return 'La detección de ubicación tardó demasiado. Puedes elegir tu municipio manualmente.';
+    default:
+      return 'No pudimos detectar tu ubicación. Puedes elegir tu municipio manualmente.';
+  }
 }
 
 const CitySelector = ({
@@ -29,7 +79,11 @@ const CitySelector = ({
 
   const [selectedCityId, setSelectedCityId] = useState<number | null>(defaultCityId);
   const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [geolocationStatus, setGeolocationStatus] = useState<GeolocationStatus>('idle');
+  const [geolocationMessage, setGeolocationMessage] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const cityRefs = useRef(new Map<number, HTMLDivElement>());
 
   useEffect(() => {
@@ -47,13 +101,29 @@ const CitySelector = ({
     return resolvedCityOptions.find((city) => city.city_id === currentCityId) ?? resolvedCityOptions[0];
   }, [controlledSelectedCity, resolvedCityOptions, selectedCityId]);
 
+  const filteredCities = useMemo(() => {
+    const normalizedQuery = normalizeSearchText(searchQuery);
+
+    if (!normalizedQuery) {
+      return resolvedCityOptions;
+    }
+
+    return resolvedCityOptions.filter((city) => {
+      const normalizedName = normalizeSearchText(city.name);
+      const apiName = 'api_name' in city ? String(city.api_name ?? '') : '';
+      const normalizedApiName = normalizeSearchText(apiName);
+
+      return normalizedName.includes(normalizedQuery) || normalizedApiName.includes(normalizedQuery);
+    });
+  }, [resolvedCityOptions, searchQuery]);
+
   const availableCities = useMemo(
-    () => resolvedCityOptions.filter((city) => city.availability === 'available'),
-    [resolvedCityOptions],
+    () => filteredCities.filter((city) => city.availability === 'available'),
+    [filteredCities],
   );
   const unavailableCities = useMemo(
-    () => resolvedCityOptions.filter((city) => city.availability !== 'available'),
-    [resolvedCityOptions],
+    () => filteredCities.filter((city) => city.availability !== 'available'),
+    [filteredCities],
   );
 
   const handleClickOutside = useCallback((event: MouseEvent) => {
@@ -70,22 +140,85 @@ const CitySelector = ({
   }, [handleClickOutside]);
 
   useEffect(() => {
-    if (isOpen && selectedCity) {
+    if (isOpen) {
+      window.setTimeout(() => searchInputRef.current?.focus(), 0);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen && selectedCity && !searchQuery) {
       cityRefs.current.get(selectedCity.city_id)?.scrollIntoView({
         behavior: 'smooth',
         block: 'nearest',
       });
     }
-  }, [selectedCity, isOpen]);
+  }, [selectedCity, isOpen, searchQuery]);
 
   const handleCityChange = (city: CitySelectorOption) => {
     if (city.availability !== 'available') {
+      setGeolocationStatus('error');
+      setGeolocationMessage('Esta ciudad no tiene datos recientes.');
       return;
     }
 
     setSelectedCityId(city.city_id);
     onCityChange(city);
     setIsOpen(false);
+    setSearchQuery('');
+  };
+
+  const findNearestAvailableCity = (coords: GeolocationCoordinates) => {
+    return resolvedCityOptions
+      .filter((city) => city.availability === 'available')
+      .filter((city) => city.latitude !== null && city.longitude !== null)
+      .map((city) => ({
+        city,
+        distance: getDistanceInKm(coords, {
+          latitude: city.latitude,
+          longitude: city.longitude,
+        }),
+      }))
+      .sort((left, right) => left.distance - right.distance)[0]?.city;
+  };
+
+  const handleUseLocation = () => {
+    setGeolocationMessage(null);
+
+    if (!navigator.geolocation) {
+      setGeolocationStatus('error');
+      setGeolocationMessage('Tu navegador no permite detectar ubicación. Puedes elegir tu municipio manualmente.');
+      setIsOpen(true);
+      return;
+    }
+
+    setGeolocationStatus('loading');
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const nearestCity = findNearestAvailableCity(position.coords);
+
+        if (!nearestCity) {
+          setGeolocationStatus('error');
+          setGeolocationMessage('No pudimos detectar una ciudad con coordenadas disponibles. Puedes elegir tu municipio manualmente.');
+          setIsOpen(true);
+          return;
+        }
+
+        setGeolocationStatus('success');
+        setGeolocationMessage(`Ubicación detectada: ${nearestCity.name}`);
+        handleCityChange(nearestCity);
+      },
+      (error) => {
+        setGeolocationStatus('error');
+        setGeolocationMessage(getGeolocationErrorMessage(error));
+        setIsOpen(true);
+      },
+      {
+        enableHighAccuracy: false,
+        maximumAge: 5 * 60 * 1000,
+        timeout: GEOLOCATION_TIMEOUT_MS,
+      },
+    );
   };
 
   const renderCityOption = (city: CitySelectorOption) => {
@@ -124,7 +257,7 @@ const CitySelector = ({
           </div>
           {isDisabled && (
             <span className="shrink-0 rounded-full bg-gray-100 px-2 py-1 text-[11px] font-medium text-gray-600 dark:bg-slate-700 dark:text-gray-300">
-              {city.disabledReason ?? 'Sin datos recientes'}
+              {city.disabledReason ?? 'Esta ciudad no tiene datos recientes'}
             </span>
           )}
         </div>
@@ -134,34 +267,60 @@ const CitySelector = ({
 
   return (
     <div className={`relative z-20 ${className}`} ref={dropdownRef}>
-      <motion.div
-        whileTap={{ scale: 0.98 }}
-        className="flex cursor-pointer items-center justify-between rounded-lg border border-gray-200 bg-white p-3 shadow-md dark:border-gray-700 dark:bg-slate-800"
-        onClick={() => setIsOpen(!isOpen)}
-        role="combobox"
-        aria-expanded={isOpen}
-        aria-haspopup="listbox"
-        aria-label="Seleccionar ciudad"
-      >
-        <div className="flex items-center">
-          <div className="mr-3 flex-shrink-0 rounded-full bg-purple-100 p-2 dark:bg-purple-900/30">
-            <img src={PinIcon} alt="Pin" className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+      <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+        <motion.div
+          whileTap={{ scale: 0.98 }}
+          className="flex cursor-pointer items-center justify-between rounded-lg border border-gray-200 bg-white p-3 shadow-md dark:border-gray-700 dark:bg-slate-800"
+          onClick={() => setIsOpen(!isOpen)}
+          role="combobox"
+          aria-expanded={isOpen}
+          aria-haspopup="listbox"
+          aria-controls="city-selector-listbox"
+          aria-label="Busca tu municipio"
+        >
+          <div className="flex min-w-0 items-center">
+            <div className="mr-3 flex-shrink-0 rounded-full bg-purple-100 p-2 dark:bg-purple-900/30">
+              <img src={PinIcon} alt="Pin" className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                {selectedCity?.name ?? 'Busca tu municipio'}
+              </p>
+              <p className="truncate text-xs text-gray-500 dark:text-gray-400">
+                {selectedCity?.availability === 'available'
+                  ? 'Zona Metropolitana de Monterrey'
+                  : 'Esta ciudad no tiene datos recientes'}
+              </p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
-              {selectedCity?.name ?? 'Selecciona una ciudad'}
-            </p>
-            <p className="truncate text-xs text-gray-500 dark:text-gray-400">
-              {selectedCity?.availability === 'available'
-                ? 'Zona Metropolitana de Monterrey'
-                : 'Sin datos recientes'}
-            </p>
-          </div>
-        </div>
-        <IoChevronDownOutline
-          className={`h-5 w-5 flex-shrink-0 text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180 transform' : ''}`}
-        />
-      </motion.div>
+          <IoChevronDownOutline
+            className={`h-5 w-5 flex-shrink-0 text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180 transform' : ''}`}
+          />
+        </motion.div>
+
+        <button
+          type="button"
+          onClick={handleUseLocation}
+          className="inline-flex items-center justify-center gap-2 rounded-lg border border-purple-200 bg-white px-4 py-3 text-sm font-semibold text-purple-700 shadow-md transition hover:bg-purple-50 disabled:cursor-wait disabled:opacity-70 dark:border-purple-900/60 dark:bg-slate-800 dark:text-purple-300 dark:hover:bg-purple-900/20"
+          disabled={geolocationStatus === 'loading'}
+        >
+          <IoLocateOutline className="h-4 w-4" />
+          {geolocationStatus === 'loading' ? 'Detectando...' : 'Usar mi ubicación'}
+        </button>
+      </div>
+
+      {geolocationMessage && (
+        <p
+          className={`mt-2 rounded-lg px-3 py-2 text-xs ${
+            geolocationStatus === 'success'
+              ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300'
+              : 'bg-amber-50 text-amber-800 dark:bg-amber-900/20 dark:text-amber-200'
+          }`}
+          role="status"
+        >
+          {geolocationMessage}
+        </p>
+      )}
 
       <AnimatePresence>
         {isOpen && (
@@ -172,21 +331,49 @@ const CitySelector = ({
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
             role="listbox"
+            id="city-selector-listbox"
           >
             <div className="border-b border-gray-100 p-2 dark:border-gray-700">
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+              <label className="sr-only" htmlFor="city-selector-search">
+                Busca tu municipio
+              </label>
+              <div className="flex items-center rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 dark:border-gray-700 dark:bg-slate-900/60">
+                <IoSearchOutline className="mr-2 h-4 w-4 text-gray-400" />
+                <input
+                  ref={searchInputRef}
+                  id="city-selector-search"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Escape') {
+                      setIsOpen(false);
+                    }
+                  }}
+                  placeholder="Busca tu municipio"
+                  className="w-full bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-400 dark:text-white"
+                />
+              </div>
+              <p className="mt-2 text-xs font-medium text-gray-500 dark:text-gray-400">
                 Selecciona una ciudad con lectura disponible
               </p>
             </div>
-            <div className="max-h-60 overflow-y-auto">
-              {availableCities.map(renderCityOption)}
-              {unavailableCities.length > 0 && (
-                <div className="border-t border-gray-100 dark:border-gray-700">
-                  <p className="px-4 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                    Sin datos recientes
-                  </p>
-                  {unavailableCities.map(renderCityOption)}
+            <div className="max-h-72 overflow-y-auto">
+              {filteredCities.length === 0 ? (
+                <div className="px-4 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                  Sin resultados. Puedes elegir tu municipio manualmente.
                 </div>
+              ) : (
+                <>
+                  {availableCities.map(renderCityOption)}
+                  {unavailableCities.length > 0 && (
+                    <div className="border-t border-gray-100 dark:border-gray-700">
+                      <p className="px-4 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                        Sin datos recientes
+                      </p>
+                      {unavailableCities.map(renderCityOption)}
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </motion.div>
