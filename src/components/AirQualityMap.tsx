@@ -1,36 +1,33 @@
 import 'leaflet/dist/leaflet.css';
 
 import { CircleMarker, MapContainer, Popup, TileLayer } from 'react-leaflet';
+import { IoChevronForwardOutline, IoLocationSharp } from 'react-icons/io5';
 import { useAirQuality } from '../context/AirQualityContext';
 import { AirQualityStatus, CityAirQualityData, CitySelectorOption } from '../types';
 import { getAirQualityStatus, getAirQualityTheme } from '../utils/airQualityUtils';
+import { AQI_STATUS_COPY } from '../utils/aqiDesignTokens';
 
 const MONTERREY_METRO_CENTER: [number, number] = [25.6866, -100.3161];
 const MONTERREY_METRO_ZOOM = 10;
 
-const AQI_LEGEND: { label: string; shortLabel: string; range: string; status: AirQualityStatus }[] = [
-  { label: 'Buena', shortLabel: 'Buena', range: '0-50', status: 'good' },
-  { label: 'Moderada', shortLabel: 'Mod.', range: '51-100', status: 'moderate' },
-  {
-    label: 'Dañina a sensibles',
-    shortLabel: 'Sensibles',
-    range: '101-150',
-    status: 'unhealthy-sensitive',
-  },
-  { label: 'Dañina', shortLabel: 'Dañina', range: '151-200', status: 'unhealthy' },
-  { label: 'Muy dañina', shortLabel: 'Muy dañina', range: '201-300', status: 'very-unhealthy' },
-  { label: 'Peligrosa', shortLabel: 'Peligrosa', range: '301+', status: 'hazardous' },
-  { label: 'Sin lectura', shortLabel: 'Sin lectura', range: 'N/D', status: 'unknown' },
+const AQI_LEGEND: { shortLabel: string; range: string; status: AirQualityStatus }[] = [
+  { shortLabel: AQI_STATUS_COPY.good.shortLabel, range: '0-50', status: 'good' },
+  { shortLabel: AQI_STATUS_COPY.moderate.shortLabel, range: '51-100', status: 'moderate' },
+  { shortLabel: AQI_STATUS_COPY['unhealthy-sensitive'].shortLabel, range: '101-150', status: 'unhealthy-sensitive' },
+  { shortLabel: AQI_STATUS_COPY.unhealthy.shortLabel, range: '151-200', status: 'unhealthy' },
+  { shortLabel: AQI_STATUS_COPY['very-unhealthy'].shortLabel, range: '201-300', status: 'very-unhealthy' },
+  { shortLabel: AQI_STATUS_COPY.hazardous.shortLabel, range: '301+', status: 'hazardous' },
+  { shortLabel: AQI_STATUS_COPY.unknown.shortLabel, range: 'N/D', status: 'unknown' },
 ];
 
 const STATUS_LABELS: Record<AirQualityStatus, string> = {
-  good: 'Buena',
-  moderate: 'Moderada',
-  'unhealthy-sensitive': 'Dañina para grupos sensibles',
-  unhealthy: 'Dañina',
-  'very-unhealthy': 'Muy dañina',
-  hazardous: 'Peligrosa',
-  unknown: 'Sin lectura confiable',
+  good: AQI_STATUS_COPY.good.label,
+  moderate: AQI_STATUS_COPY.moderate.label,
+  'unhealthy-sensitive': AQI_STATUS_COPY['unhealthy-sensitive'].label,
+  unhealthy: AQI_STATUS_COPY.unhealthy.label,
+  'very-unhealthy': AQI_STATUS_COPY['very-unhealthy'].label,
+  hazardous: AQI_STATUS_COPY.hazardous.label,
+  unknown: AQI_STATUS_COPY.unknown.label,
 };
 
 function hasValidCoordinates(row: CityAirQualityData) {
@@ -73,11 +70,11 @@ function getPollutantLabel(pollutant: string | null) {
     case 'pm10':
       return 'PM10';
     case 'o3':
-      return 'O₃';
+      return 'O3';
     case 'no2':
-      return 'NO₂';
+      return 'NO2';
     case 'so2':
-      return 'SO₂';
+      return 'SO2';
     case 'co':
       return 'CO';
     default:
@@ -117,13 +114,13 @@ export default function AirQualityMap() {
     return (
       <section
         aria-labelledby="aqi-map-title"
-        className="rounded-xl border border-slate-200 bg-white p-5 shadow-lg dark:border-slate-700 dark:bg-slate-800"
+        className="rounded-[1.35rem] border border-slate-200 bg-white p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700 dark:bg-slate-800"
       >
-        <h2 id="aqi-map-title" className="text-xl font-bold text-gray-900 dark:text-white">
+        <h2 id="aqi-map-title" className="text-xl font-black text-gray-900 dark:text-white">
           Mapa metropolitano AQI
         </h2>
         <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-          El mapa se mostrará cuando la RPC pública devuelva municipios con coordenadas válidas.
+          El mapa se mostrara cuando la RPC publica devuelva municipios con coordenadas validas.
         </p>
       </section>
     );
@@ -133,13 +130,13 @@ export default function AirQualityMap() {
     return (
       <section
         aria-labelledby="aqi-map-title"
-        className="rounded-xl border border-amber-300 bg-amber-50 p-5 text-amber-900 shadow-lg"
+        className="rounded-[1.35rem] border border-amber-300 bg-amber-50 p-5 text-amber-900 shadow-[0_12px_30px_rgba(15,23,42,0.08)]"
       >
-        <h2 id="aqi-map-title" className="text-xl font-bold">
+        <h2 id="aqi-map-title" className="text-xl font-black">
           Mapa metropolitano AQI
         </h2>
         <p className="mt-2 text-sm">
-          La RPC devolvió datos, pero ninguna ciudad incluye latitude/longitude válidas. No se
+          La RPC devolvio datos, pero ninguna ciudad incluye latitude/longitude validas. No se
           muestran ubicaciones estimadas.
         </p>
       </section>
@@ -149,15 +146,21 @@ export default function AirQualityMap() {
   return (
     <section
       aria-labelledby="aqi-map-title"
-      className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-lg dark:border-slate-700 dark:bg-slate-800 sm:p-5"
+      className="space-y-4 rounded-[1.35rem] border border-slate-200 bg-white p-4 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700 dark:bg-slate-800 sm:p-5"
     >
-      <div>
-        <h2 id="aqi-map-title" className="text-xl font-bold text-gray-900 dark:text-white">
-          Mapa metropolitano AQI
-        </h2>
-        <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
-          Toca un municipio para ver sus detalles y actualizar la tarjeta principal.
-        </p>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 gap-3">
+          <IoLocationSharp className="h-8 w-8 shrink-0" style={{ color: selectedTheme.secondary }} />
+          <div className="min-w-0">
+            <h2 id="aqi-map-title" className="text-xl font-black leading-tight text-slate-950 dark:text-white">
+              Mapa metropolitano AQI
+            </h2>
+            <p className="mt-1 text-sm leading-snug text-slate-600 dark:text-slate-300">
+              Toca un municipio para ver sus detalles y actualizar la tarjeta principal.
+            </p>
+          </div>
+        </div>
+        <IoChevronForwardOutline className="mt-1 h-7 w-7 shrink-0 text-slate-500" />
       </div>
 
       {rowsWithoutCoordinates > 0 && (
@@ -166,7 +169,7 @@ export default function AirQualityMap() {
         </p>
       )}
 
-      <div className="h-[330px] w-full overflow-hidden rounded-2xl md:h-[430px]">
+      <div className="h-[210px] w-full overflow-hidden rounded-2xl md:h-[430px]">
         <MapContainer
           center={MONTERREY_METRO_CENTER}
           className="h-full w-full"
@@ -204,11 +207,11 @@ export default function AirQualityMap() {
                   <div className="max-w-[170px] text-xs text-slate-800">
                     <p className="text-sm font-semibold leading-tight">{row.city_name}</p>
                     <p className="mt-1 font-semibold">
-                      AQI {row.aqi_us ?? 'N/D'} · {STATUS_LABELS[status]}
+                      AQI {row.aqi_us ?? 'N/D'} - {STATUS_LABELS[status]}
                     </p>
                     <p className="mt-1">{getPollutantLabel(row.main_pollutant_us)}</p>
                     <p className="mt-1 text-slate-600">
-                      Medición {formatTime(row.reading_timestamp)} · Act.{' '}
+                      Medicion {formatTime(row.reading_timestamp)} - Act.{' '}
                       {formatTime(row.last_successful_update_at)}
                     </p>
                   </div>
@@ -220,7 +223,7 @@ export default function AirQualityMap() {
       </div>
 
       {selectedRow && (
-        <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <article className="hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900 md:block">
           <h3 className="text-lg font-bold leading-tight text-gray-900 dark:text-white">
             {selectedRow.city_name}
           </h3>
@@ -247,7 +250,7 @@ export default function AirQualityMap() {
               </dd>
             </div>
             <div>
-              <dt className="text-gray-500 dark:text-gray-400">Medición</dt>
+              <dt className="text-gray-500 dark:text-gray-400">Medicion</dt>
               <dd className="font-semibold text-gray-900 dark:text-white">
                 {formatTime(selectedRow.reading_timestamp)}
               </dd>
@@ -266,7 +269,7 @@ export default function AirQualityMap() {
         </article>
       )}
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      <div className="hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900 md:block">
         <h3 className="text-base font-bold text-gray-900 dark:text-white">Escala AQI (US)</h3>
         <div className="mt-3 grid grid-cols-2 gap-2 text-center text-xs sm:grid-cols-4 lg:grid-cols-7">
           {AQI_LEGEND.map((item) => {
@@ -288,7 +291,7 @@ export default function AirQualityMap() {
           })}
         </div>
         <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
-          AQI: Índice de Calidad del Aire bajo escala US EPA.
+          AQI: Indice de Calidad del Aire bajo escala US EPA.
         </p>
       </div>
     </section>
