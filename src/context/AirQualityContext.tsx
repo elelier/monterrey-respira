@@ -12,6 +12,13 @@ import {
   isAirQualityServiceError,
   MONTERREY_LOCATIONS_WITH_COORDS,
 } from '../services/apiService';
+import {
+  getCityFromSearch,
+  readStoredCityId,
+  updateCityQueryParam,
+  writeStoredCityId,
+  findCityById,
+} from '../utils/cityRoutingUtils';
 
 type CityOption = (typeof MONTERREY_LOCATIONS_WITH_COORDS)[number];
 
@@ -265,6 +272,16 @@ function writeCachedData(cityDataArray: CityAirQualityData[]) {
   localStorage.setItem(`${CACHE_KEY}_timestamp`, Date.now().toString());
 }
 
+function resolveInitialCity(locations: readonly CityOption[], defaultCity: CityOption): CityOption {
+  const cityFromQueryParam = getCityFromSearch(locations, window.location.search);
+
+  if (cityFromQueryParam) {
+    return cityFromQueryParam;
+  }
+
+  return findCityById(locations, readStoredCityId()) ?? defaultCity;
+}
+
 export function AirQualityProvider({ children }: AirQualityProviderProps) {
   const locations = useMemo(() => MONTERREY_LOCATIONS_WITH_COORDS, []);
   const defaultCity = locations[0];
@@ -278,9 +295,17 @@ export function AirQualityProvider({ children }: AirQualityProviderProps) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [theme, setTheme] = useState<AirQualityTheme | null>(null);
-  const [selectedCity, setSelectedCity] = useState<CityOption>(defaultCity);
+  const [selectedCity, setSelectedCity] = useState<CityOption>(() => (
+    resolveInitialCity(locations, defaultCity)
+  ));
 
   const cityOptions = useMemo(() => buildCityOptions(cityDataArray), [cityDataArray]);
+
+  const persistSelectedCity = useCallback((city: CityOption) => {
+    setSelectedCity(city);
+    writeStoredCityId(city);
+    updateCityQueryParam(city);
+  }, []);
 
   const applyTransformedData = useCallback((dataRows: CityAirQualityData[], city: CityOption) => {
     const options = buildCityOptions(dataRows);
@@ -289,14 +314,14 @@ export function AirQualityProvider({ children }: AirQualityProviderProps) {
     const transformedData = transformApiResponse(dataRows, nextCity);
 
     if (nextCity.city_id !== city.city_id) {
-      setSelectedCity(nextCity);
+      persistSelectedCity(nextCity);
     }
 
     setCityDataArray(dataRows);
     setAirQualityData(transformedData);
     setTheme(getAirQualityTheme(transformedData.status));
     setError(null);
-  }, []);
+  }, [persistSelectedCity]);
 
   const fetchAirQualityData = useCallback(async (skipCache = false) => {
     if (!skipCache) {
@@ -346,13 +371,13 @@ export function AirQualityProvider({ children }: AirQualityProviderProps) {
 
     if (option && option.availability !== 'available') {
       const degradedData = transformApiResponse(cityDataArray, city);
-      setSelectedCity(city);
+      persistSelectedCity(city);
       setAirQualityData(degradedData);
       setTheme(getAirQualityTheme('unknown'));
       return;
     }
 
-    setSelectedCity(city);
+    persistSelectedCity(city);
   };
 
   useEffect(() => {
