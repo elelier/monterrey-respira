@@ -1,13 +1,14 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAirQuality } from '../context/AirQualityContext';
-import { getMainLogoIcon } from '../utils/airQualityUtils';
+import { getMainLogoIcon, getPollutantInfo } from '../utils/airQualityUtils';
 import { Link, useLocation } from 'react-router-dom';
 import { IoHomeOutline, IoInformationCircleOutline, IoLayersOutline, IoLinkOutline, IoMenuOutline, IoShareOutline } from 'react-icons/io5';
 import { Metadata } from './seo/Metadata';
 import { Analytics } from './seo/Analytics';
 import { getCitySlug } from '../utils/cityRoutingUtils';
 import { CityShareMethod, submitCityShareSignal } from '../services/coreSignalService';
+import type { AirQualityData, AirQualityStatus } from '../types';
 
 interface LayoutProps {
   children: ReactNode;
@@ -16,6 +17,45 @@ interface LayoutProps {
 const CITY_SHARE_SIGNAL_FAILED_MESSAGE = 'No se pudo registrar señal anónima de compartir ciudad:';
 const SOCIAL_PREVIEW_TITLE = 'MonterreyRespira - Calidad del aire en la Zona Metropolitana';
 const SOCIAL_PREVIEW_DESCRIPTION = 'Consulta AQI, contaminante principal y recomendaciones por municipio.';
+const AIR_QUALITY_STATUS_SHARE_LABELS: Record<AirQualityStatus, string> = {
+  good: 'Buena',
+  moderate: 'Moderada',
+  'unhealthy-sensitive': 'Dañina para grupos sensibles',
+  unhealthy: 'Dañina',
+  'very-unhealthy': 'Muy dañina',
+  hazardous: 'Peligrosa',
+  unknown: 'No disponible',
+};
+
+const hasShareableAqi = (aqi: number | null | undefined, status: AirQualityStatus): aqi is number => {
+  return status !== 'unknown' && typeof aqi === 'number' && Number.isFinite(aqi);
+};
+
+const formatMainPollutantForShare = (pollutant: string | null | undefined): string | null => {
+  if (!pollutant) {
+    return null;
+  }
+
+  return getPollutantInfo(pollutant).name;
+};
+
+const buildCitySnapshotShareDescription = (
+  cityName: string,
+  airQualityData: AirQualityData | null | undefined,
+): string => {
+  if (!airQualityData || !hasShareableAqi(airQualityData.aqi, airQualityData.status)) {
+    return `Calidad del aire en ${cityName}:\nÚltima lectura no disponible.\nRevisa recomendaciones en MtyRespira.`;
+  }
+
+  const pollutantLabel = formatMainPollutantForShare(airQualityData.main_pollutant_us);
+  const snapshotParts = [
+    `AQI ${airQualityData.aqi}`,
+    AIR_QUALITY_STATUS_SHARE_LABELS[airQualityData.status],
+    pollutantLabel,
+  ].filter(Boolean);
+
+  return `Calidad del aire en ${cityName}:\n${snapshotParts.join(' · ')}\nRevisa recomendaciones en MtyRespira.`;
+};
 
 export default function Layout({ children }: LayoutProps) {
   const { theme, airQualityData, selectedCity } = useAirQuality();
@@ -24,7 +64,7 @@ export default function Layout({ children }: LayoutProps) {
 
   // Obtener la ciudad actual para el mensaje de compartir.
   const currentCity = selectedCity.name;
-  const shareDescription = `Calidad del aire en ${currentCity}:\nRevisa AQI, contaminante principal y recomendaciones en MtyRespira.`;
+  const shareDescription = buildCitySnapshotShareDescription(currentCity, airQualityData);
 
   const submitShareSignal = (shareMethod: CityShareMethod) => {
     void submitCityShareSignal({
