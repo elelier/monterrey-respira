@@ -17,6 +17,7 @@ interface CitySelectorProps {
 }
 
 const GEOLOCATION_TIMEOUT_MS = 10000;
+const GEOLOCATION_SUCCESS_MESSAGE_MS = 3500;
 const EARTH_RADIUS_KM = 6371;
 
 function normalizeSearchText(value: string) {
@@ -138,6 +139,19 @@ const CitySelector = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [handleClickOutside]);
+
+  useEffect(() => {
+    if (geolocationStatus !== 'success' || !geolocationMessage) {
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setGeolocationMessage(null);
+      setGeolocationStatus('idle');
+    }, GEOLOCATION_SUCCESS_MESSAGE_MS);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [geolocationMessage, geolocationStatus]);
 
   useEffect(() => {
     if (isOpen) {
