@@ -327,18 +327,24 @@ const CitySelector = ({
         </button>
       </div>
 
-      {geolocationMessage && (
-        <p
-          className={`mt-2 rounded-lg px-3 py-2 text-xs ${
-            geolocationStatus === 'success'
-              ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300'
-              : 'bg-amber-50 text-amber-800 dark:bg-amber-900/20 dark:text-amber-200'
-          }`}
-          role="status"
-        >
-          {geolocationMessage}
-        </p>
-      )}
+      <AnimatePresence>
+        {geolocationMessage && (
+          <motion.p
+            className={`pointer-events-none absolute left-0 right-0 top-full z-[1100] mt-2 rounded-lg px-3 py-2 text-xs shadow-lg ${
+              geolocationStatus === 'success'
+                ? 'bg-green-50 text-green-700 dark:bg-green-900 dark:text-green-100'
+                : 'bg-amber-50 text-amber-800 dark:bg-amber-900 dark:text-amber-100'
+            }`}
+            role="status"
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18 }}
+          >
+            {geolocationMessage}
+          </motion.p>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {isOpen && (
