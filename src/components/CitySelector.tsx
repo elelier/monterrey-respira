@@ -22,7 +22,7 @@ const GEOLOCATION_TIMEOUT_MS = 10000;
 const GEOLOCATION_SUCCESS_MESSAGE_MS = 3500;
 const OUT_OF_COVERAGE_MESSAGE = 'Estás fuera del área cubierta por MtyRespira. Puedes elegir un municipio manualmente.';
 const NO_CONFIGURED_CITIES_MESSAGE = 'No pudimos detectar una ciudad con coordenadas disponibles. Puedes elegir tu municipio manualmente.';
-const OUT_OF_COVERAGE_SIGNAL_FAILED_MESSAGE = 'Failed to submit out-of-coverage demand signal:';
+const OUT_OF_COVERAGE_SIGNAL_FAILED_MESSAGE = 'No se pudo registrar señal anónima fuera de cobertura:';
 
 function normalizeSearchText(value: string) {
   return value
