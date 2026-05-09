@@ -3,6 +3,7 @@ import {
   DistanceBucket,
   MTYRESPIRA_COVERAGE_AREA,
 } from '../utils/coverageUtils';
+import { MeasurementFreshness } from '../types';
 
 const CORE_DB_SUPABASE_URL = import.meta.env.VITE_CORE_DB_SUPABASE_URL;
 const CORE_DB_SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_CORE_DB_SUPABASE_PUBLISHABLE_KEY;
@@ -10,6 +11,7 @@ const CORE_SPACE_KEY = import.meta.env.VITE_CORE_SPACE_KEY;
 const CORE_APP_KEY = import.meta.env.VITE_CORE_APP_KEY;
 
 const OUT_OF_COVERAGE_SIGNAL_KIND = 'out_of_coverage_geolocation';
+const CITY_SHARE_SIGNAL_KIND = 'city_share';
 
 let coreDbClient: SupabaseClient | null = null;
 
@@ -41,6 +43,21 @@ function getOptionalTimezone() {
   }
 }
 
+function addBrowserContext(data: Record<string, string | number | null>) {
+  const browserLanguage = getOptionalBrowserLanguage();
+  const timezone = getOptionalTimezone();
+
+  if (browserLanguage) {
+    data.browser_language = browserLanguage;
+  }
+
+  if (timezone) {
+    data.timezone = timezone;
+  }
+
+  return data;
+}
+
 export interface OutOfCoverageDemandSignalInput {
   nearestSupportedCity: string;
   roundedDistanceKm: number;
@@ -52,23 +69,12 @@ export function buildOutOfCoverageDemandSignalPayload({
   roundedDistanceKm,
   distanceBucket,
 }: OutOfCoverageDemandSignalInput) {
-  const data: Record<string, string | number> = {
+  const data = addBrowserContext({
     nearest_supported_city: nearestSupportedCity,
     distance_to_nearest_km: roundedDistanceKm,
     distance_bucket: distanceBucket,
     coverage_area: MTYRESPIRA_COVERAGE_AREA,
-  };
-
-  const browserLanguage = getOptionalBrowserLanguage();
-  const timezone = getOptionalTimezone();
-
-  if (browserLanguage) {
-    data.browser_language = browserLanguage;
-  }
-
-  if (timezone) {
-    data.timezone = timezone;
-  }
+  });
 
   return {
     space_key: CORE_SPACE_KEY,
@@ -89,6 +95,65 @@ export async function submitOutOfCoverageDemandSignal(input: OutOfCoverageDemand
   }
 
   const payload = buildOutOfCoverageDemandSignalPayload(input);
+  const { data, error } = await supabase.rpc('submit_signal', { payload });
+
+  if (error) {
+    return { ok: false, skipped: false, reason: 'submit_signal_error', error };
+  }
+
+  return { ok: true, skipped: false, data };
+}
+
+export type CityShareMethod = 'native_share' | 'clipboard_fallback';
+
+export interface CityShareSignalInput {
+  cityId: number;
+  cityName: string;
+  citySlug: string;
+  route: string;
+  shareMethod: CityShareMethod;
+  aqiUs: number | null;
+  measurementFreshness: MeasurementFreshness;
+}
+
+export function buildCityShareSignalPayload({
+  cityId,
+  cityName,
+  citySlug,
+  route,
+  shareMethod,
+  aqiUs,
+  measurementFreshness,
+}: CityShareSignalInput) {
+  const data = addBrowserContext({
+    city_id: cityId,
+    city_name: cityName,
+    city_slug: citySlug,
+    route,
+    share_method: shareMethod,
+    aqi_us: aqiUs,
+    measurement_freshness: measurementFreshness,
+  });
+
+  return {
+    space_key: CORE_SPACE_KEY,
+    app_key: CORE_APP_KEY,
+    kind: CITY_SHARE_SIGNAL_KIND,
+    title: 'City deep link shared',
+    summary: 'User shared a MtyRespira city deep link.',
+    priority: 'low',
+    data,
+  };
+}
+
+export async function submitCityShareSignal(input: CityShareSignalInput) {
+  const supabase = getCoreDbClient();
+
+  if (!supabase || !hasCoreSignalKeys()) {
+    return { ok: false, skipped: true, reason: 'core_db_config_missing' };
+  }
+
+  const payload = buildCityShareSignalPayload(input);
   const { data, error } = await supabase.rpc('submit_signal', { payload });
 
   if (error) {
