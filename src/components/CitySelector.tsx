@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { IoChevronDownOutline, IoLocateOutline } from 'react-icons/io5';
+import { IoChevronDownOutline, IoLocateOutline, IoSearchOutline } from 'react-icons/io5';
 import { MONTERREY_LOCATIONS_WITH_COORDS } from '../services/apiService';
 import { submitOutOfCoverageDemandSignal } from '../services/coreSignalService';
 import { CitySelectorOption } from '../types';
@@ -9,6 +9,8 @@ import { findNearestSupportedCity, isOutOfCoverage } from '../utils/coverageUtil
 
 type CityOption = (typeof MONTERREY_LOCATIONS_WITH_COORDS)[number];
 
+type GeolocationStatus = 'idle' | 'loading' | 'success' | 'error';
+
 interface CitySelectorProps {
   onCityChange: (city: CityOption) => void;
   selectedCity?: CityOption;
@@ -16,9 +18,36 @@ interface CitySelectorProps {
   className?: string;
 }
 
-const OUT_OF_COVERAGE_MESSAGE = 'Estás fuera del área cubierta por MtyRespira. Puedes elegir un municipio manualmente.';
+const GEOLOCATION_TIMEOUT_MS = 10000;
 const GEOLOCATION_SUCCESS_MESSAGE_MS = 3500;
-const GEOLOCATION_WARNING_MESSAGE_MS = 6000;
+const OUT_OF_COVERAGE_MESSAGE = 'Estás fuera del área cubierta por MtyRespira. Puedes elegir un municipio manualmente.';
+const NO_CONFIGURED_CITIES_MESSAGE = 'No pudimos detectar una ciudad con coordenadas disponibles. Puedes elegir tu municipio manualmente.';
+const OUT_OF_COVERAGE_SIGNAL_FAILED_MESSAGE = 'No se pudo registrar señal anónima fuera de cobertura:';
+
+function normalizeSearchText(value: string) {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
+
+function getGeolocationErrorMessage(error?: GeolocationPositionError) {
+  if (!error) {
+    return 'No pudimos detectar tu ubicación. Puedes elegir tu municipio manualmente.';
+  }
+
+  switch (error.code) {
+    case error.PERMISSION_DENIED:
+      return 'No pudimos detectar tu ubicación. Puedes elegir tu municipio manualmente.';
+    case error.POSITION_UNAVAILABLE:
+      return 'Tu ubicación no está disponible por ahora. Puedes elegir tu municipio manualmente.';
+    case error.TIMEOUT:
+      return 'La detección de ubicación tardó demasiado. Puedes elegir tu municipio manualmente.';
+    default:
+      return 'No pudimos detectar tu ubicación. Puedes elegir tu municipio manualmente.';
+  }
+}
 
 const CitySelector = ({
   onCityChange,
@@ -35,21 +64,12 @@ const CitySelector = ({
 
   const [selectedCityId, setSelectedCityId] = useState<number | null>(defaultCityId);
   const [isOpen, setIsOpen] = useState(false);
-  const [isLocating, setIsLocating] = useState(false);
-  const [locationMessage, setLocationMessage] = useState<string | null>(null);
-  const [locationMessageTone, setLocationMessageTone] = useState<'success' | 'warning'>('success');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [geolocationStatus, setGeolocationStatus] = useState<GeolocationStatus>('idle');
+  const [geolocationMessage, setGeolocationMessage] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const cityRefs = useRef(new Map<number, HTMLDivElement>());
-
-  const showLocationMessage = useCallback((message: string, tone: 'success' | 'warning') => {
-    setLocationMessage(message);
-    setLocationMessageTone(tone);
-
-    window.setTimeout(
-      () => setLocationMessage(null),
-      tone === 'warning' ? GEOLOCATION_WARNING_MESSAGE_MS : GEOLOCATION_SUCCESS_MESSAGE_MS,
-    );
-  }, []);
 
   useEffect(() => {
     if (controlledSelectedCity) {
@@ -66,13 +86,29 @@ const CitySelector = ({
     return resolvedCityOptions.find((city) => city.city_id === currentCityId) ?? resolvedCityOptions[0];
   }, [controlledSelectedCity, resolvedCityOptions, selectedCityId]);
 
+  const filteredCities = useMemo(() => {
+    const normalizedQuery = normalizeSearchText(searchQuery);
+
+    if (!normalizedQuery) {
+      return resolvedCityOptions;
+    }
+
+    return resolvedCityOptions.filter((city) => {
+      const normalizedName = normalizeSearchText(city.name);
+      const apiName = 'api_name' in city ? String(city.api_name ?? '') : '';
+      const normalizedApiName = normalizeSearchText(apiName);
+
+      return normalizedName.includes(normalizedQuery) || normalizedApiName.includes(normalizedQuery);
+    });
+  }, [resolvedCityOptions, searchQuery]);
+
   const availableCities = useMemo(
-    () => resolvedCityOptions.filter((city) => city.availability === 'available'),
-    [resolvedCityOptions],
+    () => filteredCities.filter((city) => city.availability === 'available'),
+    [filteredCities],
   );
   const unavailableCities = useMemo(
-    () => resolvedCityOptions.filter((city) => city.availability !== 'available'),
-    [resolvedCityOptions],
+    () => filteredCities.filter((city) => city.availability !== 'available'),
+    [filteredCities],
   );
 
   const handleClickOutside = useCallback((event: MouseEvent) => {
@@ -89,31 +125,57 @@ const CitySelector = ({
   }, [handleClickOutside]);
 
   useEffect(() => {
-    if (isOpen && selectedCity) {
+    if (geolocationStatus !== 'success' || !geolocationMessage) {
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setGeolocationMessage(null);
+      setGeolocationStatus('idle');
+    }, GEOLOCATION_SUCCESS_MESSAGE_MS);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [geolocationMessage, geolocationStatus]);
+
+  useEffect(() => {
+    if (isOpen) {
+      window.setTimeout(() => searchInputRef.current?.focus(), 0);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen && selectedCity && !searchQuery) {
       cityRefs.current.get(selectedCity.city_id)?.scrollIntoView({
         behavior: 'smooth',
         block: 'nearest',
       });
     }
-  }, [selectedCity, isOpen]);
+  }, [selectedCity, isOpen, searchQuery]);
 
   const handleCityChange = (city: CitySelectorOption) => {
     if (city.availability !== 'available') {
+      setGeolocationStatus('error');
+      setGeolocationMessage('Esta ciudad no tiene datos recientes.');
       return;
     }
 
     setSelectedCityId(city.city_id);
     onCityChange(city);
     setIsOpen(false);
+    setSearchQuery('');
   };
 
   const handleUseLocation = () => {
+    setGeolocationMessage(null);
+
     if (!navigator.geolocation) {
-      showLocationMessage('Tu navegador no permite usar ubicación automática.', 'warning');
+      setGeolocationStatus('error');
+      setGeolocationMessage('Tu navegador no permite detectar ubicación. Puedes elegir tu municipio manualmente.');
+      setIsOpen(true);
       return;
     }
 
-    setIsLocating(true);
+    setGeolocationStatus('loading');
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -124,44 +186,49 @@ const CitySelector = ({
         );
 
         if (!nearest) {
-          showLocationMessage('No hay municipios configurados para comparar tu ubicación.', 'warning');
-          setIsLocating(false);
+          setGeolocationStatus('error');
+          setGeolocationMessage(NO_CONFIGURED_CITIES_MESSAGE);
+          setIsOpen(true);
           return;
         }
 
         if (isOutOfCoverage(nearest.distanceKm)) {
-          showLocationMessage(OUT_OF_COVERAGE_MESSAGE, 'warning');
+          setGeolocationStatus('error');
+          setGeolocationMessage(OUT_OF_COVERAGE_MESSAGE);
+          setIsOpen(true);
           void submitOutOfCoverageDemandSignal({
             nearestSupportedCity: nearest.city.name,
             roundedDistanceKm: nearest.roundedDistanceKm,
             distanceBucket: nearest.distanceBucket,
           }).catch((error: unknown) => {
-            console.warn('No se pudo registrar señal anónima fuera de cobertura:', error);
+            console.warn(OUT_OF_COVERAGE_SIGNAL_FAILED_MESSAGE, error);
           });
-          setIsLocating(false);
           return;
         }
 
-        const matchingCity = resolvedCityOptions.find((city) => city.city_id === nearest.city.city_id);
+        const nearestCity = resolvedCityOptions.find((city) => city.city_id === nearest.city.city_id);
 
-        if (!matchingCity || matchingCity.availability !== 'available') {
-          showLocationMessage(
-            `${nearest.city.name} fue detectado, pero no tiene lectura reciente disponible.`,
-            'warning',
-          );
-          setIsLocating(false);
+        if (!nearestCity || nearestCity.availability !== 'available') {
+          setGeolocationStatus('error');
+          setGeolocationMessage(`${nearest.city.name} fue detectado, pero no tiene lectura reciente disponible.`);
+          setIsOpen(true);
           return;
         }
 
-        handleCityChange(matchingCity);
-        showLocationMessage(`Ubicación detectada: ${matchingCity.name}`, 'success');
-        setIsLocating(false);
+        setGeolocationStatus('success');
+        setGeolocationMessage(`Ubicación detectada: ${nearestCity.name}`);
+        handleCityChange(nearestCity);
       },
-      () => {
-        showLocationMessage('No pudimos detectar tu ubicación. Puedes elegir un municipio manualmente.', 'warning');
-        setIsLocating(false);
+      (error) => {
+        setGeolocationStatus('error');
+        setGeolocationMessage(getGeolocationErrorMessage(error));
+        setIsOpen(true);
       },
-      { enableHighAccuracy: false, timeout: 10000, maximumAge: 5 * 60 * 1000 },
+      {
+        enableHighAccuracy: false,
+        maximumAge: 5 * 60 * 1000,
+        timeout: GEOLOCATION_TIMEOUT_MS,
+      },
     );
   };
 
@@ -201,7 +268,7 @@ const CitySelector = ({
           </div>
           {isDisabled && (
             <span className="shrink-0 rounded-full bg-gray-100 px-2 py-1 text-[11px] font-medium text-gray-600 dark:bg-slate-700 dark:text-gray-300">
-              {city.disabledReason ?? 'Sin datos recientes'}
+              {city.disabledReason ?? 'Esta ciudad no tiene datos recientes'}
             </span>
           )}
         </div>
@@ -211,64 +278,68 @@ const CitySelector = ({
 
   return (
     <div className={`relative z-20 ${className}`} ref={dropdownRef}>
-      <div className="flex items-stretch gap-2">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
         <motion.div
           whileTap={{ scale: 0.98 }}
-          className="flex min-w-0 flex-1 cursor-pointer items-center justify-between rounded-lg border border-gray-200 bg-white p-3 shadow-md dark:border-gray-700 dark:bg-slate-800"
+          className="flex min-w-0 cursor-pointer items-center justify-between rounded-lg border border-gray-200 bg-white p-2.5 shadow-md dark:border-gray-700 dark:bg-slate-800 sm:p-3"
           onClick={() => setIsOpen(!isOpen)}
           role="combobox"
           aria-expanded={isOpen}
           aria-haspopup="listbox"
-          aria-label="Seleccionar ciudad"
+          aria-controls="city-selector-listbox"
+          aria-label="Busca tu municipio"
         >
           <div className="flex min-w-0 items-center">
-            <div className="mr-2 flex-shrink-0 rounded-full bg-purple-100 p-2 dark:bg-purple-900/30 sm:mr-3">
-              <img src={PinIcon} alt="Pin" className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+            <div className="mr-2 flex-shrink-0 rounded-full bg-purple-100 p-1.5 dark:bg-purple-900/30 sm:mr-3 sm:p-2">
+              <img src={PinIcon} alt="Pin" className="h-4 w-4 text-purple-600 dark:text-purple-400 sm:h-5 sm:w-5" />
             </div>
             <div className="min-w-0">
               <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
-                {selectedCity?.name ?? 'Selecciona una ciudad'}
+                {selectedCity?.name ?? 'Busca tu municipio'}
               </p>
-              <p className="truncate text-xs text-gray-500 dark:text-gray-400">
+              <p className="hidden truncate text-xs text-gray-500 dark:text-gray-400 xs:block sm:block">
                 {selectedCity?.availability === 'available'
                   ? 'Zona Metropolitana de Monterrey'
-                  : 'Sin datos recientes'}
+                  : 'Esta ciudad no tiene datos recientes'}
               </p>
             </div>
           </div>
           <IoChevronDownOutline
-            className={`h-5 w-5 flex-shrink-0 text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180 transform' : ''}`}
+            className={`ml-1 h-4 w-4 flex-shrink-0 text-gray-400 transition-transform duration-300 sm:h-5 sm:w-5 ${isOpen ? 'rotate-180 transform' : ''}`}
           />
         </motion.div>
 
-        <motion.button
-          whileTap={{ scale: 0.96 }}
-          className="inline-flex min-w-[3rem] shrink-0 items-center justify-center rounded-lg border border-purple-200 bg-white px-3 text-sm font-semibold text-purple-700 shadow-md transition-colors hover:bg-purple-50 disabled:cursor-wait disabled:opacity-70 dark:border-purple-800 dark:bg-slate-800 dark:text-purple-300 dark:hover:bg-purple-900/20 sm:min-w-fit sm:gap-2"
-          onClick={handleUseLocation}
-          disabled={isLocating}
+        <button
           type="button"
+          onClick={handleUseLocation}
+          className="inline-flex min-w-[4.5rem] items-center justify-center gap-1 rounded-lg border border-purple-200 bg-white px-2.5 py-2.5 text-xs font-semibold text-purple-700 shadow-md transition hover:bg-purple-50 disabled:cursor-wait disabled:opacity-70 dark:border-purple-900/60 dark:bg-slate-800 dark:text-purple-300 dark:hover:bg-purple-900/20 sm:min-w-[9.5rem] sm:gap-2 sm:px-4 sm:py-3 sm:text-sm"
+          disabled={geolocationStatus === 'loading'}
           aria-label="Usar mi ubicación"
         >
-          <IoLocateOutline className={`h-5 w-5 ${isLocating ? 'animate-pulse' : ''}`} />
-          <span className="hidden sm:inline">Usar mi ubicación</span>
-        </motion.button>
+          <IoLocateOutline className="h-4 w-4 flex-shrink-0" />
+          <span className="sm:hidden">{geolocationStatus === 'loading' ? '...' : 'Ubicación'}</span>
+          <span className="hidden sm:inline">
+            {geolocationStatus === 'loading' ? 'Detectando...' : 'Usar mi ubicación'}
+          </span>
+        </button>
       </div>
 
       <AnimatePresence>
-        {locationMessage && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            className={`pointer-events-none absolute left-0 right-0 top-[calc(100%+0.5rem)] z-[1100] rounded-lg border px-3 py-2 text-xs shadow-lg sm:text-sm ${
-              locationMessageTone === 'warning'
-                ? 'border-amber-300 bg-amber-50 text-amber-900'
-                : 'border-emerald-300 bg-emerald-50 text-emerald-900'
+        {geolocationMessage && (
+          <motion.p
+            className={`pointer-events-none absolute left-0 right-0 top-full z-[1100] mt-2 rounded-lg px-3 py-2 text-xs shadow-lg ${
+              geolocationStatus === 'success'
+                ? 'bg-green-50 text-green-700 dark:bg-green-900 dark:text-green-100'
+                : 'bg-amber-50 text-amber-800 dark:bg-amber-900 dark:text-amber-100'
             }`}
             role="status"
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18 }}
           >
-            {locationMessage}
-          </motion.div>
+            {geolocationMessage}
+          </motion.p>
         )}
       </AnimatePresence>
 
@@ -281,21 +352,49 @@ const CitySelector = ({
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
             role="listbox"
+            id="city-selector-listbox"
           >
             <div className="border-b border-gray-100 p-2 dark:border-gray-700">
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+              <label className="sr-only" htmlFor="city-selector-search">
+                Busca tu municipio
+              </label>
+              <div className="flex items-center rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 dark:border-gray-700 dark:bg-slate-900/60">
+                <IoSearchOutline className="mr-2 h-4 w-4 text-gray-400" />
+                <input
+                  ref={searchInputRef}
+                  id="city-selector-search"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Escape') {
+                      setIsOpen(false);
+                    }
+                  }}
+                  placeholder="Busca tu municipio"
+                  className="w-full bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-400 dark:text-white"
+                />
+              </div>
+              <p className="mt-2 text-xs font-medium text-gray-500 dark:text-gray-400">
                 Selecciona una ciudad con lectura disponible
               </p>
             </div>
-            <div className="max-h-60 overflow-y-auto">
-              {availableCities.map(renderCityOption)}
-              {unavailableCities.length > 0 && (
-                <div className="border-t border-gray-100 dark:border-gray-700">
-                  <p className="px-4 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                    Sin datos recientes
-                  </p>
-                  {unavailableCities.map(renderCityOption)}
+            <div className="max-h-72 overflow-y-auto">
+              {filteredCities.length === 0 ? (
+                <div className="px-4 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                  Sin resultados. Puedes elegir tu municipio manualmente.
                 </div>
+              ) : (
+                <>
+                  {availableCities.map(renderCityOption)}
+                  {unavailableCities.length > 0 && (
+                    <div className="border-t border-gray-100 dark:border-gray-700">
+                      <p className="px-4 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                        Sin datos recientes
+                      </p>
+                      {unavailableCities.map(renderCityOption)}
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </motion.div>
