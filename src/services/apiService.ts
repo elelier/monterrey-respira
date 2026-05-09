@@ -1,5 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { AirQualityHistoryRow, CityAirQualityData } from '../types';
+import { AirQualityDailyHistoryRow, AirQualityHistoryRow, CityAirQualityData } from '../types';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -43,6 +43,17 @@ const getSupabaseClient = () => {
   return supabaseClient;
 };
 
+function assertRpcArray(data: unknown, context: string) {
+  if (!Array.isArray(data)) {
+    console.warn(`Respuesta inesperada de ${context}:`, data);
+    throw new AirQualityServiceError(
+      'supabase_unexpected_response',
+      `La respuesta de ${context} no tiene el formato esperado.`,
+      data,
+    );
+  }
+}
+
 export const MONTERREY_LOCATIONS_WITH_COORDS = [
   { city_id: 9, name: 'Monterrey', latitude: 25.67507, longitude: -100.31847 },
   { city_id: 12, name: 'San Pedro Garza Garcia', latitude: 25.65716, longitude: -100.40268 },
@@ -69,14 +80,7 @@ export const fetchLatestMonterreyAirQuality = async (): Promise<CityAirQualityDa
       );
     }
 
-    if (!Array.isArray(data)) {
-      console.error('Respuesta inesperada de la función de Supabase:', data);
-      throw new AirQualityServiceError(
-        'supabase_unexpected_response',
-        'La respuesta de Supabase no tiene el formato esperado (no es un array).',
-        data,
-      );
-    }
+    assertRpcArray(data, 'la RPC de calidad del aire');
 
     return data as CityAirQualityData[];
   } catch (error: unknown) {
@@ -113,14 +117,7 @@ export const fetchAirQualityHistoryForCity = async (
       );
     }
 
-    if (!Array.isArray(data)) {
-      console.warn('Respuesta inesperada de histórico de calidad del aire:', data);
-      throw new AirQualityServiceError(
-        'supabase_unexpected_response',
-        'La respuesta de histórico de Supabase no tiene el formato esperado.',
-        data,
-      );
-    }
+    assertRpcArray(data, 'histórico de calidad del aire');
 
     return data as AirQualityHistoryRow[];
   } catch (error: unknown) {
@@ -133,6 +130,43 @@ export const fetchAirQualityHistoryForCity = async (
       : 'Error al obtener histórico de calidad del aire desde Supabase.';
 
     console.warn('Detalle del error en fetchAirQualityHistoryForCity (Supabase):', error);
+    throw new AirQualityServiceError('unknown_fetch_error', errorMessage, error);
+  }
+};
+
+export const fetchDailyAirQualityHistoryForCity = async (
+  cityId: number,
+  days: number,
+): Promise<AirQualityDailyHistoryRow[]> => {
+  try {
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase.rpc('get_daily_air_quality_history_for_city', {
+      p_city_id: cityId,
+      p_days: days,
+    });
+
+    if (error) {
+      console.warn('No se pudo consultar histórico diario de calidad del aire:', error);
+      throw new AirQualityServiceError(
+        'supabase_rpc_error',
+        `No se pudo consultar get_daily_air_quality_history_for_city: ${error.message}`,
+        error,
+      );
+    }
+
+    assertRpcArray(data, 'histórico diario de calidad del aire');
+
+    return data as AirQualityDailyHistoryRow[];
+  } catch (error: unknown) {
+    if (isAirQualityServiceError(error)) {
+      throw error;
+    }
+
+    const errorMessage = error instanceof Error
+      ? error.message
+      : 'Error al obtener histórico diario de calidad del aire desde Supabase.';
+
+    console.warn('Detalle del error en fetchDailyAirQualityHistoryForCity (Supabase):', error);
     throw new AirQualityServiceError('unknown_fetch_error', errorMessage, error);
   }
 };
