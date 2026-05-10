@@ -2,7 +2,7 @@ import { AirQualityData, HistoricalData, Station } from '../types';
 import { getAirQualityStatus } from '../utils/airQualityUtils';
 
 // Para este proyecto de demostración, usaremos datos simulados.
-// En una implementación real, se integrarían APIs como AQICN, OpenWeatherMap, o AirVisual.
+// En una implementacion real, se integrarian APIs como AQICN u OpenWeatherMap.
 
 // Coordenadas aproximadas de Monterrey, Nuevo León
 const MONTERREY_LAT = 25.6866;
