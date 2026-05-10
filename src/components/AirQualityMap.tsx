@@ -223,13 +223,13 @@ export default function AirQualityMap() {
       </div>
 
       {selectedRow && (
-        <article className="hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900 md:block">
-          <h3 className="text-lg font-bold leading-tight text-gray-900 dark:text-white">
+        <article className="mt-4 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:p-4">
+          <h3 className="text-[1rem] font-bold leading-tight text-gray-900 dark:text-white sm:text-lg">
             {selectedRow.city_name}
           </h3>
           <div className="mt-2 flex flex-wrap gap-2">
             <span
-              className="rounded-lg border px-2.5 py-1 text-lg font-bold"
+              className="rounded-lg border px-2.5 py-1 text-base font-bold sm:text-lg"
               style={{ borderColor: selectedTheme.primary, color: selectedTheme.text }}
             >
               AQI {selectedRow.aqi_us ?? 'N/D'}
@@ -269,8 +269,8 @@ export default function AirQualityMap() {
         </article>
       )}
 
-      <div className="hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900 md:block">
-        <h3 className="text-base font-bold text-gray-900 dark:text-white">Escala AQI (US)</h3>
+      <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:p-4">
+        <h3 className="text-[0.95rem] font-bold text-gray-900 dark:text-white sm:text-base">Escala AQI (US)</h3>
         <div className="mt-3 grid grid-cols-2 gap-2 text-center text-xs sm:grid-cols-4 lg:grid-cols-7">
           {AQI_LEGEND.map((item) => {
             const theme = getAirQualityTheme(item.status);

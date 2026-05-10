@@ -281,7 +281,7 @@ const CitySelector = ({
       <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
         <motion.div
           whileTap={{ scale: 0.98 }}
-          className="flex min-w-0 cursor-pointer items-center justify-between rounded-2xl border border-gray-100 bg-white p-3 shadow-[0_10px_25px_rgba(15,23,42,0.12)] dark:border-gray-700 dark:bg-slate-800 sm:p-3"
+          className="flex min-h-[2.9rem] min-w-0 cursor-pointer items-center justify-between rounded-2xl border border-gray-100 bg-white px-3 py-1.5 shadow-[0_10px_25px_rgba(15,23,42,0.12)] dark:border-gray-700 dark:bg-slate-800 sm:min-h-[3.55rem] sm:p-3"
           onClick={() => setIsOpen(!isOpen)}
           role="combobox"
           aria-expanded={isOpen}
@@ -290,11 +290,11 @@ const CitySelector = ({
           aria-label="Busca tu municipio"
         >
           <div className="flex min-w-0 items-center">
-            <div className="mr-2 flex-shrink-0 rounded-full bg-rose-50 p-2 dark:bg-purple-900/30 sm:mr-3 sm:p-2">
-              <img src={PinIcon} alt="Pin" className="h-5 w-5 text-purple-600 dark:text-purple-400 sm:h-5 sm:w-5" />
+            <div className="mr-2 flex-shrink-0 rounded-full bg-rose-50 p-1.5 dark:bg-purple-900/30 sm:mr-3 sm:p-2">
+              <img src={PinIcon} alt="Pin" className="h-4 w-4 text-purple-600 dark:text-purple-400 sm:h-5 sm:w-5" />
             </div>
             <div className="min-w-0">
-              <p className="truncate text-lg font-black leading-tight text-slate-950 dark:text-white sm:text-sm">
+              <p className="truncate text-[0.98rem] font-semibold leading-tight text-slate-950 dark:text-white sm:text-sm sm:font-black">
                 {selectedCity?.name ?? 'Busca tu municipio'}
               </p>
               <p className="hidden truncate text-xs text-gray-500 dark:text-gray-400 xs:block sm:block">
@@ -312,11 +312,11 @@ const CitySelector = ({
         <button
           type="button"
           onClick={handleUseLocation}
-          className="inline-flex min-w-[7rem] items-center justify-center gap-1 rounded-2xl border border-purple-100 bg-white px-3 py-3 text-base font-black text-purple-700 shadow-[0_10px_25px_rgba(15,23,42,0.12)] transition hover:bg-purple-50 disabled:cursor-wait disabled:opacity-70 dark:border-purple-900/60 dark:bg-slate-800 dark:text-purple-300 dark:hover:bg-purple-900/20 sm:min-w-[9.5rem] sm:gap-2 sm:px-4 sm:text-sm"
+          className="inline-flex min-h-[2.9rem] min-w-[7rem] items-center justify-center gap-1 rounded-2xl border border-purple-100 bg-white px-3 py-1.5 text-sm font-semibold text-purple-700 shadow-[0_10px_25px_rgba(15,23,42,0.12)] transition hover:bg-purple-50 disabled:cursor-wait disabled:opacity-70 dark:border-purple-900/60 dark:bg-slate-800 dark:text-purple-300 dark:hover:bg-purple-900/20 sm:min-h-[3.55rem] sm:min-w-[9.5rem] sm:gap-2 sm:px-4 sm:text-sm sm:font-black"
           disabled={geolocationStatus === 'loading'}
           aria-label="Usar mi ubicación"
         >
-          <IoLocateOutline className="h-7 w-7 flex-shrink-0 sm:h-4 sm:w-4" />
+          <IoLocateOutline className="h-6 w-6 flex-shrink-0 sm:h-4 sm:w-4" />
           <span className="sm:hidden">{geolocationStatus === 'loading' ? '...' : 'Ubicación'}</span>
           <span className="hidden sm:inline">
             {geolocationStatus === 'loading' ? 'Detectando...' : 'Usar mi ubicación'}

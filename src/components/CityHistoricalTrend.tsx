@@ -220,7 +220,7 @@ function buildPollutantSummary(rows: HistoryRow[]): PollutantSummaryItem[] {
 
 export default function CityHistoricalTrend({ cityId, cityName }: CityHistoricalTrendProps) {
   const { airQualityData } = useAirQuality();
-  const [range, setRange] = useState<HistoryRange>('24h');
+  const [range, setRange] = useState<HistoryRange>('30d');
   const [metric, setMetric] = useState<AirQualityHistoryMetric>('aqi_us');
   const [rows, setRows] = useState<HistoryRow[]>([]);
   const [loading, setLoading] = useState(false);
@@ -279,11 +279,11 @@ export default function CityHistoricalTrend({ cityId, cityName }: CityHistorical
   const theme = AQI_THEME_TOKENS[status];
 
   return (
-    <section className="rounded-[1.35rem] border border-slate-200 bg-white p-4 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700 dark:bg-slate-800 sm:p-5">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-3">
-          <IoTrendingUpOutline className="h-7 w-7 shrink-0" style={{ color: theme.secondary }} />
-          <h2 className="truncate text-xl font-black text-slate-950 dark:text-white">
+    <section className="rounded-[1.15rem] border border-slate-200 bg-white p-2 shadow-[0_10px_24px_rgba(15,23,42,0.08)] dark:border-slate-700 dark:bg-slate-800 sm:rounded-[1.35rem] sm:p-5">
+      <div className="mb-1.5 flex items-center justify-between gap-3 sm:mb-4">
+        <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+          <IoTrendingUpOutline className="h-5 w-5 shrink-0 sm:h-7 sm:w-7" style={{ color: theme.secondary }} />
+          <h2 className="truncate text-[0.94rem] font-semibold text-slate-950 dark:text-white sm:text-xl sm:font-black">
             Tendencia reciente
           </h2>
         </div>
@@ -295,13 +295,13 @@ export default function CityHistoricalTrend({ cityId, cityName }: CityHistorical
         </span>
       </div>
 
-      <div className="mb-3 grid grid-cols-4 rounded-full border border-slate-200 bg-white p-1 dark:border-slate-700 dark:bg-slate-900/60">
+      <div className="mb-1.5 grid grid-cols-4 rounded-full border border-slate-200 bg-white p-0.5 dark:border-slate-700 dark:bg-slate-900/60 sm:mb-3 sm:p-1">
         {RANGE_OPTIONS.map((option) => (
           <button
             key={option.value}
             type="button"
             onClick={() => setRange(option.value)}
-            className="rounded-full px-3 py-2 text-sm font-black transition"
+            className="rounded-full px-3 py-0.5 text-xs font-medium transition sm:py-2 sm:text-sm sm:font-black"
             style={{
               backgroundColor: range === option.value ? `${theme.primary}22` : 'transparent',
               color: range === option.value ? theme.text : undefined,
@@ -314,13 +314,13 @@ export default function CityHistoricalTrend({ cityId, cityName }: CityHistorical
         ))}
       </div>
 
-      <div className="mb-4 grid grid-cols-3 rounded-full border border-slate-200 bg-white p-1 dark:border-slate-700 dark:bg-slate-900/60">
+      <div className="mb-1.5 grid grid-cols-3 rounded-full border border-slate-200 bg-white p-0.5 dark:border-slate-700 dark:bg-slate-900/60 sm:mb-4 sm:p-1">
         {METRIC_OPTIONS.map((option) => (
           <button
             key={option.value}
             type="button"
             onClick={() => setMetric(option.value)}
-            className="rounded-full px-3 py-2 text-sm font-black transition"
+            className="rounded-full px-3 py-0.5 text-xs font-medium transition sm:py-2 sm:text-sm sm:font-black"
             style={{
               backgroundColor: metric === option.value ? `${theme.primary}22` : 'transparent',
               color: metric === option.value ? theme.text : undefined,
@@ -338,20 +338,20 @@ export default function CityHistoricalTrend({ cityId, cityName }: CityHistorical
           {degradedReason}
         </div>
       ) : !hasEnoughPointsForChart ? (
-        <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-300" role="status">
+        <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-center text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-300 sm:px-4 sm:py-6 sm:text-sm" role="status">
           {loading ? 'Cargando historico disponible...' : 'Aun no hay suficientes mediciones para graficar esta metrica.'}
         </div>
       ) : (
         <div
-          className="h-48 w-full sm:h-56"
+          className="h-24 w-full sm:h-56"
           style={{ color: theme.secondary }}
           aria-label={`Grafica historica de ${metricConfig.label} para ${cityName}`}
         >
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartPoints} margin={{ top: 10, right: 10, left: -16, bottom: 0 }}>
+            <LineChart data={chartPoints} margin={{ top: 4, right: 6, left: -20, bottom: -4 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="label" tick={{ fontSize: 11 }} minTickGap={24} />
-              <YAxis tick={{ fontSize: 11 }} width={40} domain={['auto', 'auto']} />
+              <XAxis dataKey="label" tick={{ fontSize: 10 }} minTickGap={24} />
+              <YAxis tick={{ fontSize: 10 }} width={36} domain={['auto', 'auto']} />
               <Tooltip
                 labelFormatter={(_, payload) => {
                   const point = payload?.[0]?.payload as ChartPoint | undefined;
@@ -378,7 +378,7 @@ export default function CityHistoricalTrend({ cityId, cityName }: CityHistorical
         </div>
       )}
 
-      <p className="mt-3 text-sm font-medium text-slate-500 dark:text-slate-300">
+      <p className="mt-0.5 text-[0.66rem] font-medium text-slate-500 dark:text-slate-300 sm:mt-3 sm:text-sm">
         Basado en {getMetricCopy(metric, range)}.
       </p>
 

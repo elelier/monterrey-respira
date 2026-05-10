@@ -23,7 +23,6 @@ import {
   getWindIcon,
 } from '../utils/airQualityUtils';
 import {
-  AQI_RECOMMENDATIONS,
   AQI_STATUS_COPY,
   AQI_THEME_TOKENS,
 } from '../utils/aqiDesignTokens';
@@ -171,7 +170,6 @@ function getFreshnessLabel(data: AirQualityData) {
 
 export default function AirQualityCard({ data, className = '' }: AirQualityCardProps) {
   const [showDetails, setShowDetails] = useState<boolean>(true);
-  const [showTooltip, setShowTooltip] = useState<boolean>(false);
   const [hasMounted, setHasMounted] = useState(false);
   const { refreshData } = useAirQuality();
 
@@ -184,7 +182,6 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
   const theme = AQI_THEME_TOKENS[status];
   const classes = STATUS_CLASSES[status];
   const isUnknown = status === 'unknown';
-  const mainRecommendation = AQI_RECOMMENDATIONS[status][0];
   const aqiLabel = isUnknown ? AQI_STATUS_COPY.unknown.shortLabel : data.aqi;
   const mainPollutantLabel = data.main_pollutant_us
     ? getPollutantInfo(data.main_pollutant_us).name
@@ -197,24 +194,30 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
   return (
     <motion.section
       layout
-      className={`overflow-hidden rounded-[1.35rem] bg-white shadow-[0_18px_45px_rgba(15,23,42,0.14)] ring-1 dark:bg-slate-800 ${classes.ring} ${className}`}
+      className={`space-y-2 sm:space-y-3 ${className}`}
       aria-label={`Calidad del aire en ${data.location.name}: ${copy.label}`}
     >
       <div
-        className={`relative overflow-hidden bg-gradient-to-br ${classes.gradient} px-6 py-6 text-white sm:px-8`}
+        className={`relative h-[12.25rem] overflow-hidden rounded-[1.15rem] bg-gradient-to-br ${classes.gradient} px-4 py-3 text-white shadow-[0_12px_26px_rgba(15,23,42,0.14)] ring-1 ${classes.ring} sm:h-auto sm:rounded-[1.35rem] sm:px-8 sm:py-6`}
       >
-        <div className="absolute inset-0 bg-[url('/images/seo/share-image.png')] bg-[length:125%_auto] bg-[right_center] bg-no-repeat opacity-30 mix-blend-screen" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-black/5 to-transparent" />
-        <div className="absolute -right-24 bottom-0 h-44 w-64 rounded-full bg-white/20 blur-3xl" />
+        <div
+          className="absolute inset-0 bg-[url('/images/monterrey-cerro-silla.jpg')] bg-cover bg-[78%_100%] opacity-95"
+          aria-hidden="true"
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(100deg, ${theme.primary} 0%, ${theme.primary}f7 36%, ${theme.primary}d9 51%, ${theme.secondary}55 68%, transparent 100%)`,
+          }}
+          aria-hidden="true"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/10 via-transparent to-white/10" />
 
         <div className="relative z-10">
-          <div className="mb-3 flex items-start justify-between gap-3">
+          <div className="mb-1.5 flex items-start justify-between gap-3">
             <div>
-              <p className="text-2xl font-bold leading-none tracking-normal sm:text-3xl">
+              <p className="text-[1.18rem] font-semibold leading-none tracking-normal sm:text-3xl sm:font-bold">
                 {data.location.name}
-              </p>
-              <p className="mt-2 text-sm font-semibold text-white/90">
-                Contaminante principal: <span className="font-black">{mainPollutantLabel}</span>
               </p>
             </div>
 
@@ -222,7 +225,7 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
               whileTap={{ scale: 0.92 }}
               whileHover={{ scale: 1.04 }}
               onClick={() => refreshData()}
-              className="rounded-full bg-white/20 p-2 text-white shadow-sm backdrop-blur-md transition hover:bg-white/30"
+              className="absolute right-0 top-0 hidden rounded-full bg-white/20 p-2 text-white shadow-sm backdrop-blur-md transition hover:bg-white/30 sm:block"
               aria-label="Refrescar datos"
               type="button"
             >
@@ -230,43 +233,41 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
             </motion.button>
           </div>
 
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-2">
             <div className="flex min-w-0 items-end gap-2">
               <motion.div
                 key={String(aqiLabel)}
                 initial={hasMounted ? { opacity: 0, scale: 0.95 } : false}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.25 }}
-                className="text-[4.8rem] font-black leading-[0.86] tracking-normal text-white drop-shadow-lg sm:text-8xl"
+                className="text-[3.55rem] font-black leading-[0.82] tracking-normal text-white drop-shadow-lg sm:text-8xl"
               >
                 {aqiLabel}
               </motion.div>
-              <div className="mb-1 text-xl font-medium leading-tight text-white/95 sm:text-2xl">
+              <div className="mb-1 text-[1.05rem] font-medium leading-tight text-white/95 sm:text-2xl">
                 <span className="block">AQI</span>
                 <span className="block">US</span>
               </div>
             </div>
 
             <div
-              className={`flex shrink-0 items-center gap-2 rounded-full ${classes.chip} px-4 py-3 text-white shadow-lg backdrop-blur-md`}
+              className={`flex shrink-0 items-center gap-1.5 rounded-full ${classes.chip} px-2.5 py-2 text-white shadow-lg backdrop-blur-md sm:px-4 sm:py-3`}
               style={{ backgroundColor: isUnknown ? undefined : `${theme.secondary}cc` }}
             >
-              {getStatusIcon(status, 'h-7 w-7 shrink-0')}
-              <span className="whitespace-nowrap text-lg font-black">{copy.heroLabel}</span>
+              {getStatusIcon(status, 'h-[1.1rem] w-[1.1rem] shrink-0 sm:h-7 sm:w-7')}
+              <span className="whitespace-nowrap text-[0.84rem] font-semibold sm:text-lg sm:font-black">{copy.heroLabel}</span>
             </div>
           </div>
 
-          <p className="mt-5 max-w-[28rem] text-lg font-medium leading-snug text-white sm:text-xl">
+          <p className="mt-1 text-[0.76rem] font-medium leading-tight text-white/95 sm:text-base sm:font-semibold">
+            Contaminante principal: <span className="font-semibold sm:font-black">{mainPollutantLabel}</span>
+          </p>
+
+          <p className="mt-1 max-w-[28rem] text-[0.72rem] font-normal leading-snug text-white sm:text-xl sm:font-medium">
             {copy.description}
           </p>
 
-          {mainRecommendation && (
-            <p className="mt-3 max-w-[28rem] rounded-2xl bg-white/14 px-4 py-3 text-sm font-semibold leading-snug text-white backdrop-blur-md">
-              {isUnknown ? mainRecommendation.description : mainRecommendation.description}
-            </p>
-          )}
-
-          <div className="mt-5 grid grid-cols-2 gap-3 sm:max-w-sm">
+          <div className="mt-1.5 grid grid-cols-2 gap-2.5 sm:max-w-sm">
             <InfoPill
               icon={<IoTimeOutline className={`h-6 w-6 ${classes.accent}`} />}
               label={getFreshnessLabel(data)}
@@ -281,21 +282,23 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
         </div>
       </div>
 
-      <div className="bg-white dark:bg-slate-800">
+      <div
+        className={`overflow-hidden rounded-[1.15rem] bg-white shadow-[0_10px_24px_rgba(15,23,42,0.10)] ring-1 dark:bg-slate-800 ${classes.ring} sm:rounded-[1.35rem]`}
+      >
         <button
           onClick={() => setShowDetails(!showDetails)}
-          className="flex w-full items-center justify-between px-5 py-4 text-left hover:bg-slate-50 dark:hover:bg-slate-700/30"
+          className="flex w-full items-center justify-between px-4 py-1 text-left hover:bg-slate-50 dark:hover:bg-slate-700/30 sm:px-5 sm:py-4"
           type="button"
           aria-expanded={showDetails}
         >
           <span className="flex items-center gap-3">
-            <IoLeafOutline className={`h-7 w-7 ${classes.chart}`} />
-            <span className="text-xl font-black text-slate-950 dark:text-white">
+            <IoLeafOutline className={`h-[1.125rem] w-[1.125rem] ${classes.chart} sm:h-7 sm:w-7`} />
+            <span className="text-[0.96rem] font-semibold text-slate-950 dark:text-white sm:text-xl sm:font-black">
               Detalles ambientales
             </span>
           </span>
           <motion.span animate={{ rotate: showDetails ? 180 : 0 }} transition={{ duration: 0.2 }}>
-            <IoChevronDownOutline className="h-6 w-6 text-slate-500 dark:text-slate-400" />
+            <IoChevronDownOutline className="h-5 w-5 text-slate-500 dark:text-slate-400" />
           </motion.span>
         </button>
 
@@ -308,7 +311,7 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
               transition={{ duration: 0.25 }}
               className="overflow-hidden"
             >
-              <div className="mx-4 mb-4 grid grid-cols-2 overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700">
+              <div className="mx-3 mb-2 grid grid-cols-2 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 sm:mx-4 sm:mb-4 sm:rounded-2xl">
                 <DetailItem
                   label="Temperatura"
                   value={formatNullableMetric(data.temperature, ' °C')}
@@ -368,11 +371,11 @@ interface InfoPillProps {
 
 function InfoPill({ icon, label, value }: InfoPillProps) {
   return (
-    <div className="flex min-w-0 items-center gap-3 rounded-xl bg-white/92 px-4 py-3 text-slate-950 shadow-sm backdrop-blur-md">
-      <span className="shrink-0">{icon}</span>
+    <div className="flex min-w-0 items-center gap-2 rounded-lg bg-white/95 px-2.5 py-1.5 text-slate-950 shadow-sm backdrop-blur-md sm:rounded-xl sm:px-4 sm:py-3">
+      <span className="shrink-0 [&>svg]:h-[1.125rem] [&>svg]:w-[1.125rem] sm:[&>svg]:h-6 sm:[&>svg]:w-6">{icon}</span>
       <span className="min-w-0">
-        <span className="block truncate text-sm font-medium text-slate-500">{label}</span>
-        <span className="block truncate text-base font-black">{value}</span>
+        <span className="block truncate text-[0.68rem] font-medium text-slate-500 sm:text-sm">{label}</span>
+        <span className="block truncate text-[0.78rem] font-semibold sm:text-base sm:font-black">{value}</span>
       </span>
     </div>
   );
@@ -427,11 +430,11 @@ function DetailItem({
 
   const iconNode = (() => {
     if (useWeatherIconAsMainIcon && weatherIcon) {
-      return <img src={getWeatherIconUrl(weatherIcon)} alt="Clima" className="h-9 w-9" />;
+      return <img src={getWeatherIconUrl(weatherIcon)} alt="Clima" className="h-[1.125rem] w-[1.125rem] sm:h-9 sm:w-9" />;
     }
 
     if (useHumidityIcon && humidityValue !== null && humidityValue !== undefined) {
-      return <img src={getHumidityIcon(humidityValue)} alt="Humedad" className="h-9 w-9" />;
+      return <img src={getHumidityIcon(humidityValue)} alt="Humedad" className="h-[1.125rem] w-[1.125rem] sm:h-9 sm:w-9" />;
     }
 
     if (
@@ -446,27 +449,27 @@ function DetailItem({
         <img
           src={windIcon.icon}
           alt="Viento"
-          className="h-9 w-9"
+          className="h-[1.125rem] w-[1.125rem] sm:h-9 sm:w-9"
           style={{ transform: `rotate(${windIcon.rotation}deg)` }}
         />
       );
     }
 
     if (useMainPollutantIcon) {
-      return <img src={getMainPollutantIcon()} alt="Contaminante" className="h-9 w-9" />;
+      return <img src={getMainPollutantIcon()} alt="Contaminante" className="h-[1.125rem] w-[1.125rem] sm:h-9 sm:w-9" />;
     }
 
     return <IoCloudOutline className={`h-7 w-7 ${accentClass}`} />;
   })();
 
   return (
-    <div className="relative flex min-w-0 items-center gap-2 border-b border-r border-slate-200 p-3 last:border-r-0 even:border-r-0 [&:nth-last-child(-n+2)]:border-b-0 dark:border-slate-700">
-      <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${softBgClass}`}>
+    <div className="relative flex min-w-0 items-center gap-1.5 border-b border-r border-slate-200 p-1 last:border-r-0 even:border-r-0 [&:nth-last-child(-n+2)]:border-b-0 dark:border-slate-700 sm:gap-2 sm:p-3">
+      <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${softBgClass} sm:h-12 sm:w-12`}>
         {iconNode}
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1">
-          <p className="truncate text-sm font-medium text-slate-500 dark:text-slate-300">{label}</p>
+          <p className="truncate text-[0.64rem] font-medium text-slate-500 dark:text-slate-300 sm:text-sm">{label}</p>
           {tooltipText && (
             <div className="relative">
               <button
@@ -494,7 +497,7 @@ function DetailItem({
             </div>
           )}
         </div>
-        <p className="truncate text-xl font-black text-slate-950 dark:text-white">{value}</p>
+        <p className="truncate text-[0.78rem] font-semibold text-slate-950 dark:text-white sm:text-xl sm:font-black">{value}</p>
       </div>
     </div>
   );

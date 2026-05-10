@@ -141,7 +141,7 @@ export default function Layout({ children }: LayoutProps) {
 
       <div className="min-h-screen overflow-x-hidden pb-20 md:pb-0">
         <header className={`sticky top-0 z-30 border-b border-white/10 shadow-sm backdrop-blur-sm dark:border-slate-700 ${theme ? `bg-gradient-to-r ${theme.gradient}` : 'bg-white/90 dark:bg-slate-900/90'}`}>
-          <div className="container mx-auto flex items-center justify-between px-4 py-5 sm:px-6 md:py-4 lg:px-8">
+          <div className="container mx-auto flex h-14 items-center justify-between px-4 sm:h-auto sm:px-6 sm:py-5 md:py-4 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -176,7 +176,7 @@ export default function Layout({ children }: LayoutProps) {
                 }}
               >
                 <motion.div
-                  className="logo-container mr-2 flex h-9 w-9 items-center justify-center rounded-full sm:mr-3 sm:h-10 sm:w-10"
+                  className="logo-container mr-2 flex h-8 w-8 items-center justify-center rounded-full sm:mr-3 sm:h-10 sm:w-10"
                   whileHover={{
                     scale: 1.1,
                     transition: { duration: 0.3 }
@@ -189,7 +189,7 @@ export default function Layout({ children }: LayoutProps) {
                   />
                 </motion.div>
                 <div className="logo-container">
-                  <h1 className={`${theme ? 'text-white' : 'text-black'} text-[1.35rem] font-black leading-tight transition-colors duration-500 sm:text-2xl`}>MonterreyRespira</h1>
+                  <h1 className={`${theme ? 'text-white' : 'text-black'} text-[1.2rem] font-bold leading-tight transition-colors duration-500 sm:text-2xl sm:font-black`}>MonterreyRespira</h1>
                   <span className={`${theme ? 'text-slate-200' : 'text-gray-600'} text-xs sm:text-sm hidden sm:block transition-colors duration-500`}>Calidad del aire disponible</span>
                 </div>
               </Link>
@@ -274,7 +274,7 @@ export default function Layout({ children }: LayoutProps) {
                 aria-label="Compartir"
                 type="button"
               >
-                <IoShareOutline className={`h-6 w-6 sm:h-7 sm:w-7 ${theme ? 'text-white' : 'text-gray-600'}`} />
+                <IoShareOutline className={`h-5 w-5 sm:h-7 sm:w-7 ${theme ? 'text-white' : 'text-gray-600'}`} />
               </button>
 
               <button
@@ -283,7 +283,7 @@ export default function Layout({ children }: LayoutProps) {
                 type="button"
                 aria-label="Abrir menu"
               >
-                <IoMenuOutline className="h-7 w-7 text-white" />
+                <IoMenuOutline className="h-6 w-6 text-white" />
               </button>
             </div>
           </div>
@@ -317,7 +317,7 @@ export default function Layout({ children }: LayoutProps) {
           )}
         </header>
 
-        <main className="container mx-auto px-3 py-3 sm:px-6 md:py-4 lg:px-8">
+        <main className="container mx-auto px-3 py-1.5 sm:px-6 md:py-4 lg:px-8">
           {children}
         </main>
 
@@ -380,35 +380,35 @@ export default function Layout({ children }: LayoutProps) {
         </footer>
 
         {/* Mobile bottom navigation */}
-        <div className="fixed bottom-0 left-0 right-0 z-40 rounded-t-[1.75rem] border-t border-gray-200 bg-white/95 shadow-[0_-14px_35px_rgba(15,23,42,0.16)] backdrop-blur-md dark:border-slate-700 dark:bg-slate-900/95 md:hidden">
-          <div className="grid grid-cols-4 h-16">
+        <div className="fixed bottom-0 left-0 right-0 z-40 rounded-t-[1.5rem] border-t border-gray-200 bg-white/95 shadow-[0_-14px_35px_rgba(15,23,42,0.16)] backdrop-blur-md dark:border-slate-700 dark:bg-slate-900/95 md:hidden">
+          <div className="grid h-14 grid-cols-4">
             <Link
               to="/"
               className={`flex flex-col items-center justify-center ${location.pathname === '/' ? getBottomNavActiveClass() : 'text-gray-500'}`}
             >
-              <IoHomeOutline className="text-xl mb-1" />
-              <span className="text-xs">Inicio</span>
+              <IoHomeOutline className="mb-0.5 text-lg" />
+              <span className="text-[0.68rem]">Inicio</span>
             </Link>
             <Link
               to="/acerca-de"
               className={`flex flex-col items-center justify-center ${location.pathname === '/acerca-de' ? getBottomNavActiveClass() : 'text-gray-500'}`}
             >
-              <IoInformationCircleOutline className="text-xl mb-1" />
-              <span className="text-xs">Acerca de</span>
+              <IoInformationCircleOutline className="mb-0.5 text-lg" />
+              <span className="text-[0.68rem]">Acerca de</span>
             </Link>
             <Link
               to="/datos-y-apis"
               className={`flex flex-col items-center justify-center ${location.pathname === '/datos-y-apis' ? getBottomNavActiveClass() : 'text-gray-500'}`}
             >
-              <IoLayersOutline className="text-xl mb-1" />
-              <span className="text-xs">Datos</span>
+              <IoLayersOutline className="mb-0.5 text-lg" />
+              <span className="text-[0.68rem]">Datos</span>
             </Link>
             <Link
               to="/asociaciones"
               className={`flex flex-col items-center justify-center ${location.pathname === '/asociaciones' ? getBottomNavActiveClass() : 'text-gray-500'}`}
             >
-              <IoLinkOutline className="text-xl mb-1" />
-              <span className="text-xs">Enlaces</span>
+              <IoLinkOutline className="mb-0.5 text-lg" />
+              <span className="text-[0.68rem]">Enlaces</span>
             </Link>
           </div>
         </div>
