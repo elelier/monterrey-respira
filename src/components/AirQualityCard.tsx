@@ -110,7 +110,15 @@ const STATUS_CLASSES: Record<
   },
 };
 
-function formatTime(timestamp: string | null | undefined) {
+function formatNullableMetric(value: number | null | undefined, suffix: string) {
+  if (value === null || value === undefined) {
+    return 'N/D';
+  }
+
+  return `${value}${suffix}`;
+}
+
+function formatMeasurementDateTime(timestamp: string | null | undefined) {
   if (!timestamp) {
     return 'N/D';
   }
@@ -121,19 +129,10 @@ function formatTime(timestamp: string | null | undefined) {
     return 'N/D';
   }
 
-  return parsedDate.toLocaleTimeString('es-MX', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
+  return parsedDate.toLocaleString('es-MX', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
   });
-}
-
-function formatNullableMetric(value: number | null | undefined, suffix: string) {
-  if (value === null || value === undefined) {
-    return 'N/D';
-  }
-
-  return `${value}${suffix}`;
 }
 
 function getStatusIcon(status: AirQualityStatus, className: string) {
@@ -158,13 +157,13 @@ function getStatusIcon(status: AirQualityStatus, className: string) {
 function getFreshnessLabel(data: AirQualityData) {
   switch (data.measurementFreshness) {
     case 'stale':
-      return 'Medicion';
+      return 'Ultima medicion';
     case 'degraded':
-      return 'Medicion';
+      return 'Ultima medicion';
     case 'unknown':
-      return 'Medicion';
+      return 'Ultima medicion';
     default:
-      return 'Medicion';
+      return 'Ultima medicion';
   }
 }
 
@@ -186,10 +185,7 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
   const mainPollutantLabel = data.main_pollutant_us
     ? getPollutantInfo(data.main_pollutant_us).name
     : 'N/D';
-  const measurementTime = isUnknown ? 'N/D' : formatTime(data.timestamp);
-  const pipelineTime = data.last_successful_update_at
-    ? formatTime(data.last_successful_update_at)
-    : 'N/D';
+  const measurementTime = isUnknown ? 'N/D' : formatMeasurementDateTime(data.timestamp);
 
   return (
     <motion.section
@@ -222,14 +218,14 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
             </div>
 
             <motion.button
-              whileTap={{ scale: 0.92 }}
-              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+              whileHover={{ scale: 1.02 }}
               onClick={() => refreshData()}
-              className="absolute right-0 top-0 hidden rounded-full bg-white/20 p-2 text-white shadow-sm backdrop-blur-md transition hover:bg-white/30 sm:block"
+              className="absolute right-0 top-0 hidden rounded-full bg-white/12 p-1.5 text-white/90 shadow-sm backdrop-blur-md transition hover:bg-white/20 sm:block"
               aria-label="Refrescar datos"
               type="button"
             >
-              <IoRefreshOutline className="h-5 w-5" />
+              <IoRefreshOutline className="h-4 w-4" />
             </motion.button>
           </div>
 
@@ -267,16 +263,11 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
             {copy.description}
           </p>
 
-          <div className="mt-1.5 grid grid-cols-2 gap-2.5 sm:max-w-sm">
+          <div className="mt-1.5 max-w-sm">
             <InfoPill
               icon={<IoTimeOutline className={`h-6 w-6 ${classes.accent}`} />}
               label={getFreshnessLabel(data)}
               value={measurementTime}
-            />
-            <InfoPill
-              icon={<PulseIcon className={`h-6 w-6 ${classes.accent}`} />}
-              label="Pipeline"
-              value={pipelineTime}
             />
           </div>
         </div>
@@ -378,20 +369,6 @@ function InfoPill({ icon, label, value }: InfoPillProps) {
         <span className="block truncate text-[0.78rem] font-semibold sm:text-base sm:font-black">{value}</span>
       </span>
     </div>
-  );
-}
-
-function PulseIcon({ className }: { className: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} aria-hidden="true" fill="none">
-      <path
-        d="M3 12h4l2.5-6 5 12L17 12h4"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-      />
-    </svg>
   );
 }
 
@@ -502,3 +479,4 @@ function DetailItem({
     </div>
   );
 }
+
