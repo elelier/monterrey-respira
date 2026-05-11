@@ -6,6 +6,7 @@ import { useAirQuality } from '../context/AirQualityContext';
 import { AirQualityStatus, CityAirQualityData, CitySelectorOption } from '../types';
 import { getAirQualityStatus, getAirQualityTheme } from '../utils/airQualityUtils';
 import { AQI_STATUS_COPY } from '../utils/aqiDesignTokens';
+import { formatNullableNumber, formatNullableTimestamp, hasReliableAqi, isFiniteNumber } from '../utils/airQualityDisplay';
 
 const MONTERREY_METRO_CENTER: [number, number] = [25.6866, -100.3161];
 const MONTERREY_METRO_ZOOM = 10;
@@ -39,25 +40,9 @@ function hasValidCoordinates(row: CityAirQualityData) {
   );
 }
 
-function formatTime(timestamp: string | null | undefined) {
-  if (!timestamp) {
-    return 'N/D';
-  }
-
-  const parsedDate = new Date(timestamp);
-
-  if (Number.isNaN(parsedDate.getTime())) {
-    return 'N/D';
-  }
-
-  return parsedDate.toLocaleString('es-MX', {
-    timeStyle: 'short',
-  });
-}
-
 function getPollutantLabel(pollutant: string | null) {
   if (!pollutant) {
-    return 'No disponible';
+    return 'N/D';
   }
 
   const normalizedPollutant = pollutant.toLowerCase();
@@ -83,11 +68,13 @@ function getPollutantLabel(pollutant: string | null) {
 }
 
 function getMarkerRadius(row: CityAirQualityData) {
-  if (row.aqi_us === null) {
+  const aqi = row.aqi_us;
+
+  if (!isFiniteNumber(aqi)) {
     return 11;
   }
 
-  return row.aqi_us > 150 ? 15 : 12;
+  return aqi > 150 ? 15 : 12;
 }
 
 function getCityOption(row: CityAirQualityData, cityOptions: CitySelectorOption[]) {
@@ -98,6 +85,9 @@ function getCityOption(row: CityAirQualityData, cityOptions: CitySelectorOption[
     name: row.city_name,
     latitude: row.latitude ?? MONTERREY_METRO_CENTER[0],
     longitude: row.longitude ?? MONTERREY_METRO_CENTER[1],
+    availability: hasReliableAqi(row.aqi_us) ? 'available' : 'invalid-aqi',
+    disabledReason: hasReliableAqi(row.aqi_us) ? undefined : 'Ultima lectura no disponible',
+    readingTimestamp: row.reading_timestamp,
   };
 }
 
@@ -186,6 +176,7 @@ export default function AirQualityMap() {
             const theme = getAirQualityTheme(status);
             const isSelected = selectedCity.city_id === row.city_id;
             const cityOption = getCityOption(row, cityOptions);
+            const aqiLabel = hasReliableAqi(row.aqi_us) ? formatNullableNumber(row.aqi_us) : 'N/D';
 
             return (
               <CircleMarker
@@ -207,12 +198,12 @@ export default function AirQualityMap() {
                   <div className="max-w-[170px] text-xs text-slate-800">
                     <p className="text-sm font-semibold leading-tight">{row.city_name}</p>
                     <p className="mt-1 font-semibold">
-                      AQI {row.aqi_us ?? 'N/D'} - {STATUS_LABELS[status]}
+                      AQI {aqiLabel} - {STATUS_LABELS[status]}
                     </p>
                     <p className="mt-1">{getPollutantLabel(row.main_pollutant_us)}</p>
                     <p className="mt-1 text-slate-600">
-                      Medicion {formatTime(row.reading_timestamp)} - Act.{' '}
-                      {formatTime(row.last_successful_update_at)}
+                      Medicion {formatNullableTimestamp(row.reading_timestamp, { timeStyle: 'short' })} - Act.{' '}
+                      {formatNullableTimestamp(row.last_successful_update_at, { timeStyle: 'short' })}
                     </p>
                   </div>
                 </Popup>
@@ -232,7 +223,7 @@ export default function AirQualityMap() {
               className="rounded-lg border px-2.5 py-1 text-base font-bold sm:text-lg"
               style={{ borderColor: selectedTheme.primary, color: selectedTheme.text }}
             >
-              AQI {selectedRow.aqi_us ?? 'N/D'}
+              AQI {hasReliableAqi(selectedRow.aqi_us) ? formatNullableNumber(selectedRow.aqi_us) : 'N/D'}
             </span>
             <span
               className="rounded-lg border px-2.5 py-1 text-sm font-semibold"
@@ -252,13 +243,13 @@ export default function AirQualityMap() {
             <div>
               <dt className="text-gray-500 dark:text-gray-400">Medicion</dt>
               <dd className="font-semibold text-gray-900 dark:text-white">
-                {formatTime(selectedRow.reading_timestamp)}
+                {formatNullableTimestamp(selectedRow.reading_timestamp, { timeStyle: 'short' })}
               </dd>
             </div>
             <div>
               <dt className="text-gray-500 dark:text-gray-400">Actualizado</dt>
               <dd className="font-semibold text-gray-900 dark:text-white">
-                {formatTime(selectedRow.last_successful_update_at)}
+                {formatNullableTimestamp(selectedRow.last_successful_update_at, { timeStyle: 'short' })}
               </dd>
             </div>
             <div>

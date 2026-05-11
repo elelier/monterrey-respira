@@ -8,6 +8,7 @@ import { IoHomeOutline, IoInformationCircleOutline, IoLayersOutline, IoLinkOutli
 import { Metadata } from './seo/Metadata';
 import { Analytics } from './seo/Analytics';
 import { getCitySlug } from '../utils/cityRoutingUtils';
+import { formatNullableTimestamp, hasReliableAqi } from '../utils/airQualityDisplay';
 import { CityShareMethod, submitCityShareSignal } from '../services/coreSignalService';
 import type { AirQualityData, AirQualityStatus } from '../types';
 
@@ -20,7 +21,7 @@ const SOCIAL_PREVIEW_TITLE = 'MonterreyRespira - Calidad del aire en la Zona Met
 const SOCIAL_PREVIEW_DESCRIPTION = 'Consulta AQI, contaminante principal y recomendaciones por municipio.';
 
 const hasShareableAqi = (aqi: number | null | undefined, status: AirQualityStatus): aqi is number => {
-  return status !== 'unknown' && typeof aqi === 'number' && Number.isFinite(aqi);
+  return status !== 'unknown' && hasReliableAqi(aqi);
 };
 
 const formatMainPollutantForShare = (pollutant: string | null | undefined): string | null => {
@@ -59,13 +60,17 @@ export default function Layout({ children }: LayoutProps) {
   const shareDescription = buildCitySnapshotShareDescription(currentCity, airQualityData);
 
   const submitShareSignal = (shareMethod: CityShareMethod) => {
+    const shareableAqi = airQualityData && hasReliableAqi(airQualityData)
+      ? airQualityData.aqi
+      : null;
+
     void submitCityShareSignal({
       cityId: selectedCity.city_id,
       cityName: selectedCity.name,
       citySlug: getCitySlug(selectedCity),
       route: window.location.pathname,
       shareMethod,
-      aqiUs: airQualityData?.aqi ?? null,
+      aqiUs: shareableAqi,
       measurementFreshness: airQualityData?.measurementFreshness ?? 'unknown',
     }).catch((error: unknown) => {
       console.warn(CITY_SHARE_SIGNAL_FAILED_MESSAGE, error);
@@ -109,6 +114,7 @@ export default function Layout({ children }: LayoutProps) {
       case '#f87171': return 'bg-red-100 text-red-800';
       case '#c084fc': return 'bg-purple-100 text-purple-800';
       case '#9f1239': return 'bg-rose-100 text-rose-800';
+      case '#64748b': return 'bg-slate-100 text-slate-800';
       default: return 'bg-blue-100 text-blue-800';
     }
   };
@@ -124,6 +130,7 @@ export default function Layout({ children }: LayoutProps) {
       case '#f87171': return 'text-red-600';
       case '#c084fc': return 'text-purple-600';
       case '#9f1239': return 'text-rose-600';
+      case '#64748b': return 'text-slate-600';
       default: return 'text-blue-600';
     }
   };
@@ -234,7 +241,7 @@ export default function Layout({ children }: LayoutProps) {
                     Medicion:
                   </span>
                   <span className="ml-1 text-xs sm:text-sm">
-                    {new Date(airQualityData.timestamp).toLocaleTimeString('es-MX', {
+                    {formatNullableTimestamp(airQualityData.timestamp, {
                       hour: '2-digit',
                       minute: '2-digit',
                       hour12: true

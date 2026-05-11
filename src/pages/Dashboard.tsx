@@ -8,6 +8,7 @@ import Recommendations from '../components/Recommendations';
 import CitySelector from '../components/CitySelector';
 import AirQualityMap from '../components/AirQualityMap';
 import CityHistoricalTrend from '../components/CityHistoricalTrend';
+import { hasReliableAqi } from '../utils/airQualityDisplay';
 
 export default function Dashboard() {
   const {
@@ -31,6 +32,7 @@ export default function Dashboard() {
       case '#f87171': return 'bg-red-500 hover:bg-red-600 text-white';
       case '#c084fc': return 'bg-purple-500 hover:bg-purple-600 text-white';
       case '#9f1239': return 'bg-rose-600 hover:bg-rose-700 text-white';
+      case '#64748b': return 'bg-slate-500 hover:bg-slate-600 text-white';
       default: return 'bg-blue-500 hover:bg-blue-600 text-white';
     }
   };
@@ -45,6 +47,7 @@ export default function Dashboard() {
       case '#f87171': return 'border-red-500';
       case '#c084fc': return 'border-purple-500';
       case '#9f1239': return 'border-rose-600';
+      case '#64748b': return 'border-slate-500';
       default: return 'border-blue-500';
     }
   };
@@ -139,7 +142,7 @@ export default function Dashboard() {
         <div className="flex flex-col gap-2 lg:col-span-2 lg:gap-6">
           <AirQualityCard data={airQualityData} />
           <CityHistoricalTrend cityId={selectedCity.city_id} cityName={selectedCity.name} />
-          <Recommendations status={airQualityData.status} />
+          <Recommendations status={hasReliableAqi(airQualityData) ? airQualityData.status : 'unknown'} />
           <div className="lg:hidden">
             <AirQualityMap />
           </div>

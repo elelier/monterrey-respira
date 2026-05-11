@@ -159,7 +159,7 @@ export const AQI_STATUS_COPY: Record<AirQualityStatus, AqiStatusCopy> = {
     label: 'Sin lectura',
     shortLabel: 'N/D',
     shareLabel: 'No disponible',
-    heroLabel: 'Sin lectura',
+    heroLabel: 'Sin lectura disponible',
     description: 'No hay una lectura confiable disponible para esta ciudad en este momento.',
   },
 };

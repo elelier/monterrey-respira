@@ -26,6 +26,12 @@ import {
   AQI_STATUS_COPY,
   AQI_THEME_TOKENS,
 } from '../utils/aqiDesignTokens';
+import {
+  formatNullableNumber,
+  formatNullableTimestamp,
+  getUnknownStateCopy,
+  hasReliableAqi,
+} from '../utils/airQualityDisplay';
 import { useAirQuality } from '../context/AirQualityContext';
 
 interface AirQualityCardProps {
@@ -110,31 +116,6 @@ const STATUS_CLASSES: Record<
   },
 };
 
-function formatNullableMetric(value: number | null | undefined, suffix: string) {
-  if (value === null || value === undefined) {
-    return 'N/D';
-  }
-
-  return `${value}${suffix}`;
-}
-
-function formatMeasurementDateTime(timestamp: string | null | undefined) {
-  if (!timestamp) {
-    return 'N/D';
-  }
-
-  const parsedDate = new Date(timestamp);
-
-  if (Number.isNaN(parsedDate.getTime())) {
-    return 'N/D';
-  }
-
-  return parsedDate.toLocaleString('es-MX', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  });
-}
-
 function getStatusIcon(status: AirQualityStatus, className: string) {
   switch (status) {
     case 'good':
@@ -176,16 +157,17 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
     setHasMounted(true);
   }, []);
 
-  const status = data.status || 'unknown';
-  const copy = AQI_STATUS_COPY[status];
+  const reliableAqi = hasReliableAqi(data);
+  const status = reliableAqi ? data.status : 'unknown';
+  const copy = reliableAqi ? AQI_STATUS_COPY[status] : getUnknownStateCopy();
   const theme = AQI_THEME_TOKENS[status];
   const classes = STATUS_CLASSES[status];
   const isUnknown = status === 'unknown';
-  const aqiLabel = isUnknown ? AQI_STATUS_COPY.unknown.shortLabel : data.aqi;
+  const aqiLabel = reliableAqi ? formatNullableNumber(data.aqi) : AQI_STATUS_COPY.unknown.shortLabel;
   const mainPollutantLabel = data.main_pollutant_us
     ? getPollutantInfo(data.main_pollutant_us).name
     : 'N/D';
-  const measurementTime = isUnknown ? 'N/D' : formatMeasurementDateTime(data.timestamp);
+  const measurementTime = reliableAqi ? formatNullableTimestamp(data.timestamp) : 'N/D';
 
   return (
     <motion.section
@@ -305,7 +287,7 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
               <div className="mx-3 mb-2 grid grid-cols-2 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 sm:mx-4 sm:mb-4 sm:rounded-2xl">
                 <DetailItem
                   label="Temperatura"
-                  value={formatNullableMetric(data.temperature, ' °C')}
+                  value={formatNullableNumber(data.temperature, ' °C', 1)}
                   accentClass={classes.accent}
                   softBgClass={classes.softBg}
                   weatherIcon={data.weather_icon}
@@ -313,7 +295,7 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
                 />
                 <DetailItem
                   label="Humedad"
-                  value={formatNullableMetric(data.humidity, ' %')}
+                  value={formatNullableNumber(data.humidity, ' %')}
                   accentClass="text-blue-600"
                   softBgClass="bg-blue-50"
                   useHumidityIcon={true}
@@ -321,7 +303,7 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
                 />
                 <DetailItem
                   label="Viento"
-                  value={formatNullableMetric(data.wind?.speed, ' km/h')}
+                  value={formatNullableNumber(data.wind?.speed, ' km/h', 1)}
                   accentClass="text-blue-600"
                   softBgClass="bg-blue-50"
                   useWindIcon={true}
