@@ -12,6 +12,7 @@ import {
 } from 'recharts';
 import { AirQualityData } from '../types';
 import { getPollutantInfo } from '../utils/airQualityUtils';
+import { isFiniteNumber } from '../utils/airQualityDisplay';
 import { motion } from 'framer-motion';
 import { IoInformationCircleOutline } from 'react-icons/io5';
 
@@ -72,14 +73,14 @@ export default function PollutantsChart({ data, className = '' }: PollutantsChar
     { name: 'o3', value: data.o3, fill: '#60a5fa', fullName: 'Ozono' },      // blue
     { name: 'no2', value: data.no2, fill: '#fbbf24', fullName: 'NO₂' },    // yellow
     { name: 'so2', value: data.so2, fill: '#a78bfa', fullName: 'SO₂' },    // purple
-    { name: 'co', value: data.co / 10, fill: '#4ade80', fullName: 'CO' }, // green (scaled down for visualization)
-  ];
+    { name: 'co', value: isFiniteNumber(data.co) ? data.co / 10 : null, fill: '#4ade80', fullName: 'CO' }, // green (scaled down for visualization)
+  ].filter((pollutant): pollutant is typeof pollutant & { value: number } => isFiniteNumber(pollutant.value));
 
   const getBarBackground = (index: number) => {
     return activeIndex === index ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0)';
   };
 
-  const handleBarClick = (data: any, index: number) => {
+  const handleBarClick = (_data: unknown, index: number) => {
     setActiveIndex(index === activeIndex ? null : index);
   };
 

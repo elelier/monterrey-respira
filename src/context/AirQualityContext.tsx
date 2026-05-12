@@ -19,6 +19,7 @@ import {
   writeStoredCityId,
   findCityById,
 } from '../utils/cityRoutingUtils';
+import { hasReliableAqi } from '../utils/airQualityDisplay';
 
 type CityOption = (typeof MONTERREY_LOCATIONS_WITH_COORDS)[number];
 
@@ -74,24 +75,24 @@ function getRpcFailureReason(error: unknown): string {
 
 function buildDegradedAirQualityData(city: CityOption, reason: string): AirQualityData {
   return {
-    aqi: 0,
+    aqi: null,
     status: 'unknown',
     dataQuality: 'degraded',
     degradationReason: reason,
     measurementFreshness: 'unknown',
-    pm25: 0,
-    pm10: 0,
-    o3: 0,
-    no2: 0,
-    so2: 0,
-    co: 0,
-    temperature: 0,
-    humidity: 0,
+    pm25: null,
+    pm10: null,
+    o3: null,
+    no2: null,
+    so2: null,
+    co: null,
+    temperature: null,
+    humidity: null,
     wind: {
-      speed: 0,
-      direction: 0,
+      speed: null,
+      direction: null,
     },
-    timestamp: new Date().toISOString(),
+    timestamp: null,
     last_successful_update_at: null,
     location: {
       name: city.name,
@@ -152,7 +153,7 @@ function getCityAvailability(row: CityAirQualityData | undefined): CityDataAvail
     return 'missing';
   }
 
-  return row.aqi_us === null ? 'invalid-aqi' : 'available';
+  return hasReliableAqi(row.aqi_us) ? 'available' : 'invalid-aqi';
 }
 
 function getCityDisabledReason(availability: CityDataAvailability): string | undefined {
@@ -199,7 +200,7 @@ function transformApiResponse(
     );
   }
 
-  if (cityData.aqi_us === null) {
+  if (!hasReliableAqi(cityData.aqi_us)) {
     return buildDegradedAirQualityData(
       city,
       `Última lectura no disponible para ${city.name}.`,
@@ -218,17 +219,17 @@ function transformApiResponse(
     dataQuality: measurementFreshness === 'fresh' ? 'fresh' : 'degraded',
     degradationReason: measurementFreshnessReason,
     measurementFreshness,
-    pm25: 0,
-    pm10: 0,
-    o3: 0,
-    no2: 0,
-    so2: 0,
-    co: 0,
-    temperature: cityData.temperature_c ?? 0,
-    humidity: cityData.humidity_percent ?? 0,
+    pm25: null,
+    pm10: null,
+    o3: null,
+    no2: null,
+    so2: null,
+    co: null,
+    temperature: cityData.temperature_c,
+    humidity: cityData.humidity_percent,
     wind: {
-      speed: cityData.wind_speed_ms ?? 0,
-      direction: cityData.wind_direction_deg ?? 0,
+      speed: cityData.wind_speed_ms,
+      direction: cityData.wind_direction_deg,
     },
     timestamp: cityData.reading_timestamp,
     last_successful_update_at: cityData.last_successful_update_at,

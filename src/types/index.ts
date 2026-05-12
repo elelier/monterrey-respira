@@ -58,25 +58,25 @@ export interface CitySelectorOption {
 }
 
 export interface AirQualityData {
-  aqi: number;
+  aqi: number | null;
   status: AirQualityStatus;
   dataQuality: AirQualityDataQuality;
   degradationReason?: string;
   measurementFreshness: MeasurementFreshness;
-  pm25: number;
-  pm10: number;
-  o3: number;
-  no2: number;
-  so2: number;
-  co: number;
+  pm25: number | null;
+  pm10: number | null;
+  o3: number | null;
+  no2: number | null;
+  so2: number | null;
+  co: number | null;
   iaqi?: Partial<Record<'pm25' | 'pm10' | 'o3' | 'no2' | 'so2' | 'co', { v: number }>>;
-  temperature: number;
-  humidity: number;
+  temperature: number | null;
+  humidity: number | null;
   wind: {
-    speed: number;
-    direction: number;
+    speed: number | null;
+    direction: number | null;
   };
-  timestamp: string;
+  timestamp: string | null;
   last_successful_update_at?: string | null;
   location: {
     name: string;

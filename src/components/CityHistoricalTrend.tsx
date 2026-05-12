@@ -23,6 +23,7 @@ import {
 } from '../services/apiService';
 import { useAirQuality } from '../context/AirQualityContext';
 import { AQI_THEME_TOKENS } from '../utils/aqiDesignTokens';
+import { formatNullableTimestamp, isFiniteNumber } from '../utils/airQualityDisplay';
 
 interface CityHistoricalTrendProps {
   cityId: number;
@@ -136,7 +137,7 @@ function toChartPoint(
 ): ChartPoint | null {
   const metricValue = getMetricValue(row, metric);
 
-  if (metricValue === null) {
+  if (!isFiniteNumber(metricValue)) {
     return null;
   }
 
@@ -356,7 +357,7 @@ export default function CityHistoricalTrend({ cityId, cityName }: CityHistorical
                 labelFormatter={(_, payload) => {
                   const point = payload?.[0]?.payload as ChartPoint | undefined;
                   return point
-                    ? new Date(point.timestamp).toLocaleString('es-MX', {
+                    ? formatNullableTimestamp(point.timestamp, {
                         dateStyle: 'medium',
                         timeStyle: range === '6m' ? undefined : 'short',
                       })
