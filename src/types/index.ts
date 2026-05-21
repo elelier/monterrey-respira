@@ -43,7 +43,7 @@ export type AirQualityHistoryMetric = 'aqi_us' | 'temperature_c' | 'humidity_per
 
 export type AirQualityDataQuality = 'fresh' | 'degraded';
 
-export type MeasurementFreshness = 'fresh' | 'degraded' | 'stale' | 'unknown';
+export type MeasurementFreshness = 'fresh' | 'stale' | 'old' | 'unknown';
 
 export type CityDataAvailability = 'available' | 'missing' | 'invalid-aqi';
 

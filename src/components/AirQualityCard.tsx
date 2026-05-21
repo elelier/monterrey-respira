@@ -33,6 +33,7 @@ import {
   hasReliableAqi,
 } from '../utils/airQualityDisplay';
 import { useAirQuality } from '../context/AirQualityContext';
+import { getFreshnessDisplayCopy } from '../utils/freshness';
 
 interface AirQualityCardProps {
   data: AirQualityData;
@@ -143,19 +144,6 @@ function getStatusIcon(status: AirQualityStatus, className: string) {
   }
 }
 
-function getFreshnessLabel(data: AirQualityData) {
-  switch (data.measurementFreshness) {
-    case 'stale':
-      return 'Ultima medicion';
-    case 'degraded':
-      return 'Ultima medicion';
-    case 'unknown':
-      return 'Ultima medicion';
-    default:
-      return 'Ultima medicion';
-  }
-}
-
 export default function AirQualityCard({ data, className = '' }: AirQualityCardProps) {
   const [showDetails, setShowDetails] = useState<boolean>(true);
   const [hasMounted, setHasMounted] = useState(false);
@@ -175,7 +163,9 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
   const mainPollutantLabel = data.main_pollutant_us
     ? getPollutantInfo(data.main_pollutant_us).name
     : 'N/D';
+  const freshnessCopy = getFreshnessDisplayCopy(data.measurementFreshness);
   const measurementTime = reliableAqi ? formatNullableTimestamp(data.timestamp) : 'N/D';
+  const pipelineTime = formatNullableTimestamp(data.last_successful_update_at ?? null);
 
   return (
     <motion.section
@@ -247,11 +237,22 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
             {copy.description}
           </p>
 
-          <div className="mt-4 max-w-[16.5rem]">
+          {data.degradationReason && (
+            <p className="mt-3 rounded-2xl bg-white/18 px-3 py-2 text-[0.86rem] font-semibold leading-snug text-white shadow-sm backdrop-blur-md sm:text-base">
+              {data.degradationReason}
+            </p>
+          )}
+
+          <div className="mt-4 grid max-w-[34rem] grid-cols-1 gap-2 sm:grid-cols-2">
             <InfoPill
               icon={<IoTimeOutline className="h-6 w-6" />}
-              label={getFreshnessLabel(data)}
-              value={measurementTime}
+              label={freshnessCopy.label}
+              value={`Medicion ${measurementTime}`}
+            />
+            <InfoPill
+              icon={<IoCloudOutline className="h-6 w-6" />}
+              label="Trazabilidad"
+              value={`Pipeline ${pipelineTime}`}
             />
           </div>
         </div>
@@ -463,4 +464,3 @@ function DetailItem({
     </div>
   );
 }
-
