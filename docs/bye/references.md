@@ -1,140 +1,37 @@
-# Referencias de MonterreyRespira
+# Referencias legacy de MonterreyRespira
 
-Este documento recopila todas las referencias a documentación externa e interna utilizada en el proyecto MonterreyRespira.
+Estado: legacy / no fuente de verdad operativa
+Fecha: 2026-05-13
 
-## 🌐 Documentación Externa
+Este archivo conserva referencias históricas del proyecto. No debe usarse para tomar decisiones de runtime, pipeline, deploy ni contrato de datos.
 
-### Plataformas y Servicios
+La fuente de verdad vigente está en:
 
-*   **Buildship**
-    *   Orquestación y API
-    *   Workflows programados
-    *   Endpoints API
+- `docs/shared-data-contract.md`
+- `docs/architecture.md`
+- `docs/data-pipeline.md`
+- `docs/blindaje-y-cambio-de-curso.md`
+- Workflow efectivo de `elelier/airquality_pipeline`
 
-*   **Supabase**
-    *   Base de datos PostgreSQL
-    *   API REST
-    *   Row Level Security
+## Referencias históricas
 
-*   **Netlify**
-    *   Despliegue frontend
-    *   Gestión de assets
-    *   Optimización de rendimiento
+Las siguientes referencias pueden aparecer en documentos antiguos, pero no son runtime vigente salvo evidencia nueva y explícita:
 
-### APIs y Librerías
+- Buildship como orquestador activo.
+- Netlify como deploy activo.
+- Endpoint `GET /latest-air-quality` como frontera vigente de lectura.
+- API server-side propia para el frontend.
 
-*   **AirVisual (IQAir) API**
-    *   Fuente principal de datos
-    *   Límites de peticiones
-    *   Documentación de endpoints
+## Referencias vigentes de alto nivel
 
-*   **React**
-    *   Framework frontend
-    *   Documentación oficial
-    *   Ejemplos de componentes
+- App pública: `https://mtyrespira.elelier.com`
+- Frontend: `elelier/monterrey-respira`
+- Pipeline: `elelier/airquality_pipeline`
+- Frontera de datos: Supabase PostgreSQL
+- RPC crítica: `get_latest_air_quality_per_city`
 
-*   **TypeScript**
-    *   Documentación de tipos
-    *   Mejores prácticas
-    *   Configuración
+## Regla de uso
 
-## 📚 Documentación Interna
+Si este archivo contradice documentos vigentes o runtime, este archivo pierde prioridad.
 
-### Estructura del Proyecto
-
-*   **[README.md](./README.md)**
-    *   Introducción general
-    *   Características clave
-    *   Pila tecnológica
-    *   Estado del proyecto
-
-*   **[Roadmap.md](./roadmap.md)**
-    *   Plan de desarrollo
-    *   Fases de implementación
-    *   Funcionalidades futuras
-
-*   **[Changelog.md](./changelog.md)**
-    *   Historial de cambios
-    *   Versiones del proyecto
-    *   Mejoras y correcciones
-
-### Guías y Estándares
-
-*   **[Style Guide](./style-guide.md)**
-    *   Lineamientos de diseño
-    *   Componentes visuales
-    *   Sistema de temas
-    *   Paleta de colores
-
-*   **[Best Practices](./best-practices.md)**
-    *   Mejores prácticas de desarrollo
-    *   Patrones de diseño
-    *   Guías de implementación
-
-### Componentes y Arquitectura
-
-*   **[Architecture.md](./architecture.md)**
-    *   Visión general del sistema
-    *   Arquitectura frontend
-    *   Arquitectura backend
-    *   Flujo de datos
-
-*   **[Components.md](./components.md)**
-    *   Componentes reutilizables
-    *   Estructura de componentes
-    *   Propiedades y métodos
-
-### Datos y APIs
-
-*   **[Data Pipeline](./data-pipeline.md)**
-    *   Pipeline de datos
-    *   Orquestación
-    *   Base de datos
-    *   API de lectura
-
-*   **[API.md](./api.md)**
-    *   APIs externas
-    *   Implementación
-    *   Estrategias de fallback
-
-### Contribución y Desarrollo
-
-*   **[Contributing.md](./contributing.md)**
-    *   Guía de contribución
-    *   Proceso de desarrollo
-    *   Requisitos
-
-## 📝 Referencias de Código
-
-### Contextos y Estado
-
-*   **AirQualityContext**
-    *   Gestión de datos
-    *   Temas dinámicos
-    *   Estado global
-
-### Funciones y Procesos
-
-*   **Workflow Principal**
-    *   Schedule Trigger (CRON)
-    *   API Endpoint Trigger
-    *   Procesamiento de datos
-
-*   **Funciones SQL**
-    *   Consultas eficientes
-    *   Row Number
-    *   Partición de datos
-
-### Endpoints API
-
-*   **GET /latest-air-quality**
-    *   Datos procesados
-    *   Filtros
-    *   Respuestas
-
-## 📌 Notas Importantes
-
-*   Las referencias a documentación externa deben mantenerse actualizadas
-*   Las referencias internas deben seguir la estructura del proyecto
-*   Cualquier cambio en la documentación debe reflejarse en este archivo
-*   Las referencias a código deben mantenerse sincronizadas con la implementación
+No usar este archivo como base para nuevas historias de implementación.
