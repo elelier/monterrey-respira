@@ -1,7 +1,7 @@
 # Roadmap — MtyRespira
 
-Estado: brownfield operativo
-Fecha: 2026-05-13
+Estado: brownfield operativo  
+Fecha: 2026-05-21
 
 ## Cambio de curso
 
@@ -14,9 +14,22 @@ El roadmap vigente se ordena alrededor de cuatro principios:
 3. Degradación explícita.
 4. Continuidad de pipeline y proveedor.
 
+## Gate documental vigente
+
+Story 1.3 — Provider Continuity Readiness queda bloqueada hasta que Story 1.2.1 — Canonical Project Docs Stop esté aprobada y mergeada.
+
+Razón:
+
+- El repo necesitaba `AGENTS.md` raíz.
+- El repo necesitaba PRD canónico o decisión explícita.
+- README aún contenía lenguaje de “tiempo real” incompatible con Freshness Truth UX.
+- La arquitectura y roadmap existían, pero faltaba un índice/fuente de verdad para evitar drift.
+
 ## Fase 1 — Blindaje crítico
 
 ### Story 1.1 — RPC Contract Smoke + Runtime Nullability Verification
+
+Estado: completada si existe PR merged con evidencia de smoke/nullability.
 
 Objetivo: crear evidencia repetible de lo que devuelve `get_latest_air_quality_per_city`.
 
@@ -35,6 +48,8 @@ Criterio de salida:
 
 ### Story 1.2 — Freshness Truth UX + Stale Data Guard
 
+Estado: completada por PR #23 — `feat: add freshness truth UX guard`.
+
 Objetivo: evitar que la app comunique datos viejos como si fueran frescos.
 
 Alcance:
@@ -48,12 +63,40 @@ Criterio de salida:
 - La UI no sobrepromete frescura.
 - Un dato viejo o dudoso entra en estado explícito, no normal.
 
+### Story 1.2.1 — Canonical Project Docs Stop: PRD + Architecture + Roadmap + AGENTS Baseline
+
+Estado: en curso.
+
+Objetivo: crear o normalizar los documentos mínimos que gobiernan el proyecto antes de seguir con historias de implementación.
+
+Alcance:
+
+- Crear `AGENTS.md` en raíz.
+- Crear `docs/PRD.md` si falta PRD canónico.
+- Confirmar `docs/architecture.md` como arquitectura canónica sin duplicar `docs/ARCHITECTURE.md`.
+- Confirmar `docs/roadmap.md` como roadmap canónico sin duplicar `docs/ROADMAP.md`.
+- Limpiar README para no prometer “tiempo real”.
+- Crear `docs/DOCUMENTATION_INDEX.md` si ayuda a explicar fuente de verdad.
+- Registrar en Notion que Story 1.3 queda bloqueada hasta merge.
+
+Criterio de salida:
+
+- Existe `AGENTS.md` en raíz.
+- Existe PRD canónico.
+- Existe architecture canónica o decisión explícita de ruta.
+- Existe roadmap canónico o decisión explícita de ruta.
+- README ya no promete “tiempo real”.
+- No hay cambios runtime, Supabase, RPC ni pipeline.
+
 ### Story 1.3 — Provider Continuity Readiness
+
+Estado: bloqueada hasta merge de Story 1.2.1.
 
 Objetivo: preparar fallas del proveedor activo sin romper la experiencia pública.
 
 Alcance:
 
+- Verificar proveedor activo contra `airquality_pipeline`, no contra memoria o README legacy.
 - Clasificar errores upstream.
 - Registrar estado por ciudad.
 - Documentar runbook de contingencia.
@@ -121,9 +164,12 @@ Solo después de cerrar Fase 1:
 - Gamificación.
 - Nuevas lecturas ambientales fuera del contrato actual.
 
-## Documentos relacionados
+## Documentos canónicos relacionados
 
-- `docs/shared-data-contract.md`
-- `docs/data-pipeline.md`
+- `AGENTS.md`
+- `docs/DOCUMENTATION_INDEX.md`
+- `docs/PRD.md`
 - `docs/architecture.md`
+- `docs/shared-data-contract.md`
+- `docs/freshness-truth-ux.md`
 - `docs/blindaje-y-cambio-de-curso.md`
