@@ -1,57 +1,129 @@
-Aquí tienes el contenido listo para reemplazar tu archivo docs/roadmap.md, reflejando fielmente el estado actual del proyecto tras 3 semanas, el avance real y los siguientes pasos recomendados. El formato es claro y profesional, siguiendo el estilo de tu documentación.
+# Roadmap — MtyRespira
 
-Roadmap de MonterreyRespira (Actualizado - Semana 3)
-Este roadmap refleja el estado actual del proyecto tras 3 semanas de desarrollo, con una separación clara entre lo ya integrado y las siguientes prioridades sugeridas.
+Estado: brownfield operativo
+Fecha: 2026-05-13
 
-1. Avance Actual (Semana 3)
-Backend & Pipeline de Datos
-[x] Configuración y despliegue de Supabase como base de datos principal (PostgreSQL).
-[x] Esquema de tablas cities y air_quality_readings creado y documentado.
-[x] Seguridad: RLS habilitado, uso de service_role para el pipeline.
-[x] Pipeline automatizado en Buildship para:
-[x] Sincronización de ciudades monitoreadas con la API de AirVisual.
-[x] Obtención y almacenamiento programado (CRON) de datos de calidad del aire cada hora.
-[x] Manejo de errores y reintentos automáticos.
-[x] Función RPC get_latest_air_quality_per_city implementada y consumida desde el frontend.
-Frontend
-[x] Estructura modular en React + TypeScript, con rutas principales y layout adaptativo.
-[x] Integración con Supabase vía API propia (no consumo directo de APIs externas en frontend).
-[x] Contexto global para calidad del aire: manejo de estado, caché local y refresco.
-[x] Componentes clave implementados:
-[x] Tarjetas y visualizaciones de calidad del aire.
-[x] Mapa interactivo y mapas de calor (heatmap).
-[x] Gráficos históricos y comparativos.
-[x] Sistema de alertas visuales.
-[x] Accesibilidad básica y soporte para temas dinámicos.
-[x] Guía de estilos y arquitectura documentadas y alineadas con el código.
-[x] Tipografía y paleta de colores arquitectónica (Montserrat, Work Sans, colores por estado AQI).
-DevOps y Calidad
-[x] Despliegue automático en Netlify.
-[x] Linting (ESLint), formateo (Prettier) y control de calidad automatizado.
-[x] Documentación técnica y de diseño actualizada.
-2. Siguientes pasos recomendados (Prioridades)
-Backend & Pipeline
-[ ] Optimizar la función RPC para mayor eficiencia si crece el volumen de datos.
-[ ] Implementar endpoint para datos históricos reales.
-[ ] Integrar nuevas fuentes de datos (ej. SIMA) cuando estén disponibles.
-[ ] Mejorar logs y telemetría del pipeline (Buildship).
-Frontend
-[ ] Implementar lazy loading para componentes pesados (mapas, gráficos).
-[ ] Mejorar la experiencia móvil (optimización de UI/UX en dispositivos pequeños).
-[ ] Añadir modo para personas daltónicas y accesibilidad avanzada (WCAG 2.1 AA).
-[ ] Permitir preferencias de usuario persistentes (requiere Supabase Auth).
-[ ] Mejorar sistema de alertas (push/email) y configuración de umbrales personalizados.
-[ ] Añadir sección de participación ciudadana (reportes, galería, compartir en redes).
-[ ] Desarrollar vista de pronóstico de calidad del aire (integrar modelos o APIs de forecast).
-Visualización y Analítica
-[ ] Implementar comparativas entre ciudades.
-[ ] Añadir vistas de tendencias y patrones a largo plazo.
-[ ] Preparar la base para análisis predictivo y visualización avanzada.
-Escalabilidad y Expansión
-[ ] Planificar la expansión a otras ciudades de México.
-[ ] Preparar la infraestructura para soportar mayor volumen y diversidad de datos.
-3. Visión a mediano y largo plazo
-Plataforma educativa ambiental y gamificación.
-Calculadora de huella de carbono personal.
-Modelos de predicción y alertas preventivas.
-Expansión nacional y comparativas regionales.
+## Cambio de curso
+
+La prioridad actual de MtyRespira no es expandir superficie visible. La prioridad es blindar confianza operativa antes de agregar features nuevas.
+
+El roadmap vigente se ordena alrededor de cuatro principios:
+
+1. Contrato de datos verificable.
+2. Frescura honesta.
+3. Degradación explícita.
+4. Continuidad de pipeline y proveedor.
+
+## Fase 1 — Blindaje crítico
+
+### Story 1.1 — RPC Contract Smoke + Runtime Nullability Verification
+
+Objetivo: crear evidencia repetible de lo que devuelve `get_latest_air_quality_per_city`.
+
+Alcance:
+
+- Validar columnas esperadas.
+- Validar nullability observada.
+- Validar timestamps UTC.
+- Validar una o más ciudades conocidas.
+- Dejar fixture o smoke test canónico.
+
+Criterio de salida:
+
+- Existe evidencia verificable del payload real.
+- `docs/shared-data-contract.md` queda actualizado si se detecta drift.
+
+### Story 1.2 — Freshness Truth UX + Stale Data Guard
+
+Objetivo: evitar que la app comunique datos viejos como si fueran frescos.
+
+Alcance:
+
+- Distinguir medición, actualización de pipeline y refresh de frontend.
+- Mostrar estado fresco, viejo, degradado o faltante.
+- Evitar lenguaje de “tiempo real” cuando exceda la cadencia real del productor.
+
+Criterio de salida:
+
+- La UI no sobrepromete frescura.
+- Un dato viejo o dudoso entra en estado explícito, no normal.
+
+### Story 1.3 — Provider Continuity Readiness
+
+Objetivo: preparar fallas del proveedor activo sin romper la experiencia pública.
+
+Alcance:
+
+- Clasificar errores upstream.
+- Registrar estado por ciudad.
+- Documentar runbook de contingencia.
+- Evitar fallback productivo no verificado.
+
+Criterio de salida:
+
+- El equipo puede distinguir error upstream, dato viejo, ciudad sin update y estado sano.
+
+### Story 1.4 — Public Runtime Verification Gate
+
+Objetivo: verificar producción después de cambios relevantes.
+
+Alcance:
+
+- Validar `https://mtyrespira.elelier.com`.
+- Validar workflow horario del pipeline.
+- Validar una ciudad conocida contra el contrato.
+- Registrar evidencia básica posterior a release.
+
+Criterio de salida:
+
+- Cada release relevante tiene evidencia mínima de app, pipeline y contrato.
+
+## Fase 2 — Limpieza y gobernanza
+
+### Story 2.1 — Docs Drift Cleanup
+
+Objetivo: eliminar referencias o afirmaciones obsoletas que contradigan runtime vigente.
+
+Alcance:
+
+- Marcar Buildship como legacy si aparece como runtime activo.
+- Marcar Netlify como legacy si aparece como deploy activo.
+- Remover endpoints legacy presentados como API vigente.
+- Alinear README, arquitectura, pipeline, roadmap y referencias.
+
+### Story 2.2 — Cross-Repo Change Checklist
+
+Objetivo: evitar cambios locales que rompan el producto coordinado.
+
+Todo PR que toque datos debe declarar impacto sobre:
+
+```text
+pipeline -> Supabase/RPC -> frontend -> UX
+```
+
+## Fase 3 — UX y visualización posterior
+
+Solo después de cerrar Fase 1:
+
+- Mejoras mobile-first.
+- Pulido de tarjetas AQI.
+- Visualizaciones históricas más claras.
+- Mejoras de accesibilidad.
+- Comparativas entre ciudades.
+
+## Fuera de alcance hasta nuevo aviso
+
+- Auth de usuarios.
+- Alertas personalizadas.
+- Nuevas fuentes productivas sin contrato verificado.
+- Pronóstico ambiental.
+- Expansión nacional.
+- Gamificación.
+- Nuevas lecturas ambientales fuera del contrato actual.
+
+## Documentos relacionados
+
+- `docs/shared-data-contract.md`
+- `docs/data-pipeline.md`
+- `docs/architecture.md`
+- `docs/blindaje-y-cambio-de-curso.md`
