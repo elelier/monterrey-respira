@@ -20,6 +20,10 @@ import {
   findCityById,
 } from '../utils/cityRoutingUtils';
 import { hasReliableAqi } from '../utils/airQualityDisplay';
+import {
+  getMeasurementFreshness,
+  getMeasurementFreshnessReason,
+} from '../utils/freshness';
 
 type CityOption = (typeof MONTERREY_LOCATIONS_WITH_COORDS)[number];
 
@@ -53,23 +57,21 @@ interface AirQualityProviderProps {
 
 const CACHE_KEY = 'airQualityDataCache';
 const CACHE_EXPIRATION_TIME = 60 * 60 * 1000;
-const MEASUREMENT_DEGRADED_HOURS = 2;
-const MEASUREMENT_STALE_HOURS = 6;
 
 function getRpcFailureReason(error: unknown): string {
   if (!isAirQualityServiceError(error)) {
-    return 'No se pudo consultar la fuente pública de calidad del aire.';
+    return 'No se pudo consultar la fuente publica de calidad del aire.';
   }
 
   switch (error.code) {
     case 'supabase_config_missing':
-      return 'El deployment público no tiene configurada la conexión de Supabase.';
+      return 'El deployment publico no tiene configurada la conexion de Supabase.';
     case 'supabase_rpc_error':
-      return 'Supabase rechazó o no pudo ejecutar la RPC pública de calidad del aire.';
+      return 'Supabase rechazo o no pudo ejecutar la RPC publica de calidad del aire.';
     case 'supabase_unexpected_response':
-      return 'La RPC de calidad del aire respondió con un formato inesperado.';
+      return 'La RPC de calidad del aire respondio con un formato inesperado.';
     default:
-      return 'No se pudo consultar la fuente pública de calidad del aire.';
+      return 'No se pudo consultar la fuente publica de calidad del aire.';
   }
 }
 
@@ -104,50 +106,6 @@ function buildDegradedAirQualityData(city: CityOption, reason: string): AirQuali
   };
 }
 
-function getMeasurementAgeHours(readingTimestamp: string): number | null {
-  const readingTime = new Date(readingTimestamp).getTime();
-
-  if (Number.isNaN(readingTime)) {
-    return null;
-  }
-
-  return (Date.now() - readingTime) / (60 * 60 * 1000);
-}
-
-function getMeasurementFreshness(readingTimestamp: string): AirQualityData['measurementFreshness'] {
-  const ageHours = getMeasurementAgeHours(readingTimestamp);
-
-  if (ageHours === null) {
-    return 'unknown';
-  }
-
-  if (ageHours > MEASUREMENT_STALE_HOURS) {
-    return 'stale';
-  }
-
-  if (ageHours > MEASUREMENT_DEGRADED_HOURS) {
-    return 'degraded';
-  }
-
-  return 'fresh';
-}
-
-function getMeasurementFreshnessReason(
-  freshness: AirQualityData['measurementFreshness'],
-  cityName: string,
-): string | undefined {
-  switch (freshness) {
-    case 'stale':
-      return `Ultima medicion disponible para ${cityName}.`;
-    case 'degraded':
-      return `La medicion ambiental de ${cityName} tiene retraso frente a la cadencia esperada.`;
-    case 'unknown':
-      return `No se pudo validar la hora de medicion ambiental para ${cityName}.`;
-    default:
-      return undefined;
-  }
-}
-
 function getCityAvailability(row: CityAirQualityData | undefined): CityDataAvailability {
   if (!row) {
     return 'missing';
@@ -161,7 +119,7 @@ function getCityDisabledReason(availability: CityDataAvailability): string | und
     case 'missing':
       return 'Sin datos recientes';
     case 'invalid-aqi':
-      return 'Última lectura no disponible';
+      return 'Ultima lectura no disponible';
     default:
       return undefined;
   }
@@ -203,7 +161,7 @@ function transformApiResponse(
   if (!hasReliableAqi(cityData.aqi_us)) {
     return buildDegradedAirQualityData(
       city,
-      `Última lectura no disponible para ${city.name}.`,
+      `Ultima lectura no disponible para ${city.name}.`,
     );
   }
 
@@ -350,14 +308,14 @@ export function AirQualityProvider({ children }: AirQualityProviderProps) {
         setCityDataArray([]);
         setAirQualityData(degradedData);
         setTheme(getAirQualityTheme('unknown'));
-        setError('No se pudieron cargar datos frescos de calidad del aire.');
+        setError('No se pudieron cargar datos de calidad del aire.');
       }
     } catch (err) {
       console.error('Error fetching air quality data:', err);
       const degradedData = buildDegradedAirQualityData(selectedCity, getRpcFailureReason(err));
       setAirQualityData(degradedData);
       setTheme(getAirQualityTheme('unknown'));
-      setError('No se pudieron cargar datos frescos de calidad del aire.');
+      setError('No se pudieron cargar datos de calidad del aire.');
     } finally {
       setLoading(false);
     }
