@@ -2,16 +2,18 @@
 
 ![MonterreyRespira Logo](public/mty.png)
 
-MonterreyRespira es una aplicación web que proporciona información en tiempo real sobre la calidad del aire en Monterrey y su área metropolitana. Diseñada para ayudar a los ciudadanos a comprender y monitorear la calidad del aire que respiran diariamente.
+MonterreyRespira es una aplicación web pública que presenta lecturas disponibles de calidad del aire para Monterrey y su área metropolitana.
+
+El producto ayuda a las personas a consultar AQI, contaminante principal cuando está disponible, contexto ambiental y la frescura de la medición reportada. No promete monitoreo en tiempo real: la app distingue entre hora de medición, actualización del pipeline y estados degradados o sin lectura.
 
 ## ✨ Características
 
-- 📊 Visualización de datos de calidad del aire en tiempo real
-- 🗺️ Mapas interactivos con estaciones de monitoreo
-- 📈 Gráficos históricos de contaminantes
-- 🔍 Información detallada sobre contaminantes y sus efectos en la salud
+- 📊 Visualización de lecturas disponibles de calidad del aire
+- 🗺️ Mapa interactivo y selección de ciudad
+- 📈 Gráficos históricos de contaminantes cuando hay datos disponibles
+- 🔍 Información sobre contaminantes y efectos en la salud
 - 📱 Diseño responsive optimizado para dispositivos móviles
-- 🌡️ Sistema de alertas basado en la calidad del aire actual
+- 🕒 Freshness Truth UX: medición reciente, con retraso, vieja o sin lectura disponible
 
 ## 🛠️ Tecnologías
 
@@ -20,20 +22,37 @@ MonterreyRespira es una aplicación web que proporciona información en tiempo r
 - **Visualización:** Chart.js, Leaflet
 - **Animaciones:** Framer Motion
 - **Iconos:** React Icons
-- **APIs:** IQAir, OpenAQ, SIMA (en desarrollo)
+- **Datos:** Supabase RPC `get_latest_air_quality_per_city`
+- **Pipeline ambiental:** repositorio `elelier/airquality_pipeline`
+- **Hosting app:** Cloudflare Pages
+
+## 🧭 Arquitectura resumida
+
+```text
+provider -> airquality_pipeline -> Supabase tables -> get_latest_air_quality_per_city -> frontend
+```
+
+Conceptos críticos:
+
+- `reading_timestamp` = tiempo de medición ambiental.
+- `last_successful_update_at` = trazabilidad de éxito del pipeline.
+- `get_latest_air_quality_per_city` = RPC crítica consumida por el frontend.
+- `cities` y `air_quality_readings` = tablas ambientales principales.
+
+Core DB no se usa para lecturas ambientales.
 
 ## 🚀 Comenzando
 
 ### Prerequisitos
 
 - Node.js 18.x o superior
-- Bun (recomendado) o npm
+- Bun recomendado o npm
 
 ### Instalación
 
 1. Clona el repositorio:
    ```bash
-   git clone https://github.com/tuusuario/monterrey-respira.git
+   git clone https://github.com/elelier/monterrey-respira.git
    cd monterrey-respira
    ```
 
@@ -47,31 +66,37 @@ MonterreyRespira es una aplicación web que proporciona información en tiempo r
    bun dev
    ```
 
-4. Abre [http://localhost:5173](http://localhost:5173) en tu navegador
+4. Abre [http://localhost:5173](http://localhost:5173) en tu navegador.
 
-## 📚 Documentación
+## 📚 Documentación canónica
 
-La documentación completa del proyecto se encuentra en la carpeta [docs](./docs):
+La documentación principal vive en la carpeta [docs](./docs):
 
-- [Guía de Estilo](./docs/style-guide.md)
+- [Reglas para agentes](./AGENTS.md)
+- [Índice documental](./docs/DOCUMENTATION_INDEX.md)
+- [PRD](./docs/PRD.md)
 - [Arquitectura](./docs/architecture.md)
-- [API](./docs/api.md)
 - [Roadmap](./docs/roadmap.md)
+- [Contrato compartido de datos](./docs/shared-data-contract.md)
+- [Freshness Truth UX](./docs/freshness-truth-ux.md)
+- [Mapa de blindaje y cambio de curso](./docs/blindaje-y-cambio-de-curso.md)
+- [Guía de Estilo](./docs/style-guide.md)
+- [API](./docs/api.md)
 - [Contribución](./docs/contributing.md)
 
 ## 🤝 Contribuir
 
-Las contribuciones son bienvenidas. Por favor, lee la [guía de contribución](./docs/contributing.md) para más detalles.
+Las contribuciones son bienvenidas dentro del alcance de MtyRespira. Antes de abrir cambios, lee [AGENTS.md](./AGENTS.md) y la [guía de contribución](./docs/contributing.md).
 
 ## 📝 Licencia
 
-Este proyecto está licenciado bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para más detalles.
+Este proyecto está licenciado bajo la Licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
 
 ## 📧 Contacto
 
-Para preguntas o sugerencias, por favor abre un issue en este repositorio.
+Para preguntas o sugerencias, abre un issue en este repositorio.
 
 ## 🙏 Agradecimientos
 
-- A todas las organizaciones que proporcionan datos abiertos sobre calidad del aire
-- A la comunidad de desarrolladores de Monterrey
+- A las organizaciones y comunidades que publican información ambiental.
+- A la comunidad de desarrolladores de Monterrey.
