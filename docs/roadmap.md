@@ -14,16 +14,21 @@ El roadmap vigente se ordena alrededor de cuatro principios:
 3. Degradación explícita.
 4. Continuidad de pipeline y proveedor.
 
-## Gate documental vigente
+## Estado documental vigente
 
-Story 1.3 — Provider Continuity Readiness queda bloqueada hasta que Story 1.2.1 — Canonical Project Docs Stop esté aprobada y mergeada.
+Story 1.2.1 — Canonical Project Docs Stop quedó completada por PR #24 — `docs: add canonical MtyRespira project docs baseline`.
+
+Story 1.3 — Provider Continuity Readiness quedó completada en el repo de pipeline por PR #14 — `docs: add provider continuity readiness runbook`.
+
+El roadmap queda desbloqueado para Story 1.4 — Public Runtime Verification Gate como la siguiente historia lógica de Fase 1.
 
 Razón:
 
-- El repo necesitaba `AGENTS.md` raíz.
-- El repo necesitaba PRD canónico o decisión explícita.
-- README aún contenía lenguaje de “tiempo real” incompatible con Freshness Truth UX.
-- La arquitectura y roadmap existían, pero faltaba un índice/fuente de verdad para evitar drift.
+- El repo app ya cuenta con `AGENTS.md` raíz.
+- El repo app ya cuenta con PRD, arquitectura, roadmap e índice documental canónicos.
+- README ya no promete “tiempo real”.
+- El pipeline ya documentó WAQI/AQICN como proveedor activo y AirVisual/IQAir como legacy/fallback explícito.
+- La siguiente necesidad crítica es verificar runtime público, workflow horario y contrato después de cambios relevantes.
 
 ## Fase 1 — Blindaje crítico
 
@@ -65,48 +70,74 @@ Criterio de salida:
 
 ### Story 1.2.1 — Canonical Project Docs Stop: PRD + Architecture + Roadmap + AGENTS Baseline
 
-Estado: en curso.
+Estado: completada por PR #24 — `docs: add canonical MtyRespira project docs baseline`.
 
 Objetivo: crear o normalizar los documentos mínimos que gobiernan el proyecto antes de seguir con historias de implementación.
 
-Alcance:
+Alcance completado:
 
 - Crear `AGENTS.md` en raíz.
-- Crear `docs/PRD.md` si falta PRD canónico.
+- Crear `docs/PRD.md` como PRD canónico.
 - Confirmar `docs/architecture.md` como arquitectura canónica sin duplicar `docs/ARCHITECTURE.md`.
 - Confirmar `docs/roadmap.md` como roadmap canónico sin duplicar `docs/ROADMAP.md`.
 - Limpiar README para no prometer “tiempo real”.
-- Crear `docs/DOCUMENTATION_INDEX.md` si ayuda a explicar fuente de verdad.
-- Registrar en Notion que Story 1.3 queda bloqueada hasta merge.
+- Crear `docs/DOCUMENTATION_INDEX.md` como índice/fuente de verdad.
 
 Criterio de salida:
 
 - Existe `AGENTS.md` en raíz.
 - Existe PRD canónico.
-- Existe architecture canónica o decisión explícita de ruta.
-- Existe roadmap canónico o decisión explícita de ruta.
+- Existe architecture canónica.
+- Existe roadmap canónico.
 - README ya no promete “tiempo real”.
-- No hay cambios runtime, Supabase, RPC ni pipeline.
+- No hubo cambios runtime, Supabase, RPC ni pipeline en el repo app.
 
 ### Story 1.3 — Provider Continuity Readiness
 
-Estado: bloqueada hasta merge de Story 1.2.1.
+Estado: completada por PR #14 en `elelier/airquality_pipeline` — `docs: add provider continuity readiness runbook`.
 
 Objetivo: preparar fallas del proveedor activo sin romper la experiencia pública.
 
-Alcance:
+Alcance completado:
 
 - Verificar proveedor activo contra `airquality_pipeline`, no contra memoria o README legacy.
-- Clasificar errores upstream.
-- Registrar estado por ciudad.
+- Documentar WAQI/AQICN como provider activo.
+- Documentar AirVisual/IQAir como provider legacy/fallback, no activo.
+- Confirmar `AIR_QUALITY_PROVIDER=waqi` como default.
+- Confirmar `workflow_dispatch` con opciones `waqi` / `airvisual`.
+- Documentar taxonomía de errores upstream.
 - Documentar runbook de contingencia.
 - Evitar fallback productivo no verificado.
 
 Criterio de salida:
 
 - El equipo puede distinguir error upstream, dato viejo, ciudad sin update y estado sano.
+- Existe runbook operativo de continuidad en `airquality_pipeline`.
+
+### Story 1.3.1 — App Docs Provider State Reconciliation + Roadmap Unlock
+
+Estado: en curso por esta historia documental.
+
+Objetivo: reconciliar los documentos canónicos del repo app con el estado real post-PR #14 del pipeline.
+
+Alcance:
+
+- Desbloquear roadmap post Story 1.3.
+- Alinear arquitectura a WAQI/AQICN como provider activo.
+- Alinear contrato compartido a provider genérico con WAQI/AQICN activo y AirVisual/IQAir legacy/fallback.
+- Alinear PRD e índice documental con el estado post-PR #14.
+
+Criterio de salida:
+
+- ROADMAP no deja Story 1.2.1 como en curso.
+- ROADMAP no deja Story 1.3 como bloqueada.
+- Architecture no presenta AirVisual/IQAir como provider activo.
+- Shared data contract no congela el boundary como AirVisual-only.
+- Story 1.4 queda como siguiente gate recomendado.
 
 ### Story 1.4 — Public Runtime Verification Gate
+
+Estado: siguiente historia recomendada después de cerrar Story 1.3.1.
 
 Objetivo: verificar producción después de cambios relevantes.
 
@@ -173,3 +204,5 @@ Solo después de cerrar Fase 1:
 - `docs/shared-data-contract.md`
 - `docs/freshness-truth-ux.md`
 - `docs/blindaje-y-cambio-de-curso.md`
+- `elelier/airquality_pipeline/docs/provider-continuity-readiness.md`
+- `elelier/airquality_pipeline/docs/provider-continuity-runbook.md`
