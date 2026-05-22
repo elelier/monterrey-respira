@@ -20,7 +20,9 @@ Story 1.2.1 — Canonical Project Docs Stop quedó completada por PR #24 — `do
 
 Story 1.3 — Provider Continuity Readiness quedó completada en el repo de pipeline por PR #14 — `docs: add provider continuity readiness runbook`.
 
-El roadmap queda desbloqueado para Story 1.4 — Public Runtime Verification Gate como la siguiente historia lógica de Fase 1.
+Story 1.3.1 — App Docs Provider State Reconciliation + Roadmap Unlock quedó completada por PR #25 — `docs: reconcile provider state and roadmap after Story 1.3`.
+
+Story 1.4 — Public Runtime Verification Gate queda como gate de verificación documental/QA en curso por esta historia.
 
 Razón:
 
@@ -116,11 +118,11 @@ Criterio de salida:
 
 ### Story 1.3.1 — App Docs Provider State Reconciliation + Roadmap Unlock
 
-Estado: en curso por esta historia documental.
+Estado: completada por PR #25 — `docs: reconcile provider state and roadmap after Story 1.3`.
 
 Objetivo: reconciliar los documentos canónicos del repo app con el estado real post-PR #14 del pipeline.
 
-Alcance:
+Alcance completado:
 
 - Desbloquear roadmap post Story 1.3.
 - Alinear arquitectura a WAQI/AQICN como provider activo.
@@ -137,7 +139,7 @@ Criterio de salida:
 
 ### Story 1.4 — Public Runtime Verification Gate
 
-Estado: siguiente historia recomendada después de cerrar Story 1.3.1.
+Estado: en curso por esta historia.
 
 Objetivo: verificar producción después de cambios relevantes.
 
@@ -151,6 +153,7 @@ Alcance:
 Criterio de salida:
 
 - Cada release relevante tiene evidencia mínima de app, pipeline y contrato.
+- Si falta acceso a Supabase/RPC o aparece drift de copy pública, se registra como degraded pass o follow-up explícito.
 
 ## Fase 2 — Limpieza y gobernanza
 
@@ -204,5 +207,6 @@ Solo después de cerrar Fase 1:
 - `docs/shared-data-contract.md`
 - `docs/freshness-truth-ux.md`
 - `docs/blindaje-y-cambio-de-curso.md`
+- `docs/public-runtime-verification-gate.md`
 - `elelier/airquality_pipeline/docs/provider-continuity-readiness.md`
 - `elelier/airquality_pipeline/docs/provider-continuity-runbook.md`
