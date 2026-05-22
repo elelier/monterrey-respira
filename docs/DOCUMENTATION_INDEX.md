@@ -20,6 +20,7 @@ MtyRespira must remain scoped to the public air-quality product for Monterrey. D
 | `docs/shared-data-contract.md` | Shared data contract | Canonical boundary for `provider -> pipeline -> Supabase/RPC -> frontend`. |
 | `docs/freshness-truth-ux.md` | Freshness UX semantics | Canonical copy/threshold rules for measurement freshness. |
 | `docs/blindaje-y-cambio-de-curso.md` | Risk posture | Premortem-derived guardrails and change-of-course map. |
+| `docs/public-runtime-verification-gate.md` | Runtime verification gate | Minimum safe QA/docs gate for public app, pipeline evidence, and RPC verification after relevant changes. |
 | `README.md` | Public contributor orientation | Must stay honest, but is not the deepest source of truth. |
 
 ## Cross-repo operational references
@@ -53,8 +54,9 @@ When files disagree:
 5. `docs/roadmap.md`.
 6. `docs/freshness-truth-ux.md`.
 7. `docs/blindaje-y-cambio-de-curso.md`.
-8. README.
-9. Pipeline provider continuity docs for incident/runbook detail.
+8. `docs/public-runtime-verification-gate.md` for post-change runtime evidence.
+9. README.
+10. Pipeline provider continuity docs for incident/runbook detail.
 
 ## Drift cleanup rules
 
@@ -71,10 +73,11 @@ Allowed appearances:
 - Provider state that is explicitly tied to current runtime evidence.
 - WAQI/AQICN references as active provider when sourced from pipeline evidence.
 - Core DB clarification that it is not used for environmental readings.
+- Runtime verification evidence or known-drift notes in `docs/public-runtime-verification-gate.md`.
 
 Disallowed appearances:
 
-- `tiempo real` as a product promise.
+- `tiempo real` as a product promise in docs or README.
 - Buildship/Netlify as active runtime if current evidence says otherwise.
 - `service_role` in frontend guidance.
 - Core DB as storage for environmental readings.
@@ -86,4 +89,6 @@ Story 1.2.1 — Canonical Project Docs Stop is completed by PR #24.
 
 Story 1.3 — Provider Continuity Readiness is completed by PR #14 in `elelier/airquality_pipeline`.
 
-Story 1.4 — Public Runtime Verification Gate is the next recommended Fase 1 story after Story 1.3.1 closes.
+Story 1.3.1 — App Docs Provider State Reconciliation + Roadmap Unlock is completed by PR #25.
+
+Story 1.4 — Public Runtime Verification Gate is the current Fase 1 QA/docs gate.
