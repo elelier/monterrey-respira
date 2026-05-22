@@ -1,7 +1,7 @@
 # Roadmap — MtyRespira
 
 Estado: brownfield operativo  
-Fecha: 2026-05-21
+Fecha: 2026-05-22
 
 ## Cambio de curso
 
@@ -22,15 +22,20 @@ Story 1.3 — Provider Continuity Readiness quedó completada en el repo de pipe
 
 Story 1.3.1 — App Docs Provider State Reconciliation + Roadmap Unlock quedó completada por PR #25 — `docs: reconcile provider state and roadmap after Story 1.3`.
 
-Story 1.4 — Public Runtime Verification Gate queda como gate de verificación documental/QA en curso, con Story 1.4.1 como follow-up mínimo para corregir metadata pública de frescura.
+Story 1.4 — Public Runtime Verification Gate sigue en estado degraded/open porque la evidencia live read-only de la RPC `get_latest_air_quality_per_city` no pudo capturarse en la sesión de Story 1.4.2 por falta de herramienta Supabase disponible.
+
+Story 1.4.1 — Public Metadata Freshness Claim Cleanup quedó completada por PR #27 — `fix: remove real-time freshness claim from public metadata`.
+
+Story 1.4.2 — Read-only RPC Evidence Capture queda bloqueada/degraded en esta sesión. Existe evidencia documental del bloqueo en `docs/evidence/story-1-4-2-rpc-read-only-evidence.md`, pero no existe todavía evidencia live de filas, shape observado o nullability observada contra Supabase.
 
 Razón:
 
-- El repo app ya cuenta con `AGENTS.md` raíz.
-- El repo app ya cuenta con PRD, arquitectura, roadmap e índice documental canónicos.
-- README ya no promete “tiempo real”.
-- El pipeline ya documentó WAQI/AQICN como proveedor activo y AirVisual/IQAir como legacy/fallback explícito.
-- La siguiente necesidad crítica es verificar runtime público, workflow horario y contrato después de cambios relevantes.
+- El repo app cuenta con `AGENTS.md` raíz.
+- El repo app cuenta con PRD, arquitectura, roadmap e índice documental canónicos.
+- README ya no promete `tiempo real`.
+- La metadata pública fue corregida por Story 1.4.1 / PR #27.
+- El pipeline documenta WAQI/AQICN como proveedor activo y AirVisual/IQAir como legacy/fallback explícito.
+- Falta capturar evidencia live read-only contra `get_latest_air_quality_per_city` con herramienta Supabase disponible.
 
 ## Fase 1 — Blindaje crítico
 
@@ -39,14 +44,6 @@ Razón:
 Estado: completada si existe PR merged con evidencia de smoke/nullability.
 
 Objetivo: crear evidencia repetible de lo que devuelve `get_latest_air_quality_per_city`.
-
-Alcance:
-
-- Validar columnas esperadas.
-- Validar nullability observada.
-- Validar timestamps UTC.
-- Validar una o más ciudades conocidas.
-- Dejar fixture o smoke test canónico.
 
 Criterio de salida:
 
@@ -59,12 +56,6 @@ Estado: completada por PR #23 — `feat: add freshness truth UX guard`.
 
 Objetivo: evitar que la app comunique datos viejos como si fueran frescos.
 
-Alcance:
-
-- Distinguir medición, actualización de pipeline y refresh de frontend.
-- Mostrar estado fresco, viejo, degradado o faltante.
-- Evitar lenguaje de “tiempo real” cuando exceda la cadencia real del productor.
-
 Criterio de salida:
 
 - La UI no sobrepromete frescura.
@@ -76,22 +67,13 @@ Estado: completada por PR #24 — `docs: add canonical MtyRespira project docs b
 
 Objetivo: crear o normalizar los documentos mínimos que gobiernan el proyecto antes de seguir con historias de implementación.
 
-Alcance completado:
-
-- Crear `AGENTS.md` en raíz.
-- Crear `docs/PRD.md` como PRD canónico.
-- Confirmar `docs/architecture.md` como arquitectura canónica sin duplicar `docs/ARCHITECTURE.md`.
-- Confirmar `docs/roadmap.md` como roadmap canónico sin duplicar `docs/ROADMAP.md`.
-- Limpiar README para no prometer “tiempo real”.
-- Crear `docs/DOCUMENTATION_INDEX.md` como índice/fuente de verdad.
-
 Criterio de salida:
 
 - Existe `AGENTS.md` en raíz.
 - Existe PRD canónico.
 - Existe architecture canónica.
 - Existe roadmap canónico.
-- README ya no promete “tiempo real”.
+- README ya no promete `tiempo real`.
 - No hubo cambios runtime, Supabase, RPC ni pipeline en el repo app.
 
 ### Story 1.3 — Provider Continuity Readiness
@@ -99,17 +81,6 @@ Criterio de salida:
 Estado: completada por PR #14 en `elelier/airquality_pipeline` — `docs: add provider continuity readiness runbook`.
 
 Objetivo: preparar fallas del proveedor activo sin romper la experiencia pública.
-
-Alcance completado:
-
-- Verificar proveedor activo contra `airquality_pipeline`, no contra memoria o README legacy.
-- Documentar WAQI/AQICN como provider activo.
-- Documentar AirVisual/IQAir como provider legacy/fallback, no activo.
-- Confirmar `AIR_QUALITY_PROVIDER=waqi` como default.
-- Confirmar `workflow_dispatch` con opciones `waqi` / `airvisual`.
-- Documentar taxonomía de errores upstream.
-- Documentar runbook de contingencia.
-- Evitar fallback productivo no verificado.
 
 Criterio de salida:
 
@@ -122,13 +93,6 @@ Estado: completada por PR #25 — `docs: reconcile provider state and roadmap af
 
 Objetivo: reconciliar los documentos canónicos del repo app con el estado real post-PR #14 del pipeline.
 
-Alcance completado:
-
-- Desbloquear roadmap post Story 1.3.
-- Alinear arquitectura a WAQI/AQICN como provider activo.
-- Alinear contrato compartido a provider genérico con WAQI/AQICN activo y AirVisual/IQAir legacy/fallback.
-- Alinear PRD e índice documental con el estado post-PR #14.
-
 Criterio de salida:
 
 - ROADMAP no deja Story 1.2.1 como en curso.
@@ -139,7 +103,7 @@ Criterio de salida:
 
 ### Story 1.4 — Public Runtime Verification Gate
 
-Estado: en curso por esta historia.
+Estado: degraded/open.
 
 Objetivo: verificar producción después de cambios relevantes.
 
@@ -153,27 +117,45 @@ Alcance:
 Criterio de salida:
 
 - Cada release relevante tiene evidencia mínima de app, pipeline y contrato.
-- Si falta acceso a Supabase/RPC o aparece drift de copy pública, se registra como degraded pass o follow-up explícito.
+- La evidencia RPC live read-only confirma shape/nullability esperada, o queda bloqueo explícito.
+
+Bloqueo actual:
+
+- No se pudo ejecutar Supabase RPC desde la sesión de Story 1.4.2 porque solo hubo tooling GitHub/Notion disponible.
+- No se debe marcar Story 1.4 como completada hasta capturar evidencia live read-only de `get_latest_air_quality_per_city`.
 
 ### Story 1.4.1 — Public Metadata Freshness Claim Cleanup
 
-Estado: en curso por PR pequeño de metadata/copy.
+Estado: completada por PR #27 — `fix: remove real-time freshness claim from public metadata`.
 
 Objetivo: remover claims públicos de `Tiempo Real` en metadata/SEO visible sin cambiar comportamiento de datos.
-
-Alcance:
-
-- Actualizar `<title>`, description y metadata social pública si contienen o heredan claim de frescura excesivo.
-- Mantener intactos AQI card behavior, históricos, geolocalización, Supabase/RPC, provider y pipeline.
-- Actualizar el gate de Story 1.4 para dejar claro que el drift de metadata queda mitigado y que la evidencia RPC read-only sigue pendiente si no se captura.
 
 Criterio de salida:
 
 - La metadata pública de la app no promete `Tiempo Real`.
 - Las apariciones restantes de `tiempo real` quedan limitadas a prohibición, riesgo o drift histórico documentado.
-- Story 1.4 queda lista para Story 1.4.2 — Read-only RPC Evidence Capture si la evidencia RPC sigue pendiente.
+- Story 1.4 queda lista para Story 1.4.2 si la evidencia RPC sigue pendiente.
+
+### Story 1.4.2 — Read-only RPC Evidence Capture
+
+Estado: bloqueada/degraded en esta sesión.
+
+Objetivo: capturar evidencia read-only de la RPC crítica `get_latest_air_quality_per_city` sin modificar datos, SQL, provider, pipeline, frontend ni Cloudflare.
+
+Resultado de esta sesión:
+
+- Se creó `docs/evidence/story-1-4-2-rpc-read-only-evidence.md`.
+- No se capturó respuesta live de Supabase porque no hubo herramienta Supabase disponible.
+- No hubo writes, DDL, cambios SQL/RPC/schema/grants/RLS, cambios frontend, cambios pipeline ni cambios provider.
+
+Criterio de salida pendiente:
+
+- Capturar timestamp de ejecución, herramienta usada, filas devueltas, ciudades observadas, shape de campos, nullability observada y timestamps presentes.
+- Documentar cualquier `aqi_us` nulo o ciudad faltante sin corregirlo ni inventar causa.
 
 ## Fase 2 — Limpieza y gobernanza
+
+No iniciar Fase 2 como trabajo principal hasta cerrar o aceptar explícitamente el bloqueo de Story 1.4 / Story 1.4.2.
 
 ### Story 2.1 — Docs Drift Cleanup
 
@@ -226,5 +208,6 @@ Solo después de cerrar Fase 1:
 - `docs/freshness-truth-ux.md`
 - `docs/blindaje-y-cambio-de-curso.md`
 - `docs/public-runtime-verification-gate.md`
+- `docs/evidence/story-1-4-2-rpc-read-only-evidence.md`
 - `elelier/airquality_pipeline/docs/provider-continuity-readiness.md`
 - `elelier/airquality_pipeline/docs/provider-continuity-runbook.md`
