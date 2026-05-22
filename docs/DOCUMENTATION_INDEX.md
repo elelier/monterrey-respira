@@ -1,7 +1,7 @@
 # Documentation Index — MtyRespira
 
 Status: canonical documentation map  
-Date: 2026-05-21
+Date: 2026-05-22
 
 ## Purpose
 
@@ -21,6 +21,7 @@ MtyRespira must remain scoped to the public air-quality product for Monterrey. D
 | `docs/freshness-truth-ux.md` | Freshness UX semantics | Canonical copy/threshold rules for measurement freshness. |
 | `docs/blindaje-y-cambio-de-curso.md` | Risk posture | Premortem-derived guardrails and change-of-course map. |
 | `docs/public-runtime-verification-gate.md` | Runtime verification gate | Minimum safe QA/docs gate for public app, pipeline evidence, and RPC verification after relevant changes. |
+| `docs/evidence/story-1-4-2-rpc-read-only-evidence.md` | RPC evidence/blocker record | Tracks Story 1.4.2 read-only RPC evidence attempt and remaining live Supabase blocker. |
 | `README.md` | Public contributor orientation | Must stay honest, but is not the deepest source of truth. |
 
 ## Cross-repo operational references
@@ -40,6 +41,7 @@ These docs live in `elelier/airquality_pipeline` and are operational references,
 - Roadmap stays at `docs/roadmap.md`.
 - PRD lives at `docs/PRD.md`.
 - Agent rules live at root `AGENTS.md`.
+- Story-specific operational evidence lives under `docs/evidence/` when it is useful for future QA gates.
 
 Do not create duplicate uppercase/lowercase variants unless a future migration deliberately redirects old paths.
 
@@ -55,15 +57,16 @@ When files disagree:
 6. `docs/freshness-truth-ux.md`.
 7. `docs/blindaje-y-cambio-de-curso.md`.
 8. `docs/public-runtime-verification-gate.md` for post-change runtime evidence.
-9. README.
-10. Pipeline provider continuity docs for incident/runbook detail.
+9. Story evidence under `docs/evidence/` for scoped QA outcomes and blockers.
+10. README.
+11. Pipeline provider continuity docs for incident/runbook detail.
 
 ## Drift cleanup rules
 
 Any mention of these terms must be reviewed before merge:
 
 ```bash
-rg "tiempo real|AirVisual|IQAir|WAQI|AQICN|Buildship|Netlify|service_role|Core DB" README.md docs AGENTS.md
+rg "Story 1.4|Story 1.4.1|Story 1.4.2|get_latest_air_quality_per_city|tiempo real|Tiempo Real|AirVisual|IQAir|WAQI|AQICN|service_role|Core DB" README.md docs AGENTS.md
 ```
 
 Allowed appearances:
@@ -74,6 +77,7 @@ Allowed appearances:
 - WAQI/AQICN references as active provider when sourced from pipeline evidence.
 - Core DB clarification that it is not used for environmental readings.
 - Runtime verification evidence or known-drift notes in `docs/public-runtime-verification-gate.md`.
+- Story 1.4 / 1.4.1 / 1.4.2 status and evidence records.
 
 Disallowed appearances:
 
@@ -91,4 +95,8 @@ Story 1.3 — Provider Continuity Readiness is completed by PR #14 in `elelier/a
 
 Story 1.3.1 — App Docs Provider State Reconciliation + Roadmap Unlock is completed by PR #25.
 
-Story 1.4 — Public Runtime Verification Gate is the current Fase 1 QA/docs gate.
+Story 1.4 — Public Runtime Verification Gate remains degraded/open until live read-only RPC evidence is captured or the blocker is explicitly accepted.
+
+Story 1.4.1 — Public Metadata Freshness Claim Cleanup is completed by PR #27.
+
+Story 1.4.2 — Read-only RPC Evidence Capture is blocked/degraded in the current session because no Supabase connector/tool was available for live RPC execution.

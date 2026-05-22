@@ -66,30 +66,23 @@ Evidence to capture in the PR:
 - Any visible freshness/degradation state.
 - Any public copy or metadata drift found.
 
-### Current Story 1.4 observation
+### Story 1.4.1 result
 
-A safe public fetch of `https://mtyrespira.elelier.com/` on 2026-05-22 returned the page title:
+Story 1.4.1 — Public Metadata Freshness Claim Cleanup mitigated the prior metadata drift in source by replacing public app title/social metadata with freshness-honest wording.
 
-```text
-MonterreyRespira - Calidad del Aire en Tiempo Real
-```
+Merged evidence:
 
-This is public metadata/runtime copy, not a documentation claim. It should be treated as follow-up drift because the canonical docs prohibit using `tiempo real` as a product promise unless runtime can support that meaning.
+- PR #27 — `fix: remove real-time freshness claim from public metadata`.
+- Corrected title/copy target: `MonterreyRespira - Lecturas de calidad del aire`.
 
-Do not fix this in this docs-only gate. Open a separate app runtime/SEO copy story if the team decides to remove that title claim.
-
-### Story 1.4.1 follow-up
-
-Story 1.4.1 — Public Metadata Freshness Claim Cleanup mitigates this metadata drift in source by replacing the public app title and social metadata with `MonterreyRespira - Lecturas de calidad del aire`.
-
-The remaining degraded-pass blocker is Supabase/RPC read-only evidence for `get_latest_air_quality_per_city`; this follow-up does not change data flow, provider behavior, Supabase schema, RPCs, AQI rendering, historical views, or geolocation.
+This follow-up did not change data flow, provider behavior, Supabase schema, RPCs, AQI rendering, historical views, or geolocation.
 
 ## 5. Documentation drift verification
 
 Run or document equivalent:
 
 ```bash
-rg "tiempo real|AirVisual|IQAir|WAQI|AQICN|Buildship|Netlify|privileged database key|Core DB" README.md docs AGENTS.md
+rg "Story 1.4|Story 1.4.1|Story 1.4.2|get_latest_air_quality_per_city|tiempo real|Tiempo Real|AirVisual|IQAir|WAQI|AQICN|service_role|Core DB" README.md docs AGENTS.md
 ```
 
 Allowed appearances:
@@ -99,7 +92,7 @@ Allowed appearances:
 - AirVisual/IQAir only as legacy/fallback, not active provider.
 - Privileged database key wording only as security prohibition or pipeline-only secret context.
 - Core DB only as a clarification that it is not used for environmental readings.
-- Buildship/Netlify only as legacy context, not active runtime.
+- Story 1.4 / 1.4.1 / 1.4.2 evidence and status references.
 
 Disallowed appearances:
 
@@ -164,13 +157,13 @@ Preferred read-only evidence:
 - `last_successful_update_at` remains pipeline traceability.
 - Nullable fields remain treated as nullable.
 
-If Supabase is not connected to the agent, do not guess. Record the blocker and ask an operator to run a read-only sample of `get_latest_air_quality_per_city` in Supabase.
-
-Manual reviewer should verify:
+Expected fields:
 
 - `city_id`
 - `city_name`
 - `api_name`
+- `latitude`
+- `longitude`
 - `reading_timestamp`
 - `aqi_us`
 - `main_pollutant_us`
@@ -181,7 +174,29 @@ Manual reviewer should verify:
 - `weather_icon`
 - `last_successful_update_at`
 
+If Supabase is not connected to the agent, do not guess. Record the blocker and ask an operator to run a read-only sample of `get_latest_air_quality_per_city` in Supabase.
+
 Do not change SQL, grants, schema, function body, RLS, or data as part of this gate.
+
+### Story 1.4.2 attempt
+
+Story 1.4.2 attempted to capture read-only RPC evidence in a GitHub/Notion agent session.
+
+Result: blocked / degraded evidence.
+
+Evidence file:
+
+- `docs/evidence/story-1-4-2-rpc-read-only-evidence.md`
+
+Reason:
+
+- GitHub and Notion tooling were available.
+- No Supabase connector/tool was available for live RPC execution.
+- No Supabase URL/key/secret was requested, printed, copied, committed, or exposed.
+- No live RPC response was retrieved.
+- No writes, DDL, SQL/RPC/schema/grants/RLS changes, frontend runtime changes, pipeline changes, provider changes, or Cloudflare changes were performed.
+
+Story 1.4.2 remains blocked until a future operator or agent session with read-only Supabase access records live RPC row count, fields, nullability, timestamps, and sampled city presence.
 
 ## 8. Pass / degraded / fail outcomes
 
@@ -214,24 +229,25 @@ Use fail when:
 
 ## 9. Current Story 1.4 result
 
-Result: degraded pass pending read-only RPC evidence.
+Result: degraded/open pending live read-only RPC evidence.
 
 Evidence:
 
-- Public app URL responded on 2026-05-22.
-- Public metadata included `Calidad del Aire en Tiempo Real`; Story 1.4.1 mitigates this runtime/SEO copy drift in source.
-- Pipeline workflow config confirms hourly schedule, default `waqi`, explicit `waqi` / `airvisual` dispatch options, and read-only RPC health mode.
-- No Supabase live query was executed from this agent session because no Supabase connector/tool was available here.
-- No runtime files were changed.
-- No pipeline files were changed.
+- Story 1.4.1 / PR #27 mitigated public metadata freshness-claim drift in source.
+- Pipeline workflow config previously confirmed hourly schedule, default `waqi`, explicit `waqi` / `airvisual` dispatch options, and read-only RPC health mode.
+- Story 1.4.2 created a safe evidence/blocker file for RPC capture.
+- No Supabase live query was executed in Story 1.4.2 because no Supabase connector/tool was available in that session.
+- No runtime files were changed by Story 1.4.2.
+- No pipeline files were changed by Story 1.4.2.
 - No Supabase writes were performed.
 
 ## 10. Follow-up recommendations
 
-Recommended next follow-up after this gate and Story 1.4.1:
+Recommended next follow-up:
 
-1. Manual or agent-enabled read-only Supabase RPC evidence capture for `get_latest_air_quality_per_city`.
-2. Fase 2 Story 2.1 — Docs Drift Cleanup only after RPC evidence is captured or explicitly accepted as a remaining degraded-pass blocker.
+1. Run `get_latest_air_quality_per_city` with read-only Supabase access and update `docs/evidence/story-1-4-2-rpc-read-only-evidence.md` with real observed evidence.
+2. Only after that, mark Story 1.4 completed or explicitly accept the remaining degraded blocker.
+3. Do not start Fase 2 as the main track until Story 1.4 is closed or the blocker is explicitly accepted.
 
 ## 11. Rollback
 
@@ -239,6 +255,6 @@ This file is documentation only.
 
 Rollback:
 
-1. Revert the PR that added this file.
+1. Revert the PR that updated this file.
 2. Keep runtime unchanged.
-3. Re-open Story 1.4 if the removed evidence still needs to be captured.
+3. Re-open Story 1.4 / Story 1.4.2 if the removed evidence status still needs to be tracked.
