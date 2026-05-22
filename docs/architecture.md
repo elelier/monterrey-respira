@@ -23,17 +23,25 @@ El target operativo actual del frontend es Cloudflare Pages. Cualquier referenci
 - La RPC `get_latest_air_quality_per_city` es un contrato crítico de producto.
 - No introducir runtime server-side para el flujo público principal.
 - No inventar datos cuando el contrato falle; degradar de forma explícita.
+- No usar un fallback de proveedor que no esté explícitamente seleccionado, sano y documentado.
 
 ## Flujo end-to-end vigente
 
 ```text
-AirVisual / IQAir
+WAQI/AQICN active provider
   -> airquality_pipeline GitHub Actions
   -> Supabase tables: cities, air_quality_readings
   -> Supabase RPC: get_latest_air_quality_per_city
   -> monterrey-respira frontend
   -> mtyrespira.elelier.com
 ```
+
+Provider state:
+
+- WAQI/AQICN es el proveedor activo confirmado por el pipeline.
+- `AIR_QUALITY_PROVIDER=waqi` es el default de runtime del pipeline.
+- IQAir/AirVisual existe como adapter legacy/fallback y solo debe usarse si se selecciona explícitamente, se confirma sano y se opera como rollback/control recovery.
+- No existe un proveedor oculto en el flujo vigente.
 
 ## Frontend
 
@@ -66,7 +74,7 @@ El frontend consume Supabase mediante variables públicas con prefijo `VITE_`:
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`
 
-No debe usar claves privilegiadas como `SUPABASE_SERVICE_ROLE_KEY` ni `AIRVISUAL_API_KEY`.
+No debe usar claves privilegiadas como `SUPABASE_SERVICE_ROLE_KEY`, `WAQI_API_TOKEN` ni `AIRVISUAL_API_KEY`.
 
 ## Pipeline backend
 
@@ -79,17 +87,20 @@ Workflow vigente:
 - Runtime: Python 3.11
 - Runner: `windows-latest`
 - Ejecuta `pytest` antes de `main.py`
+- `workflow_dispatch.provider` permite `waqi` o `airvisual`, default `waqi`
 
 Responsabilidades:
 
-- Obtener ciudades disponibles desde AirVisual.
-- Leer ciudades existentes desde Supabase.
-- Sincronizar altas/desactivaciones.
-- Evaluar si cada ciudad necesita actualización.
+- Usar WAQI/AQICN por default mediante `AIR_QUALITY_PROVIDER=waqi`.
+- Conservar las ciudades existentes en Supabase cuando el provider activo es WAQI.
+- Usar mapeo explícito ciudad -> estación WAQI para las ciudades activas esperadas.
+- Rechazar payloads sin AQI, sin timestamp, sin coordenadas válidas o fuera de Nuevo León.
+- Evaluar si cada ciudad necesita actualización según `last_successful_update_at` y el intervalo operativo.
 - Consultar datos de calidad del aire.
 - Validar payload antes de insertar.
-- Insertar lecturas en `air_quality_readings`.
+- Insertar lecturas válidas en `air_quality_readings`.
 - Actualizar estado operativo en `cities`.
+- Usar AirVisual/IQAir solo si `AIR_QUALITY_PROVIDER=airvisual` se selecciona explícitamente y el acceso está sano.
 
 ## Supabase y contrato compartido
 
@@ -97,6 +108,7 @@ Tablas compartidas:
 
 - `cities`
 - `air_quality_readings`
+- `pipeline_logs` cuando aplique
 
 RPC crítica:
 
@@ -110,6 +122,7 @@ Reglas:
 - Reconciliar ciudades por `city_id`, no por nombre.
 - Tratar `reading_timestamp` como tiempo de medición.
 - Tratar `last_successful_update_at` como tiempo de éxito del pipeline.
+- No hacer depender el contrato frontend de que el proveedor sea AirVisual, WAQI u otro proveedor específico.
 
 El contrato detallado vive en:
 
@@ -172,5 +185,6 @@ Cambios de contrato:
 
 - SQL exacto, grants y nullability runtime de la RPC aún requieren validación directa en Supabase.
 - La configuración exacta de Cloudflare Pages puede no estar expresada como IaC dentro del repo.
-- La continuidad de proveedor upstream debe tratarse como riesgo operativo de producto.
+- WAQI/AQICN depende de disponibilidad upstream, token y estación mapeada por ciudad.
+- AirVisual/IQAir no debe tratarse como fallback operativo normal si el acceso no está probado sano.
 - Falta automatizar un smoke test canónico real contra la RPC en entorno controlado.
