@@ -78,6 +78,12 @@ This is public metadata/runtime copy, not a documentation claim. It should be tr
 
 Do not fix this in this docs-only gate. Open a separate app runtime/SEO copy story if the team decides to remove that title claim.
 
+### Story 1.4.1 follow-up
+
+Story 1.4.1 — Public Metadata Freshness Claim Cleanup mitigates this metadata drift in source by replacing the public app title and social metadata with `MonterreyRespira - Lecturas de calidad del aire`.
+
+The remaining degraded-pass blocker is Supabase/RPC read-only evidence for `get_latest_air_quality_per_city`; this follow-up does not change data flow, provider behavior, Supabase schema, RPCs, AQI rendering, historical views, or geolocation.
+
 ## 5. Documentation drift verification
 
 Run or document equivalent:
@@ -208,12 +214,12 @@ Use fail when:
 
 ## 9. Current Story 1.4 result
 
-Result: degraded pass.
+Result: degraded pass pending read-only RPC evidence.
 
 Evidence:
 
 - Public app URL responded on 2026-05-22.
-- Public metadata still includes `Calidad del Aire en Tiempo Real`; this is a follow-up runtime/SEO copy drift, not fixed here.
+- Public metadata included `Calidad del Aire en Tiempo Real`; Story 1.4.1 mitigates this runtime/SEO copy drift in source.
 - Pipeline workflow config confirms hourly schedule, default `waqi`, explicit `waqi` / `airvisual` dispatch options, and read-only RPC health mode.
 - No Supabase live query was executed from this agent session because no Supabase connector/tool was available here.
 - No runtime files were changed.
@@ -222,11 +228,10 @@ Evidence:
 
 ## 10. Follow-up recommendations
 
-Recommended next follow-up after this gate:
+Recommended next follow-up after this gate and Story 1.4.1:
 
-1. Small app/SEO copy story to remove or soften public page title metadata containing `Tiempo Real` if confirmed in source.
-2. Manual or agent-enabled read-only Supabase RPC evidence capture for `get_latest_air_quality_per_city`.
-3. Fase 2 Story 2.1 — Docs Drift Cleanup only after the runtime/metadata copy issue is either accepted as known drift or corrected.
+1. Manual or agent-enabled read-only Supabase RPC evidence capture for `get_latest_air_quality_per_city`.
+2. Fase 2 Story 2.1 — Docs Drift Cleanup only after RPC evidence is captured or explicitly accepted as a remaining degraded-pass blocker.
 
 ## 11. Rollback
 

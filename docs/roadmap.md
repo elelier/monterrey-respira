@@ -22,7 +22,7 @@ Story 1.3 — Provider Continuity Readiness quedó completada en el repo de pipe
 
 Story 1.3.1 — App Docs Provider State Reconciliation + Roadmap Unlock quedó completada por PR #25 — `docs: reconcile provider state and roadmap after Story 1.3`.
 
-Story 1.4 — Public Runtime Verification Gate queda como gate de verificación documental/QA en curso por esta historia.
+Story 1.4 — Public Runtime Verification Gate queda como gate de verificación documental/QA en curso, con Story 1.4.1 como follow-up mínimo para corregir metadata pública de frescura.
 
 Razón:
 
@@ -154,6 +154,24 @@ Criterio de salida:
 
 - Cada release relevante tiene evidencia mínima de app, pipeline y contrato.
 - Si falta acceso a Supabase/RPC o aparece drift de copy pública, se registra como degraded pass o follow-up explícito.
+
+### Story 1.4.1 — Public Metadata Freshness Claim Cleanup
+
+Estado: en curso por PR pequeño de metadata/copy.
+
+Objetivo: remover claims públicos de `Tiempo Real` en metadata/SEO visible sin cambiar comportamiento de datos.
+
+Alcance:
+
+- Actualizar `<title>`, description y metadata social pública si contienen o heredan claim de frescura excesivo.
+- Mantener intactos AQI card behavior, históricos, geolocalización, Supabase/RPC, provider y pipeline.
+- Actualizar el gate de Story 1.4 para dejar claro que el drift de metadata queda mitigado y que la evidencia RPC read-only sigue pendiente si no se captura.
+
+Criterio de salida:
+
+- La metadata pública de la app no promete `Tiempo Real`.
+- Las apariciones restantes de `tiempo real` quedan limitadas a prohibición, riesgo o drift histórico documentado.
+- Story 1.4 queda lista para Story 1.4.2 — Read-only RPC Evidence Capture si la evidencia RPC sigue pendiente.
 
 ## Fase 2 — Limpieza y gobernanza
 
