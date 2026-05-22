@@ -4,7 +4,9 @@ Status: Brownfield baseline
 
 This document freezes the shared product boundary for MtyRespira:
 
-`AirVisual -> airquality_pipeline -> Supabase tables -> RPC -> monterrey-respira frontend`
+`provider (WAQI/AQICN active; AirVisual/IQAir legacy/fallback) -> airquality_pipeline -> Supabase tables -> RPC -> monterrey-respira frontend`
+
+The contract is intentionally provider-agnostic from the frontend perspective. The frontend must consume normalized Supabase/RPC fields and must not depend on AirVisual-only, WAQI-only, or provider-specific payload internals.
 
 ## Source of truth hierarchy
 
@@ -13,7 +15,8 @@ When implementation, docs, tests, and runtime disagree, use this order:
 1. Effective workflow behavior in `airquality_pipeline/.github/workflows/air-quality-workflow.yml`
 2. This document
 3. Producer and consumer code
-4. Supporting docs such as `docs/data-pipeline.md` and `docs/architecture.md`
+4. Supporting docs such as `docs/architecture.md`
+5. Provider continuity docs in `elelier/airquality_pipeline/docs/provider-continuity-readiness.md` and `elelier/airquality_pipeline/docs/provider-continuity-runbook.md`
 
 ## Repos involved
 
@@ -26,9 +29,23 @@ When implementation, docs, tests, and runtime disagree, use this order:
 - `elelier/airquality_pipeline`
   - Producer paths:
     - `main.py`
+    - `waqi_api.py`
+    - `airvisual_api.py`
     - `update_city.py`
     - `utils.py`
     - `.github/workflows/air-quality-workflow.yml`
+
+## Provider boundary
+
+Runtime provider state confirmed by the pipeline:
+
+- WAQI/AQICN is the active provider.
+- `AIR_QUALITY_PROVIDER=waqi` is the default.
+- WAQI uses existing Supabase cities and explicit city -> station mapping.
+- AirVisual/IQAir is a legacy/fallback adapter only; it is not the active provider.
+- `workflow_dispatch.provider` can explicitly select `waqi` or `airvisual` for controlled manual runs.
+
+Contract rule: provider-specific ingestion can change only through a coordinated pipeline/contract rollout. The frontend contract remains the normalized Supabase/RPC payload, not the upstream provider response.
 
 ## Critical latest RPC
 
@@ -253,7 +270,7 @@ The daily history RPC returns rows ordered by `reading_date` ascending:
 | --- | --- | --- | --- |
 | `city_id` | `number` | required | Stable identity key. |
 | `city_name` | `string` | required | Display label from RPC. |
-| `api_name` | `string` | required | Upstream API naming value. |
+| `api_name` | `string` | required | Upstream/provider naming value normalized through Supabase. |
 | `latitude` | `number \| null` | nullable | Frontend falls back to static city coordinates if null. |
 | `longitude` | `number \| null` | nullable | Frontend falls back to static city coordinates if null. |
 | `reading_timestamp` | `string` | required | Source measurement time. Treat as UTC. |
@@ -293,7 +310,7 @@ Rules:
 
 ## Pollutant data limitation
 
-The current AirVisual integration exposes and stores AQI and dominant pollutant keys from `current.pollution` (`aqius`, `mainus`, `aqicn`, `maincn`, `ts`). It does not provide confirmed historical concentration series for PM2.5, PM10, O3, NO2, SO2, or CO in the current contract.
+The current normalized contract exposes AQI and dominant pollutant keys from provider payloads. Under WAQI/AQICN, pollutant concentration availability is provider/station dependent and is not guaranteed by this frontend contract. Under legacy AirVisual/IQAir, historical concentration series are also not part of the current contract.
 
 Allowed:
 
@@ -321,6 +338,7 @@ Prohibited:
 - Do not label a client refresh as a new upstream measurement.
 - Do not match cities by name when `city_id` is available.
 - Do not fallback historical charts to random, mocked, or zero-filled series.
+- Do not switch to AirVisual/IQAir silently to mask WAQI/AQICN failure.
 
 ## Release checklist for contract-affecting changes
 
@@ -328,10 +346,10 @@ Before merge:
 
 - [ ] Validate `npm run lint` and `npm run build` for frontend changes.
 - [ ] Validate `pytest` for pipeline changes.
-- [ ] Check whether the change affects RPC shape, nullability, freshness, timestamps, cache, or city identity.
+- [ ] Check whether the change affects RPC shape, nullability, freshness, timestamps, cache, provider, or city identity.
 - [ ] Update this document if the shared contract changes.
 - [ ] Add or update fixture/smoke evidence for `get_latest_air_quality_per_city`.
-- [ ] Include rollback guidance when a change touches Supabase/RPC, pipeline, public deploy, or routing.
+- [ ] Include rollback guidance when a change touches Supabase/RPC, pipeline, public deploy, provider, or routing.
 
 After deploy:
 
