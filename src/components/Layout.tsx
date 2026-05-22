@@ -17,8 +17,8 @@ interface LayoutProps {
 }
 
 const CITY_SHARE_SIGNAL_FAILED_MESSAGE = 'No se pudo registrar señal anónima de compartir ciudad:';
-const SOCIAL_PREVIEW_TITLE = 'MonterreyRespira - Calidad del aire en la Zona Metropolitana';
-const SOCIAL_PREVIEW_DESCRIPTION = 'Consulta AQI, contaminante principal y recomendaciones por municipio.';
+const SOCIAL_PREVIEW_TITLE = 'MonterreyRespira - Lecturas de calidad del aire';
+const SOCIAL_PREVIEW_DESCRIPTION = 'Consulta lecturas disponibles de AQI, contaminante principal y recomendaciones por municipio.';
 
 const hasShareableAqi = (aqi: number | null | undefined, status: AirQualityStatus): aqi is number => {
   return status !== 'unknown' && hasReliableAqi(aqi);

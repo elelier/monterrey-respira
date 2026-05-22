@@ -1,6 +1,6 @@
 # MonterreyRespira - Monitor de Calidad del Aire
 
-MonterreyRespira es una aplicación web dedicada a proporcionar información clara, accesible y en tiempo real sobre la calidad del aire en Monterrey y su área metropolitana. Nuestro objetivo es concienciar a la ciudadanía y ofrecer datos útiles para la toma de decisiones diarias.
+MonterreyRespira es una aplicación web dedicada a proporcionar información clara y accesible sobre lecturas disponibles de calidad del aire en Monterrey y su área metropolitana. Nuestro objetivo es concienciar a la ciudadanía y ofrecer datos útiles para la toma de decisiones diarias.
 
 ## 📋 Prerrequisitos
 
@@ -56,7 +56,7 @@ npm run build
 
 ## ✨ Características Clave
 
-*   **Datos en Tiempo Real:** Muestra las últimas lecturas de calidad del aire (AQI US, contaminante principal) y condiciones meteorológicas (temperatura, humedad, viento) para múltiples municipios.
+*   **Lecturas disponibles:** Muestra lecturas de calidad del aire (AQI US, contaminante principal) y condiciones meteorológicas reportadas (temperatura, humedad, viento) para múltiples municipios.
 *   **Fuente de Datos Robusta:** Utiliza un pipeline automatizado que recolecta, procesa y almacena datos de fuentes como AirVisual (IQAir), con planes de integrar otras (ej. SIMA).
 *   **Visualización Geográfica:** (Planeado) Mapa interactivo mostrando la calidad del aire por zona.
 *   **Datos Históricos:** (Planeado) Gráficos y consultas para analizar tendencias pasadas.

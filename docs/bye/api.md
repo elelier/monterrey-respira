@@ -1,6 +1,6 @@
 # Documentación de APIs
 
-MonterreyRespira utiliza diversas APIs para obtener datos de calidad del aire en tiempo real. Esta documentación describe las APIs utilizadas, su implementación en el proyecto y las estrategias de fallback.
+MonterreyRespira utiliza APIs para obtener lecturas disponibles de calidad del aire. Esta documentación legacy describe APIs utilizadas históricamente, su implementación anterior y estrategias de fallback.
 
 ## APIs Externas
 
