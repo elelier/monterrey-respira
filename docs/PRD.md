@@ -28,11 +28,13 @@ Current shared data concepts:
 - Critical RPC: `get_latest_air_quality_per_city`.
 - Public app hosting target: Cloudflare Pages.
 - Current public app URL: `https://mtyrespira.elelier.com/`.
+- Active provider: WAQI/AQICN, confirmed by pipeline docs/runtime configuration.
+- Legacy/fallback provider: IQAir/AirVisual, only for explicit controlled fallback when access is healthy.
 
 Canonical data flow:
 
 ```text
-provider -> airquality_pipeline -> Supabase tables -> get_latest_air_quality_per_city -> frontend -> public UX
+provider (WAQI/AQICN active; AirVisual/IQAir legacy/fallback) -> airquality_pipeline -> Supabase tables -> get_latest_air_quality_per_city -> frontend -> public UX
 ```
 
 ## 3. Objective for this brownfield phase
@@ -48,6 +50,7 @@ The product must evolve without breaking:
 - The public app.
 - The hourly producer assumptions.
 - The distinction between measurement time and pipeline update time.
+- The distinction between active provider and legacy/fallback adapters.
 
 ## 4. Users
 
@@ -74,8 +77,9 @@ Operational success:
 
 - The project has canonical docs for PRD, architecture, roadmap, and agent rules.
 - Future stories follow the documented roadmap instead of being invented from memory.
-- Provider continuity work does not begin until this baseline is merged.
+- Provider continuity is documented and runbook-ready in `elelier/airquality_pipeline`.
 - Runtime claims in README and docs do not contradict Freshness Truth UX.
+- Story 1.4 can verify runtime public behavior after this documentation reconciliation.
 
 Technical success:
 
@@ -84,6 +88,7 @@ Technical success:
 - `last_successful_update_at` remains pipeline traceability, not measurement freshness.
 - No frontend code uses service-role credentials.
 - Environmental readings remain in the MtyRespira Supabase boundary, not Core DB.
+- The frontend contract remains provider-agnostic and based on normalized Supabase/RPC fields.
 
 ## 6. Functional requirements
 
@@ -130,6 +135,8 @@ Geolocation UX must preserve the supported-area boundary and must not imply cove
 ### FR11 — Provider continuity
 
 Provider continuity work must classify upstream failures and maintain honest public states without adding unverified fallback providers.
+
+Current status: requirement documented/runbook-ready by PR #14 in `elelier/airquality_pipeline`. Remaining work is runtime public verification, not a blocker for provider docs readiness.
 
 ### FR12 — Documentation governance
 
@@ -182,22 +189,24 @@ Out of scope for this brownfield stabilization phase:
 
 ## 9. Open risks
 
-- Provider continuity still needs explicit readiness work after this docs baseline.
-- Runtime/provider docs may still drift between `monterrey-respira` and `airquality_pipeline`.
-- The exact production provider state must be verified against pipeline runtime before public claims are updated beyond this baseline.
-- RPC SQL/grants/nullability may still need direct Supabase verification.
+- Runtime public verification still needs explicit evidence after documentation/provider-state reconciliation.
+- RPC SQL/grants/nullability may still need direct Supabase verification if not fully closed by prior smoke evidence.
 - Some historical docs may still include legacy references that need cleanup in later stories.
+- WAQI/AQICN availability, token health, and station mapping remain operational risks.
+- AirVisual/IQAir must not be treated as a normal fallback while access is unproven or unhealthy.
 
 ## 10. Relationship to roadmap
 
 This PRD supports the roadmap in `docs/roadmap.md`.
 
-Current gate:
+Current gate/status:
 
 - Story 1.1: completed when PR evidence confirms RPC contract smoke/runtime nullability.
-- Story 1.2: completed when PR evidence confirms Freshness Truth UX guard.
-- Story 1.2.1: this canonical documentation baseline.
-- Story 1.3: Provider Continuity Readiness must remain blocked until Story 1.2.1 is merged.
+- Story 1.2: completed by PR #23 — `feat: add freshness truth UX guard`.
+- Story 1.2.1: completed by PR #24 — `docs: add canonical MtyRespira project docs baseline`.
+- Story 1.3: completed by PR #14 in `elelier/airquality_pipeline` — `docs: add provider continuity readiness runbook`.
+- Story 1.3.1: reconciles app docs with the post-PR #14 provider state.
+- Story 1.4: next recommended gate — Public Runtime Verification Gate.
 
 ## 11. Source of truth
 
@@ -210,5 +219,6 @@ When there is drift, use this order:
 5. `docs/roadmap.md` for story order.
 6. `AGENTS.md` for agent execution rules.
 7. README for contributor orientation.
+8. Provider continuity docs in `elelier/airquality_pipeline` for operational runbook details.
 
 Do not use stale README claims as product truth when they conflict with the contract or freshness docs.
