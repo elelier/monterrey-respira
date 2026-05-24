@@ -70,7 +70,7 @@ No data flow, provider behavior, Supabase schema, RPC, AQI rendering, historical
 Run or document equivalent:
 
 ```bash
-rg "Story 1.4|Story 1.4.1|Story 1.4.2|get_latest_air_quality_per_city|tiempo real|Tiempo Real|AirVisual|IQAir|WAQI|AQICN|Core DB" README.md docs AGENTS.md
+rg "Story 1.4|Story 1.4.1|Story 1.4.2|get_latest_air_quality_per_city|tiempo real|Tiempo Real|AirVisual|IQAir|WAQI|AQICN|service_role|Core DB" README.md docs AGENTS.md
 ```
 
 Allowed appearances:
@@ -78,6 +78,7 @@ Allowed appearances:
 - `tiempo real` only as a prohibition, historical drift note, or explicit risk.
 - WAQI/AQICN as active provider when sourced from pipeline evidence.
 - AirVisual/IQAir only as legacy/fallback.
+- `service_role` only as security prohibition or pipeline-only secret context.
 - Core DB only as clarification that it is not used for environmental readings.
 - Story 1.4 / 1.4.1 / 1.4.2 evidence and status references.
 
