@@ -13,6 +13,13 @@ export interface CityAirQualityData {
   wind_direction_deg: number | null;
   weather_icon: string | null;
   last_successful_update_at: string | null;
+  weather_temperature_c: number | null;
+  weather_humidity_percent: number | null;
+  weather_wind_speed_kmh: number | null;
+  weather_wind_direction_deg: number | null;
+  weather_wind_gust_kmh: number | null;
+  weather_provider: string | null;
+  weather_timestamp: string | null;
 }
 
 export interface AirQualityHistoryRow {
@@ -85,6 +92,8 @@ export interface AirQualityData {
   };
   weather_icon?: string | null;
   main_pollutant_us?: string | null;
+  weather_provider?: string | null;
+  weather_timestamp?: string | null;
 }
 
 export type AirQualityStatus =
