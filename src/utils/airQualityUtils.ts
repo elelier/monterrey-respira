@@ -58,12 +58,12 @@ export function getHumidityIcon(humidity: number): string {
 }
 
 export function getWindIcon(
-  windSpeedMs: number | null | undefined,
+  windSpeedKmh: number | null | undefined,
   windDirectionDeg: number | null | undefined,
 ): { icon: string; rotation?: number } {
   if (
-    windSpeedMs === null ||
-    windSpeedMs === undefined ||
+    windSpeedKmh === null ||
+    windSpeedKmh === undefined ||
     windDirectionDeg === null ||
     windDirectionDeg === undefined
   ) {
@@ -73,13 +73,13 @@ export function getWindIcon(
   let icon = '';
   let rotation = 0;
 
-  if (windSpeedMs < 5) {
+  if (windSpeedKmh < 18) {
     icon = iconlowwind;
     rotation = windDirectionDeg;
-  } else if (windSpeedMs < 15) {
+  } else if (windSpeedKmh < 54) {
     icon = iconmidwind;
     rotation = windDirectionDeg;
-  } else if (windSpeedMs < 25) {
+  } else if (windSpeedKmh < 90) {
     icon = iconwindstorm;
   } else {
     icon = icontornado;
