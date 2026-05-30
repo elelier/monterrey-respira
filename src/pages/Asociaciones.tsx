@@ -291,6 +291,38 @@ export default function Asociaciones() {
           ))}
         </div>
 
+        <motion.section
+          className="mb-12 overflow-hidden rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-sky-50 p-6 shadow-lg dark:border-amber-700/50 dark:from-slate-800 dark:via-slate-800 dark:to-slate-900"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
+        >
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div className="max-w-3xl">
+              <p className="mb-2 text-xs font-black uppercase tracking-[0.24em] text-amber-700 dark:text-amber-300">
+                Campaña ciudadana activa
+              </p>
+              <h2 className="mb-3 text-2xl font-black text-slate-950 dark:text-white md:text-3xl">
+                Desahógate: Consulta Pública por el aire limpio en Nuevo León
+              </h2>
+              <p className="text-sm leading-6 text-slate-700 dark:text-slate-300 md:text-base">
+                Si quieres pasar de informarte a participar, esta campaña reúne puntos para firmar, voluntariado, documentos y preguntas frecuentes sobre la consulta pública por el aire limpio.
+              </p>
+            </div>
+            <a
+              href="https://linktr.ee/sisepuedenuevoleon"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex shrink-0 items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white shadow-md transition hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200"
+            >
+              Ver cómo participar <IoArrowForwardOutline className="ml-2" />
+            </a>
+          </div>
+          <p className="mt-4 text-xs text-slate-500 dark:text-slate-400">
+            Referencia ciudadana externa. MtyRespira no procesa firmas ni datos personales de esta campaña.
+          </p>
+        </motion.section>
+
         <div className="mb-12 rounded-lg bg-green-50 p-8 dark:bg-green-900/20">
           <h2 className="mb-4 text-2xl font-bold text-green-800 dark:text-green-400">¿Cómo puedo contribuir?</h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
