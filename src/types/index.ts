@@ -96,14 +96,7 @@ export interface AirQualityData {
   weather_timestamp?: string | null;
 }
 
-export type AirQualityStatus =
-  | 'good'
-  | 'moderate'
-  | 'unhealthy-sensitive'
-  | 'unhealthy'
-  | 'very-unhealthy'
-  | 'hazardous'
-  | 'unknown';
+export type AirQualityStatus = 'good' | 'moderate' | 'unhealthy-sensitive' | 'unhealthy' | 'very-unhealthy' | 'hazardous' | 'unknown';
 
 export interface HistoricalData {
   date: string;
