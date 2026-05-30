@@ -232,12 +232,12 @@ export default function CityHistoricalTrend({ cityId, cityName }: CityHistorical
           {loading ? 'Cargando historico disponible...' : getInsufficientDataCopy(metric)}
         </div>
       ) : (
-        <div className="h-24 w-full sm:h-56" style={{ color: theme.secondary }} aria-label={`Grafica historica de ${metricConfig.label} para ${cityName}`}>
+        <div className="h-28 w-full sm:h-56" style={{ color: theme.secondary }} aria-label={`Grafica historica de ${metricConfig.label} para ${cityName}`}>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartPoints} margin={{ top: 4, right: 6, left: -20, bottom: -4 }}>
+            <LineChart data={chartPoints} margin={{ top: 8, right: 10, left: 8, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="label" tick={{ fontSize: 10 }} minTickGap={24} />
-              <YAxis tick={{ fontSize: 10 }} width={36} domain={['auto', 'auto']} />
+              <XAxis dataKey="label" tick={{ fontSize: 10 }} minTickGap={24} tickMargin={8} />
+              <YAxis tick={{ fontSize: 10 }} width={42} domain={['auto', 'auto']} tickMargin={6} />
               <Tooltip labelFormatter={(_, payload) => {
                 const point = payload?.[0]?.payload as ChartPoint | undefined;
                 return point ? formatNullableTimestamp(point.timestamp, { dateStyle: 'medium', timeStyle: range === '6m' ? undefined : 'short' }) : 'Medicion';
