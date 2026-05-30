@@ -54,8 +54,9 @@ const RANGE_OPTIONS: { label: string; value: HistoryRange }[] = [
 
 const METRIC_OPTIONS: { label: string; value: AirQualityHistoryMetric; suffix: string }[] = [
   { label: 'AQI', value: 'aqi_us', suffix: ' AQI' },
-  { label: 'Temperatura', value: 'temperature_c', suffix: ' °C' },
-  { label: 'Humedad', value: 'humidity_percent', suffix: '%' },
+  { label: 'Temperatura', value: 'weather_temperature_c', suffix: ' °C' },
+  { label: 'Humedad', value: 'weather_humidity_percent', suffix: '%' },
+  { label: 'Viento', value: 'weather_wind_speed_kmh', suffix: ' km/h' },
 ];
 
 const RANGE_TO_HOURS: Record<Exclude<HistoryRange, '6m'>, number> = {
@@ -68,12 +69,17 @@ const SIX_MONTH_DAYS = 183;
 const MIN_POINTS_FOR_TREND = 2;
 const STABLE_DELTA_BY_METRIC: Record<AirQualityHistoryMetric, number> = {
   aqi_us: 5,
-  temperature_c: 1,
-  humidity_percent: 3,
+  weather_temperature_c: 1,
+  weather_humidity_percent: 3,
+  weather_wind_speed_kmh: 5,
 };
 
 function isDailyRow(row: HistoryRow): row is AirQualityDailyHistoryRow {
   return 'reading_date' in row;
+}
+
+function isWeatherMetric(metric: AirQualityHistoryMetric) {
+  return metric !== 'aqi_us';
 }
 
 function getMetricConfig(metric: AirQualityHistoryMetric) {
@@ -81,8 +87,12 @@ function getMetricConfig(metric: AirQualityHistoryMetric) {
   return config ?? METRIC_OPTIONS[0];
 }
 
-function getTimestamp(row: HistoryRow) {
-  return isDailyRow(row) ? row.reading_date : row.reading_timestamp;
+function getTimestamp(row: HistoryRow, metric: AirQualityHistoryMetric) {
+  if (isDailyRow(row)) {
+    return row.reading_date;
+  }
+
+  return isWeatherMetric(metric) ? (row.weather_timestamp ?? row.reading_timestamp) : row.reading_timestamp;
 }
 
 function getPollutant(row: HistoryRow) {
@@ -91,21 +101,16 @@ function getPollutant(row: HistoryRow) {
 
 function getMetricValue(row: HistoryRow, metric: AirQualityHistoryMetric): number | null {
   if (isDailyRow(row)) {
-    switch (metric) {
-      case 'temperature_c':
-        return row.avg_temperature_c;
-      case 'humidity_percent':
-        return row.avg_humidity_percent;
-      default:
-        return row.avg_aqi_us;
-    }
+    return metric === 'aqi_us' ? row.avg_aqi_us : null;
   }
 
   switch (metric) {
-    case 'temperature_c':
-      return row.temperature_c;
-    case 'humidity_percent':
-      return row.humidity_percent;
+    case 'weather_temperature_c':
+      return row.weather_temperature_c ?? null;
+    case 'weather_humidity_percent':
+      return row.weather_humidity_percent ?? null;
+    case 'weather_wind_speed_kmh':
+      return row.weather_wind_speed_kmh ?? null;
     default:
       return row.aqi_us;
   }
@@ -141,7 +146,7 @@ function toChartPoint(
     return null;
   }
 
-  const timestamp = getTimestamp(row);
+  const timestamp = getTimestamp(row, metric);
 
   return {
     timestamp,
@@ -186,10 +191,20 @@ function getTrendLabel(trend: AirQualityTrend) {
 
 function getMetricCopy(metric: AirQualityHistoryMetric, range: HistoryRange) {
   if (range === '6m') {
-    return metric === 'aqi_us' ? 'promedio diario de AQI' : 'promedio diario';
+    return metric === 'aqi_us'
+      ? 'promedio diario de AQI'
+      : 'campos meteorologicos canonicos disponibles';
   }
 
-  return 'mediciones disponibles';
+  return isWeatherMetric(metric)
+    ? 'campos meteorologicos Open-Meteo disponibles'
+    : 'mediciones disponibles';
+}
+
+function getInsufficientDataCopy(metric: AirQualityHistoryMetric) {
+  return isWeatherMetric(metric)
+    ? 'Aun no hay suficientes mediciones con clima Open-Meteo para graficar esta metrica.'
+    : 'Aun no hay suficientes mediciones para graficar esta metrica.';
 }
 
 function buildPollutantSummary(rows: HistoryRow[]): PollutantSummaryItem[] {
@@ -315,13 +330,13 @@ export default function CityHistoricalTrend({ cityId, cityName }: CityHistorical
         ))}
       </div>
 
-      <div className="mb-1.5 grid grid-cols-3 rounded-full border border-slate-200 bg-white p-0.5 dark:border-slate-700 dark:bg-slate-900/60 sm:mb-4 sm:p-1">
+      <div className="mb-1.5 grid grid-cols-4 rounded-full border border-slate-200 bg-white p-0.5 dark:border-slate-700 dark:bg-slate-900/60 sm:mb-4 sm:p-1">
         {METRIC_OPTIONS.map((option) => (
           <button
             key={option.value}
             type="button"
             onClick={() => setMetric(option.value)}
-            className="rounded-full px-3 py-0.5 text-xs font-medium transition sm:py-2 sm:text-sm sm:font-black"
+            className="rounded-full px-2 py-0.5 text-[0.68rem] font-medium transition sm:px-3 sm:py-2 sm:text-sm sm:font-black"
             style={{
               backgroundColor: metric === option.value ? `${theme.primary}22` : 'transparent',
               color: metric === option.value ? theme.text : undefined,
@@ -340,7 +355,7 @@ export default function CityHistoricalTrend({ cityId, cityName }: CityHistorical
         </div>
       ) : !hasEnoughPointsForChart ? (
         <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-center text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-300 sm:px-4 sm:py-6 sm:text-sm" role="status">
-          {loading ? 'Cargando historico disponible...' : 'Aun no hay suficientes mediciones para graficar esta metrica.'}
+          {loading ? 'Cargando historico disponible...' : getInsufficientDataCopy(metric)}
         </div>
       ) : (
         <div
