@@ -160,9 +160,12 @@ export default function Asociaciones() {
           <p className="mb-8 max-w-3xl text-lg md:text-xl">
             Estas organizaciones trabajan activamente para mejorar la calidad del aire en Monterrey y su área metropolitana. Conoce su labor y descubre cómo puedes contribuir a esta importante causa.
           </p>
-          <button className="flex items-center rounded-md bg-white px-6 py-3 font-semibold text-blue-600 shadow-md transition-colors hover:bg-opacity-90">
+          <a
+            href="#desahogate"
+            className="inline-flex items-center rounded-md bg-white px-6 py-3 font-semibold text-blue-600 shadow-md transition-colors hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-amber-500"
+          >
             ¿Cómo puedo ayudar? <IoArrowForwardOutline className="ml-2" />
-          </button>
+          </a>
         </div>
 
         <div className="mb-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-2">
@@ -292,7 +295,8 @@ export default function Asociaciones() {
         </div>
 
         <motion.section
-          className="mb-12 overflow-hidden rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-sky-50 p-6 shadow-lg dark:border-amber-700/50 dark:from-slate-800 dark:via-slate-800 dark:to-slate-900"
+          id="desahogate"
+          className="mb-12 scroll-mt-24 overflow-hidden rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-sky-50 p-6 shadow-lg dark:border-amber-700/50 dark:from-slate-800 dark:via-slate-800 dark:to-slate-900"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
