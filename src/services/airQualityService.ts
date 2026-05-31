@@ -1,8 +1,7 @@
 import { AirQualityData, HistoricalData, Station } from '../types';
 import { getAirQualityStatus } from '../utils/airQualityUtils';
 
-// Para este proyecto de demostración, usaremos datos simulados.
-// En una implementacion real, se integrarian APIs como AQICN u OpenWeatherMap.
+// Cliente legacy conservado para compatibilidad local. El flujo público vigente consume Supabase/RPC.
 
 // Coordenadas aproximadas de Monterrey, Nuevo León
 const MONTERREY_LAT = 25.6866;
@@ -54,7 +53,7 @@ const MONTERREY_STATIONS: Station[] = [
 // En un entorno real, estos datos vendrían de APIs externas
 export const getCurrentAirQuality = async (): Promise<AirQualityData> => {
   try {
-    // Para la demostración, generamos datos simulados
+    // Respuesta local legacy para pantallas antiguas no conectadas al flujo Supabase/RPC.
     const aqi = Math.floor(Math.random() * 200) + 30; // AQI entre 30 y 230
     const status = getAirQualityStatus(aqi);
 

@@ -226,10 +226,11 @@ export default function HistoricalChart() {
           className="border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-gray-900/30 px-4 py-3"
         >
           <p className="text-xs text-gray-600 dark:text-gray-300">
-            Este gráfico muestra la tendencia histórica de la calidad del aire en la ubicación seleccionada. Los datos se actualizan diariamente y pueden ser utilizados para identificar patrones y tendencias en la contaminación del aire. Las variaciones pueden estar influenciadas por el tráfico, condiciones climáticas, actividad industrial y eventos especiales.
+            Este grafico legacy muestra una serie sintetica para apoyo visual de la interfaz. No usa el historial guardado en Supabase.
           </p>
           <p className="text-xs text-gray-600 dark:text-gray-300 mt-2">
-            <span className="font-semibold">Nota:</span> Los datos mostrados son simulados con fines demostrativos. En una implementación real, se obtendría de APIs oficiales.
+            <span className="font-semibold">Nota:</span> Esta grafica legacy usa datos simulados para apoyo visual.
+            No debe leerse como historico guardado.
           </p>
         </motion.div>
       )}
@@ -355,7 +356,7 @@ export default function HistoricalChart() {
           </button>
         </div>
         <div className="text-xs text-gray-500 dark:text-gray-400 italic">
-          * Datos simulados con fines de demostración
+          * Datos simulados con fines visuales
         </div>
       </div>
     </div>

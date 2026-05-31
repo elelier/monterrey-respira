@@ -127,7 +127,7 @@ export default function AirQualityMap() {
         </h2>
         <p className="mt-2 text-sm">
           La RPC devolvio datos, pero ninguna ciudad incluye latitude/longitude validas. No se
-          muestran ubicaciones estimadas.
+          muestra el mapa hasta recibir coordenadas confiables.
         </p>
       </section>
     );
