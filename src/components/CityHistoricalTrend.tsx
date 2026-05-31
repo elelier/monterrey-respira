@@ -49,7 +49,6 @@ const RANGE_TO_HOURS: Record<Exclude<HistoryRange, '6m'>, number> = {
 
 const SIX_MONTH_DAYS = 183;
 const MIN_POINTS_FOR_TREND = 2;
-const DARK_AXIS_COLOR = '#cbd5e1';
 const CHART_FOCUS_CLASS =
   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-300 focus-visible:ring-offset-2 dark:focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-900';
 const STABLE_DELTA_BY_METRIC: Record<AirQualityHistoryMetric, number> = {
@@ -272,13 +271,13 @@ export default function CityHistoricalTrend({ cityId, cityName }: CityHistorical
         </div>
 
         {pollutantSummary.length > 0 && (
-          <div className="mt-3 h-36 w-full" style={{ color: theme.secondary }}>
+          <div className="mt-3 h-36 w-full text-slate-600 dark:text-slate-300">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={pollutantSummary.slice(0, 5)} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                <XAxis dataKey="pollutant" tick={{ fontSize: 11, fill: DARK_AXIS_COLOR }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: DARK_AXIS_COLOR }} width={42} allowDecimals={false} axisLine={false} tickLine={false} />
+                <XAxis dataKey="pollutant" tick={axisTick} axisLine={false} tickLine={false} />
+                <YAxis tick={axisTick} width={42} allowDecimals={false} axisLine={false} tickLine={false} />
                 <Tooltip formatter={(value) => [`${value} mediciones`, 'Frecuencia']} contentStyle={{ borderRadius: '0.875rem', borderColor: '#cbd5e1', color: '#0f172a' }} />
-                <Bar dataKey="count" fill="currentColor" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="count" fill={theme.secondary} radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
