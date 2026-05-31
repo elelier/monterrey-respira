@@ -5,13 +5,13 @@ const SITE_URL = 'https://mtyrespira.elelier.com';
 const SITE_NAME = 'MonterreyRespira';
 const SHARE_IMAGE = `${SITE_URL}/images/seo/share-image.png`;
 
-type RouteMetadata = {
+interface RouteMetadataConfig {
   title: string;
   description: string;
   path: string;
-};
+}
 
-const routeMetadata: Record<string, RouteMetadata> = {
+const routeMetadata: Record<string, RouteMetadataConfig> = {
   '/': {
     title: 'MonterreyRespira | Lecturas disponibles de calidad del aire en Monterrey',
     description:
