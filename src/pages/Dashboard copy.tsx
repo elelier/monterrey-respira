@@ -314,13 +314,13 @@ export default function Dashboard() {
             </li>
             <li>
               <strong>Sistema Integral de Monitoreo Ambiental (SIMA):</strong> Red de estaciones de monitoreo que cubre la zona metropolitana de Monterrey.
-              <a href="http://aire.nl.gob.mx/" target="_blank" rel="noopener noreferrer" className={`ml-1 hover:underline ${getStatusBorderClass().replace('border-', 'text-')}`}>Ver sitio oficial</a>
+              <a href="http://aire.nl.gob.mx/" target="_blank" rel="noopener noreferrer" className={`ml-1 hover:underline ${getStatusBorderClass().replace('border-', 'text-')}`}>Ver fuente</a>
             </li>
           </ul>
 
           <p className={`mt-4 p-3 rounded-lg ${getStatusButtonClass().replace('bg-', 'bg-').replace('hover:bg-', 'bg-').replace('text-white', 'bg-opacity-10 ' + getStatusBorderClass().replace('border-', 'text-'))}`}>
-            <strong>Nota:</strong> Algunos datos pueden ser estimados cuando no están disponibles de las fuentes oficiales.
-            En un entorno de producción, se requeriría acceso a APIs oficiales mediante convenios con las instituciones correspondientes.
+            <strong>Nota:</strong> Los datos faltantes deben mostrarse como no disponibles, no como valores inventados.
+            Para decisiones sensibles, consulta avisos de emergencia y apoyo profesional.
           </p>
         </div>
       </div>

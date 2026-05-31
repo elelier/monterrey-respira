@@ -368,8 +368,8 @@ export default function AirQualityHeatmap({ centralData, className = '' }: AirQu
             Las zonas más rojas y moradas indican mayor contaminación, mientras que las zonas verdes representan mejor calidad del aire.
           </p>
           <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
-            <strong>Nota:</strong> Los datos mostrados son simulados con fines demostrativos. En una implementación real,
-            se obtendrían datos disponibles de estaciones de monitoreo.
+            <strong>Nota:</strong> Esta vista debe leerse como apoyo visual. Las lecturas disponibles pueden tener huecos
+            o campos faltantes.
           </p>
           <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
             <strong>Interpretación:</strong> El mapa muestra datos de monitoreo combinados con interpolación espacial para estimar la

@@ -229,7 +229,7 @@ export default function HistoricalChart() {
             Este gráfico muestra la tendencia histórica de la calidad del aire en la ubicación seleccionada. Los datos se actualizan diariamente y pueden ser utilizados para identificar patrones y tendencias en la contaminación del aire. Las variaciones pueden estar influenciadas por el tráfico, condiciones climáticas, actividad industrial y eventos especiales.
           </p>
           <p className="text-xs text-gray-600 dark:text-gray-300 mt-2">
-            <span className="font-semibold">Nota:</span> Los datos mostrados son simulados con fines demostrativos. En una implementación real, se obtendría de APIs oficiales.
+            <span className="font-semibold">Nota:</span> La tendencia muestra puntos disponibles. Si falta una medición, no se rellena con valores inventados.
           </p>
         </motion.div>
       )}
@@ -355,7 +355,7 @@ export default function HistoricalChart() {
           </button>
         </div>
         <div className="text-xs text-gray-500 dark:text-gray-400 italic">
-          * Datos simulados con fines de demostración
+          * Puntos disponibles según el rango seleccionado
         </div>
       </div>
     </div>

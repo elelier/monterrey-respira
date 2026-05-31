@@ -8,6 +8,7 @@ import Recommendations from '../components/Recommendations';
 import CitySelector from '../components/CitySelector';
 import AirQualityMap from '../components/AirQualityMap';
 import CityHistoricalTrend from '../components/CityHistoricalTrend';
+import DataTrustExplainer from '../components/DataTrustExplainer';
 import { hasReliableAqi } from '../utils/airQualityDisplay';
 
 export default function Dashboard() {
@@ -153,6 +154,10 @@ export default function Dashboard() {
         <AirQualityMap />
       </div>
 
+      <div className="mt-8">
+        <DataTrustExplainer variant="compact" />
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -178,7 +183,11 @@ export default function Dashboard() {
       <div className="mt-8">
         <h2 className="mb-4 text-[1.05rem] font-bold sm:mb-6 sm:text-xl" style={{ color: theme?.text }}>Recursos para cuidar nuestra calidad del aire</h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3 sm:gap-6">
-          <Link to="https://www.who.int/es/news-room/fact-sheets/detail/ambient-(outdoor)-air-quality-and-health" target="_blank">
+          <a
+            href="https://www.who.int/es/news-room/fact-sheets/detail/ambient-(outdoor)-air-quality-and-health"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <motion.div
               whileHover={{ y: -5 }}
               transition={{ type: 'spring', stiffness: 300 }}
@@ -195,9 +204,13 @@ export default function Dashboard() {
                 </p>
               </div>
             </motion.div>
-          </Link>
+          </a>
 
-          <Link to="http://aire.nl.gob.mx/map_calidad.html" target="_blank">
+          <a
+            href="http://aire.nl.gob.mx/map_calidad.html"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <motion.div
               whileHover={{ y: -5 }}
               transition={{ type: 'spring', stiffness: 300 }}
@@ -214,9 +227,13 @@ export default function Dashboard() {
                 </p>
               </div>
             </motion.div>
-          </Link>
+          </a>
 
-          <Link to="https://www.gob.mx/cofepris/documentos/protegete-de-la-contaminacion-ambiental" target="_blank">
+          <a
+            href="https://www.gob.mx/cofepris/documentos/protegete-de-la-contaminacion-ambiental"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <motion.div
               whileHover={{ y: -5 }}
               transition={{ type: 'spring', stiffness: 300 }}
@@ -233,7 +250,7 @@ export default function Dashboard() {
                 </p>
               </div>
             </motion.div>
-          </Link>
+          </a>
         </div>
       </div>
 
@@ -241,7 +258,7 @@ export default function Dashboard() {
         <h2 className="mb-3 text-[1.05rem] font-bold text-gray-900 dark:text-white sm:mb-4 sm:text-xl">Fuentes de Datos</h2>
 
         <div className="text-sm text-gray-600 dark:text-gray-400">
-          <p>Esta aplicacion integra y procesa datos de multiples fuentes para proporcionar informacion completa sobre la calidad del aire en Monterrey:</p>
+          <p>Esta aplicacion muestra lecturas disponibles de proveedores externos y las presenta con estados de frescura.</p>
 
           <ul className="mt-3 list-disc space-y-2 pl-5">
             <li>
@@ -249,13 +266,13 @@ export default function Dashboard() {
               <a href="https://aqicn.org/api/" target="_blank" rel="noopener noreferrer" className={`ml-1 hover:underline ${getStatusBorderClass().replace('border-', 'text-')}`}>Ver API</a>
             </li>
             <li>
-              <strong>Sistema Integral de Monitoreo Ambiental (SIMA):</strong> Red de estaciones de monitoreo que cubre la zona metropolitana de Monterrey.
-              <a href="http://aire.nl.gob.mx/" target="_blank" rel="noopener noreferrer" className={`ml-1 hover:underline ${getStatusBorderClass().replace('border-', 'text-')}`}>Ver sitio oficial</a>
+              <strong>Open-Meteo:</strong> Fuente meteorologica para contexto de clima cuando esta disponible.
+              <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" className={`ml-1 hover:underline ${getStatusBorderClass().replace('border-', 'text-')}`}>Ver fuente</a>
             </li>
           </ul>
 
           <p className={`mt-4 rounded-lg p-3 ${getStatusButtonClass().replace('bg-', 'bg-').replace('hover:bg-', 'bg-').replace('text-white', `bg-opacity-10 ${getStatusBorderClass().replace('border-', 'text-')}`)}`}>
-            La tarjeta principal muestra la hora de medicion y la ultima actualizacion del pipeline cuando aplica.
+            La tarjeta principal muestra la hora de medicion y la ultima actualizacion del pipeline cuando aplica. Los datos externos pueden retrasarse, faltar o llegar con campos ausentes.
           </p>
         </div>
       </div>

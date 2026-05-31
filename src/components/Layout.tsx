@@ -220,7 +220,7 @@ export default function Layout({ children }: LayoutProps) {
                 to="/datos-y-apis"
                 className={`px-3 py-2 rounded-md ${location.pathname === '/datos-y-apis' ? 'bg-white/20' : 'hover:bg-white/10'} text-white transition-colors`}
               >
-                Datos y APIs
+                Metodología
               </Link>
               <Link
                 to="/asociaciones"
@@ -311,7 +311,7 @@ export default function Layout({ children }: LayoutProps) {
                   Acerca de
                 </Link>
                 <Link to="/datos-y-apis" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
-                  Datos y APIs
+                  Metodología
                 </Link>
                 <Link to="/asociaciones" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
                   Asociaciones
@@ -330,7 +330,7 @@ export default function Layout({ children }: LayoutProps) {
 
         <footer className="container mx-auto py-6 md:py-8 px-4 sm:px-6 lg:px-8 text-center text-gray-500 dark:text-gray-400 text-sm">
           <div className="space-y-2">
-            <p className="text-xs sm:text-sm">MonterreyRespira {new Date().getFullYear()} - Monitoreando la calidad del aire en Monterrey, Nuevo León</p>
+            <p className="text-xs sm:text-sm">MonterreyRespira {new Date().getFullYear()} - Lecturas disponibles de calidad del aire en Monterrey, Nuevo León</p>
             <div className="hidden md:block">
               <Link
                 to="/acerca-de"
@@ -343,7 +343,7 @@ export default function Layout({ children }: LayoutProps) {
                 to="/datos-y-apis"
                 className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
               >
-                Datos y APIs
+                Metodología
               </Link>
               {' · '}
               <Link

@@ -301,8 +301,8 @@ export const AQI_RECOMMENDATIONS: Record<AirQualityStatus, RecommendationInfo[]>
     },
     {
       icon: 'IoInformationCircle',
-      title: 'Consulta fuentes oficiales',
-      description: 'Si necesitas tomar una decisión sensible, revisa también fuentes oficiales.',
+      title: 'Consulta referencias de emergencia',
+      description: 'Si necesitas tomar una decisión sensible, revisa también avisos de emergencia y apoyo profesional.',
     },
   ],
 };

@@ -18,7 +18,7 @@ export default function AcercaDe() {
             <div className="p-6">
               <h2 className="text-xl font-semibold mb-4 text-amber-700 dark:text-amber-400">Nuestra Misión</h2>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
-                MonterreyRespira es una plataforma diseñada para proporcionar información clara y accesible sobre la calidad del aire en Monterrey y su área metropolitana. Nuestro objetivo es empoderar a los ciudadanos con datos precisos que les permitan tomar decisiones informadas para proteger su salud y contribuir a mejorar la calidad del aire en nuestra comunidad.
+                MonterreyRespira es una plataforma diseñada para proporcionar información clara y accesible sobre la calidad del aire en Monterrey y su área metropolitana. Nuestro objetivo es ayudar a la ciudadanía a leer mediciones disponibles y entender cuándo un dato puede estar retrasado o no disponible.
               </p>
               <p className="text-gray-700 dark:text-gray-300">
                 Creemos que la transparencia y el acceso a la información son fundamentales para fomentar la conciencia ambiental y promover acciones tanto individuales como colectivas que contribuyan a un aire más limpio para todos.
@@ -30,13 +30,13 @@ export default function AcercaDe() {
             <div className="p-6">
               <h2 className="text-xl font-semibold mb-4 text-amber-700 dark:text-amber-400">¿Cómo funciona?</h2>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
-                MonterreyRespira utiliza datos de diversas fuentes, incluyendo estaciones de monitoreo oficiales, APIs de calidad del aire y plataformas de datos abiertos para ofrecer información actualizada sobre la concentración de contaminantes en el aire.
+                MonterreyRespira consume lecturas normalizadas desde Supabase. El AQI proviene de WAQI/AQICN y el contexto de clima puede venir de Open-Meteo cuando está disponible.
               </p>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
-                Nuestra plataforma analiza estos datos y los presenta de manera visualmente comprensible, calculando el Índice de Calidad del Aire (AQI) y proporcionando recomendaciones personalizadas según los niveles de contaminación actual.
+                La plataforma presenta el Índice de Calidad del Aire (AQI), contaminante dominante cuando existe y recomendaciones generales según el estado reportado.
               </p>
               <p className="text-gray-700 dark:text-gray-300">
-                También ofrecemos información sobre los principales contaminantes, sus efectos en la salud y recursos educativos para entender mejor la problemática de la contaminación atmosférica.
+                También ofrecemos información sobre los principales contaminantes, sus efectos en la salud y recursos educativos para entender mejor la problemática de la contaminación atmosférica. MtyRespira no reemplaza avisos de emergencia.
               </p>
             </div>
           </div>
@@ -45,10 +45,10 @@ export default function AcercaDe() {
             <div className="p-6">
               <h2 className="text-xl font-semibold mb-4 text-amber-700 dark:text-amber-400">Nuestro Equipo</h2>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
-                MonterreyRespira es un proyecto colaborativo desarrollado por un equipo multidisciplinario de ingenieros, científicos ambientales, diseñadores y desarrolladores comprometidos con la calidad del aire en Monterrey.
+                MonterreyRespira es un proyecto desarrollado por elelier para hacer más legibles las lecturas ambientales disponibles de Monterrey.
               </p>
               <p className="text-gray-700 dark:text-gray-300">
-                Estamos comprometidos con la mejora continua de esta plataforma y trabajamos constantemente para incorporar nuevas fuentes de datos, mejorar la precisión de nuestras mediciones y expandir nuestras funcionalidades.
+                La mejora continua se enfoca en claridad pública, trazabilidad de datos y estados honestos cuando los proveedores externos se retrasan o no entregan campos.
               </p>
             </div>
           </div>
