@@ -217,10 +217,10 @@ export default function Layout({ children }: LayoutProps) {
                 Acerca de
               </Link>
               <Link
-                to="/datos-y-apis"
+                to="/datos-y-apis#metodologia-y-limites"
                 className={`px-3 py-2 rounded-md ${location.pathname === '/datos-y-apis' ? 'bg-white/20' : 'hover:bg-white/10'} text-white transition-colors`}
               >
-                Metodología
+                Fuentes
               </Link>
               <Link
                 to="/asociaciones"
@@ -310,8 +310,8 @@ export default function Layout({ children }: LayoutProps) {
                 <Link to="/acerca-de" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
                   Acerca de
                 </Link>
-                <Link to="/datos-y-apis" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
-                  Metodología
+                <Link to="/datos-y-apis#metodologia-y-limites" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
+                  Fuentes y metodología
                 </Link>
                 <Link to="/asociaciones" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
                   Asociaciones
@@ -340,10 +340,10 @@ export default function Layout({ children }: LayoutProps) {
               </Link>
               {' · '}
               <Link
-                to="/datos-y-apis"
+                to="/datos-y-apis#metodologia-y-limites"
                 className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
               >
-                Metodología
+                Fuentes y metodología
               </Link>
               {' · '}
               <Link
@@ -404,11 +404,11 @@ export default function Layout({ children }: LayoutProps) {
               <span className="text-[0.68rem]">Acerca de</span>
             </Link>
             <Link
-              to="/datos-y-apis"
+              to="/datos-y-apis#metodologia-y-limites"
               className={`flex flex-col items-center justify-center ${location.pathname === '/datos-y-apis' ? getBottomNavActiveClass() : 'text-gray-500'}`}
             >
               <IoLayersOutline className="mb-0.5 text-lg" />
-              <span className="text-[0.68rem]">Datos</span>
+              <span className="text-[0.68rem]">Fuentes</span>
             </Link>
             <Link
               to="/asociaciones"
