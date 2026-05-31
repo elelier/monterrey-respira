@@ -49,7 +49,6 @@ const RANGE_TO_HOURS: Record<Exclude<HistoryRange, '6m'>, number> = {
 
 const SIX_MONTH_DAYS = 183;
 const MIN_POINTS_FOR_TREND = 2;
-const MOBILE_AXIS_COLOR = '#475569';
 const DARK_AXIS_COLOR = '#cbd5e1';
 const CHART_FOCUS_CLASS =
   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-300 focus-visible:ring-offset-2 dark:focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-900';
@@ -200,7 +199,7 @@ export default function CityHistoricalTrend({ cityId, cityName }: CityHistorical
   const hasEnoughPointsForChart = chartPoints.length >= MIN_POINTS_FOR_TREND;
   const status = airQualityData?.status ?? 'unknown';
   const theme = AQI_THEME_TOKENS[status];
-  const axisTick = { fontSize: 11, fill: MOBILE_AXIS_COLOR };
+  const axisTick = { fontSize: 11, fill: 'currentColor' };
   const chartValueLabel = `${metricConfig.label}${metricConfig.suffix === ' AQI' ? '' : ` (${metricConfig.suffix.trim()})`}`;
 
   return (
@@ -243,17 +242,17 @@ export default function CityHistoricalTrend({ cityId, cityName }: CityHistorical
           {loading ? 'Cargando histórico disponible...' : getInsufficientDataCopy(metric)}
         </div>
       ) : (
-        <div className="h-44 w-full sm:h-64" style={{ color: theme.secondary }} aria-label={`Gráfica histórica de ${metricConfig.label} para ${cityName}`}>
+        <div className="h-44 w-full text-slate-600 dark:text-slate-300 sm:h-64" aria-label={`Gráfica histórica de ${metricConfig.label} para ${cityName}`}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartPoints} margin={{ top: 12, right: 12, left: 2, bottom: 8 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(100,116,139,0.28)" />
               <XAxis dataKey="label" tick={axisTick} minTickGap={20} tickMargin={10} axisLine={false} tickLine={false} />
-              <YAxis tick={axisTick} width={50} domain={['auto', 'auto']} tickMargin={8} axisLine={false} tickLine={false} label={{ value: chartValueLabel, angle: -90, position: 'insideLeft', fill: MOBILE_AXIS_COLOR, fontSize: 10, offset: 6 }} />
+              <YAxis tick={axisTick} width={50} domain={['auto', 'auto']} tickMargin={8} axisLine={false} tickLine={false} label={{ value: chartValueLabel, angle: -90, position: 'insideLeft', fill: 'currentColor', fontSize: 10, offset: 6 }} />
               <Tooltip labelFormatter={(_, payload) => {
                 const point = payload?.[0]?.payload as ChartPoint | undefined;
                 return point ? formatNullableTimestamp(point.timestamp, { dateStyle: 'medium', timeStyle: range === '6m' ? undefined : 'short' }) : 'Medición';
               }} formatter={(value) => [`${value}${metricConfig.suffix}`, metricConfig.label]} contentStyle={{ borderRadius: '0.875rem', borderColor: '#cbd5e1', color: '#0f172a' }} labelStyle={{ color: '#0f172a', fontWeight: 700 }} itemStyle={{ color: '#0f172a' }} />
-              <Line type="monotone" dataKey="value" stroke="currentColor" strokeWidth={3} dot={range === '24h'} connectNulls={false} isAnimationActive={false} />
+              <Line type="monotone" dataKey="value" stroke={theme.secondary} strokeWidth={3} dot={range === '24h'} connectNulls={false} isAnimationActive={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>
