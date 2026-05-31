@@ -9,12 +9,23 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import './App.css';
 
 // Componente que se asegura de que la página se desplace hacia arriba al navegar
+// y respeta anchors internos como /asociaciones#desahogate.
 function ScrollToTop() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+    if (!hash) {
+      window.scrollTo(0, 0);
+      return;
+    }
+
+    const elementId = decodeURIComponent(hash.replace('#', ''));
+    const scrollToHashElement = () => {
+      document.getElementById(elementId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    window.requestAnimationFrame(scrollToHashElement);
+  }, [pathname, hash]);
 
   return null;
 }
