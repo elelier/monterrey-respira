@@ -36,7 +36,7 @@ const RANGE_OPTIONS: { label: string; value: HistoryRange }[] = [
 
 const METRIC_OPTIONS: { label: string; value: AirQualityHistoryMetric; suffix: string }[] = [
   { label: 'AQI', value: 'aqi_us', suffix: ' AQI' },
-  { label: 'Temp.', value: 'weather_temperature_c', suffix: ' C' },
+  { label: 'Temp.', value: 'weather_temperature_c', suffix: ' °C' },
   { label: 'Humedad', value: 'weather_humidity_percent', suffix: '%' },
   { label: 'Viento', value: 'weather_wind_speed_kmh', suffix: ' km/h' },
 ];
@@ -49,6 +49,10 @@ const RANGE_TO_HOURS: Record<Exclude<HistoryRange, '6m'>, number> = {
 
 const SIX_MONTH_DAYS = 183;
 const MIN_POINTS_FOR_TREND = 2;
+const MOBILE_AXIS_COLOR = '#475569';
+const DARK_AXIS_COLOR = '#cbd5e1';
+const CHART_FOCUS_CLASS =
+  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-300 focus-visible:ring-offset-2 dark:focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-900';
 const STABLE_DELTA_BY_METRIC: Record<AirQualityHistoryMetric, number> = {
   aqi_us: 5,
   weather_temperature_c: 1,
@@ -134,8 +138,8 @@ function getMetricCopy(metric: AirQualityHistoryMetric, range: HistoryRange) {
 
 function getInsufficientDataCopy(metric: AirQualityHistoryMetric) {
   return isWeatherMetric(metric)
-    ? 'Aun no hay suficientes mediciones de clima para graficar esta metrica.'
-    : 'Aun no hay suficientes mediciones para graficar esta metrica.';
+    ? 'Aún no hay suficientes mediciones de clima para graficar esta métrica.'
+    : 'Aún no hay suficientes mediciones para graficar esta métrica.';
 }
 
 function buildPollutantSummary(rows: HistoryRow[]): PollutantSummaryItem[] {
@@ -173,7 +177,7 @@ export default function CityHistoricalTrend({ cityId, cityName }: CityHistorical
       } catch {
         if (isCurrent) {
           setRows([]);
-          setDegradedReason('Historico no disponible por ahora. El panel principal sigue usando datos recientes.');
+          setDegradedReason('Histórico no disponible por ahora. El panel principal sigue usando datos recientes.');
         }
       } finally {
         if (isCurrent) setLoading(false);
@@ -196,30 +200,37 @@ export default function CityHistoricalTrend({ cityId, cityName }: CityHistorical
   const hasEnoughPointsForChart = chartPoints.length >= MIN_POINTS_FOR_TREND;
   const status = airQualityData?.status ?? 'unknown';
   const theme = AQI_THEME_TOKENS[status];
+  const axisTick = { fontSize: 11, fill: MOBILE_AXIS_COLOR };
+  const chartValueLabel = `${metricConfig.label}${metricConfig.suffix === ' AQI' ? '' : ` (${metricConfig.suffix.trim()})`}`;
 
   return (
-    <section className="rounded-[1.15rem] border border-slate-200 bg-white p-2 shadow-[0_10px_24px_rgba(15,23,42,0.08)] dark:border-slate-700 dark:bg-slate-800 sm:rounded-[1.35rem] sm:p-5">
-      <div className="mb-1.5 flex items-center justify-between gap-3 sm:mb-4">
+    <section className="rounded-[1.15rem] border border-slate-200 bg-white p-3 shadow-[0_10px_24px_rgba(15,23,42,0.08)] dark:border-slate-700 dark:bg-slate-800 sm:rounded-[1.35rem] sm:p-5">
+      <div className="mb-2 flex items-center justify-between gap-3 sm:mb-4">
         <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
           <IoTrendingUpOutline className="h-5 w-5 shrink-0 sm:h-7 sm:w-7" style={{ color: theme.secondary }} />
-          <h2 className="truncate text-[0.94rem] font-semibold text-slate-950 dark:text-white sm:text-xl sm:font-black">Tendencia reciente</h2>
+          <div className="min-w-0">
+            <h2 className="truncate text-[0.94rem] font-bold text-slate-950 dark:text-white sm:text-xl sm:font-black">Tendencia reciente</h2>
+            <p className="text-[0.68rem] font-medium text-slate-600 dark:text-slate-300 sm:hidden">
+              {metricConfig.label} · {range}
+            </p>
+          </div>
         </div>
         <span className="hidden w-fit rounded-full border px-3 py-1 text-xs font-semibold sm:inline-flex" style={{ borderColor: `${theme.primary}66`, color: theme.text, backgroundColor: `${theme.primary}18` }}>
           {getTrendLabel(trend)}
         </span>
       </div>
 
-      <div className="mb-1.5 grid grid-cols-4 rounded-full border border-slate-200 bg-white p-0.5 dark:border-slate-700 dark:bg-slate-900/60 sm:mb-3 sm:p-1">
+      <div className="mb-2 grid grid-cols-4 rounded-full border border-slate-200 bg-white p-0.5 dark:border-slate-700 dark:bg-slate-900/60 sm:mb-3 sm:p-1">
         {RANGE_OPTIONS.map((option) => (
-          <button key={option.value} type="button" onClick={() => setRange(option.value)} className="rounded-full px-3 py-0.5 text-xs font-medium transition sm:py-2 sm:text-sm sm:font-black" style={{ backgroundColor: range === option.value ? `${theme.primary}22` : 'transparent', color: range === option.value ? theme.text : undefined, boxShadow: range === option.value ? `inset 0 0 0 1px ${theme.primary}66` : undefined }} aria-pressed={range === option.value}>
+          <button key={option.value} type="button" onClick={() => setRange(option.value)} className={`rounded-full px-3 py-1 text-xs font-semibold transition sm:py-2 sm:text-sm sm:font-black ${CHART_FOCUS_CLASS}`} style={{ backgroundColor: range === option.value ? `${theme.primary}22` : 'transparent', color: range === option.value ? theme.text : undefined, boxShadow: range === option.value ? `inset 0 0 0 1px ${theme.primary}66` : undefined }} aria-pressed={range === option.value}>
             {option.label}
           </button>
         ))}
       </div>
 
-      <div className="mb-1.5 grid grid-cols-4 rounded-full border border-slate-200 bg-white p-0.5 dark:border-slate-700 dark:bg-slate-900/60 sm:mb-4 sm:p-1">
+      <div className="mb-3 grid grid-cols-4 rounded-full border border-slate-200 bg-white p-0.5 dark:border-slate-700 dark:bg-slate-900/60 sm:mb-4 sm:p-1">
         {METRIC_OPTIONS.map((option) => (
-          <button key={option.value} type="button" onClick={() => setMetric(option.value)} className="rounded-full px-2 py-0.5 text-[0.68rem] font-medium transition sm:px-3 sm:py-2 sm:text-sm sm:font-black" style={{ backgroundColor: metric === option.value ? `${theme.primary}22` : 'transparent', color: metric === option.value ? theme.text : undefined, boxShadow: metric === option.value ? `inset 0 0 0 1px ${theme.primary}66` : undefined }} aria-pressed={metric === option.value}>
+          <button key={option.value} type="button" onClick={() => setMetric(option.value)} className={`rounded-full px-2 py-1 text-[0.68rem] font-semibold transition sm:px-3 sm:py-2 sm:text-sm sm:font-black ${CHART_FOCUS_CLASS}`} style={{ backgroundColor: metric === option.value ? `${theme.primary}22` : 'transparent', color: metric === option.value ? theme.text : undefined, boxShadow: metric === option.value ? `inset 0 0 0 1px ${theme.primary}66` : undefined }} aria-pressed={metric === option.value}>
             {option.label}
           </button>
         ))}
@@ -228,27 +239,27 @@ export default function CityHistoricalTrend({ cityId, cityName }: CityHistorical
       {degradedReason ? (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800" role="status">{degradedReason}</div>
       ) : !hasEnoughPointsForChart ? (
-        <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-center text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-300 sm:px-4 sm:py-6 sm:text-sm" role="status">
-          {loading ? 'Cargando historico disponible...' : getInsufficientDataCopy(metric)}
+        <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-center text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-300 sm:px-4 sm:py-6 sm:text-sm" role="status">
+          {loading ? 'Cargando histórico disponible...' : getInsufficientDataCopy(metric)}
         </div>
       ) : (
-        <div className="h-28 w-full sm:h-56" style={{ color: theme.secondary }} aria-label={`Grafica historica de ${metricConfig.label} para ${cityName}`}>
+        <div className="h-44 w-full sm:h-64" style={{ color: theme.secondary }} aria-label={`Gráfica histórica de ${metricConfig.label} para ${cityName}`}>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartPoints} margin={{ top: 8, right: 10, left: 8, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="label" tick={{ fontSize: 10 }} minTickGap={24} tickMargin={8} />
-              <YAxis tick={{ fontSize: 10 }} width={42} domain={['auto', 'auto']} tickMargin={6} />
+            <LineChart data={chartPoints} margin={{ top: 12, right: 12, left: 2, bottom: 8 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(100,116,139,0.28)" />
+              <XAxis dataKey="label" tick={axisTick} minTickGap={20} tickMargin={10} axisLine={false} tickLine={false} />
+              <YAxis tick={axisTick} width={50} domain={['auto', 'auto']} tickMargin={8} axisLine={false} tickLine={false} label={{ value: chartValueLabel, angle: -90, position: 'insideLeft', fill: MOBILE_AXIS_COLOR, fontSize: 10, offset: 6 }} />
               <Tooltip labelFormatter={(_, payload) => {
                 const point = payload?.[0]?.payload as ChartPoint | undefined;
-                return point ? formatNullableTimestamp(point.timestamp, { dateStyle: 'medium', timeStyle: range === '6m' ? undefined : 'short' }) : 'Medicion';
-              }} formatter={(value) => [`${value}${metricConfig.suffix}`, metricConfig.label]} />
+                return point ? formatNullableTimestamp(point.timestamp, { dateStyle: 'medium', timeStyle: range === '6m' ? undefined : 'short' }) : 'Medición';
+              }} formatter={(value) => [`${value}${metricConfig.suffix}`, metricConfig.label]} contentStyle={{ borderRadius: '0.875rem', borderColor: '#cbd5e1', color: '#0f172a' }} labelStyle={{ color: '#0f172a', fontWeight: 700 }} itemStyle={{ color: '#0f172a' }} />
               <Line type="monotone" dataKey="value" stroke="currentColor" strokeWidth={3} dot={range === '24h'} connectNulls={false} isAnimationActive={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>
       )}
 
-      <p className="mt-0.5 text-[0.66rem] font-medium text-slate-500 dark:text-slate-300 sm:mt-3 sm:text-sm">Basado en {getMetricCopy(metric, range)}.</p>
+      <p className="mt-2 text-[0.72rem] font-medium leading-5 text-slate-600 dark:text-slate-300 sm:mt-3 sm:text-sm">Basado en {getMetricCopy(metric, range)}. Los espacios sin punto representan datos no disponibles, no valores estimados.</p>
 
       <div className="mt-4 hidden rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/40 md:block">
         <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
@@ -262,12 +273,12 @@ export default function CityHistoricalTrend({ cityId, cityName }: CityHistorical
         </div>
 
         {pollutantSummary.length > 0 && (
-          <div className="mt-3 h-28 w-full">
+          <div className="mt-3 h-36 w-full" style={{ color: theme.secondary }}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={pollutantSummary.slice(0, 5)} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}>
-                <XAxis dataKey="pollutant" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} width={36} allowDecimals={false} />
-                <Tooltip formatter={(value) => [`${value} mediciones`, 'Frecuencia']} />
+              <BarChart data={pollutantSummary.slice(0, 5)} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                <XAxis dataKey="pollutant" tick={{ fontSize: 11, fill: DARK_AXIS_COLOR }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: DARK_AXIS_COLOR }} width={42} allowDecimals={false} axisLine={false} tickLine={false} />
+                <Tooltip formatter={(value) => [`${value} mediciones`, 'Frecuencia']} contentStyle={{ borderRadius: '0.875rem', borderColor: '#cbd5e1', color: '#0f172a' }} />
                 <Bar dataKey="count" fill="currentColor" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
