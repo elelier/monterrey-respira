@@ -259,7 +259,7 @@ export default function CityHistoricalTrend({ cityId, cityName }: CityHistorical
         </div>
       )}
 
-      <p className="mt-2 text-[0.72rem] font-medium leading-5 text-slate-600 dark:text-slate-300 sm:mt-3 sm:text-sm">Basado en {getMetricCopy(metric, range)}. Los espacios sin punto representan datos no disponibles, no valores estimados.</p>
+      <p className="mt-2 text-[0.72rem] font-medium leading-5 text-slate-600 dark:text-slate-300 sm:mt-3 sm:text-sm">Basado en {getMetricCopy(metric, range)}. La gráfica muestra solo puntos con datos disponibles; MtyRespira no estima valores faltantes.</p>
 
       <div className="mt-4 hidden rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/40 md:block">
         <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
