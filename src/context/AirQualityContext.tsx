@@ -55,7 +55,7 @@ interface AirQualityProviderProps {
   children: React.ReactNode;
 }
 
-const CACHE_KEY = 'airQualityDataCache';
+const CACHE_KEY = 'airQualityDataCache:v2-weather-context';
 const CACHE_EXPIRATION_TIME = 60 * 60 * 1000;
 
 function getRpcFailureReason(error: unknown): string {
@@ -103,6 +103,8 @@ function buildDegradedAirQualityData(city: CityOption, reason: string): AirQuali
     },
     weather_icon: null,
     main_pollutant_us: null,
+    weather_provider: null,
+    weather_timestamp: null,
   };
 }
 
@@ -183,11 +185,11 @@ function transformApiResponse(
     no2: null,
     so2: null,
     co: null,
-    temperature: cityData.temperature_c,
-    humidity: cityData.humidity_percent,
+    temperature: cityData.weather_temperature_c,
+    humidity: cityData.weather_humidity_percent,
     wind: {
-      speed: cityData.wind_speed_ms,
-      direction: cityData.wind_direction_deg,
+      speed: cityData.weather_wind_speed_kmh,
+      direction: cityData.weather_wind_direction_deg,
     },
     timestamp: cityData.reading_timestamp,
     last_successful_update_at: cityData.last_successful_update_at,
@@ -196,8 +198,10 @@ function transformApiResponse(
       latitude: cityData.latitude ?? city.latitude,
       longitude: cityData.longitude ?? city.longitude,
     },
-    weather_icon: cityData.weather_icon,
+    weather_icon: null,
     main_pollutant_us: cityData.main_pollutant_us,
+    weather_provider: cityData.weather_provider,
+    weather_timestamp: cityData.weather_timestamp,
   };
 }
 
@@ -312,10 +316,17 @@ export function AirQualityProvider({ children }: AirQualityProviderProps) {
       }
     } catch (err) {
       console.error('Error fetching air quality data:', err);
-      const degradedData = buildDegradedAirQualityData(selectedCity, getRpcFailureReason(err));
-      setAirQualityData(degradedData);
-      setTheme(getAirQualityTheme('unknown'));
-      setError('No se pudieron cargar datos de calidad del aire.');
+      const cachedRows = readCachedData();
+
+      if (cachedRows) {
+        applyTransformedData(cachedRows, selectedCity);
+        setError(`${getRpcFailureReason(err)} Mostrando la ultima lectura guardada localmente.`);
+      } else {
+        const degradedData = buildDegradedAirQualityData(selectedCity, getRpcFailureReason(err));
+        setAirQualityData(degradedData);
+        setTheme(getAirQualityTheme('unknown'));
+        setError('No se pudieron cargar datos de calidad del aire.');
+      }
     } finally {
       setLoading(false);
     }

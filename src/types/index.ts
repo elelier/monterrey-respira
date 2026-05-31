@@ -13,6 +13,13 @@ export interface CityAirQualityData {
   wind_direction_deg: number | null;
   weather_icon: string | null;
   last_successful_update_at: string | null;
+  weather_temperature_c: number | null;
+  weather_humidity_percent: number | null;
+  weather_wind_speed_kmh: number | null;
+  weather_wind_direction_deg: number | null;
+  weather_wind_gust_kmh: number | null;
+  weather_provider: string | null;
+  weather_timestamp: string | null;
 }
 
 export interface AirQualityHistoryRow {
@@ -23,6 +30,11 @@ export interface AirQualityHistoryRow {
   main_pollutant_us: string | null;
   temperature_c: number | null;
   humidity_percent: number | null;
+  weather_temperature_c: number | null;
+  weather_humidity_percent: number | null;
+  weather_wind_speed_kmh: number | null;
+  weather_timestamp: string | null;
+  weather_provider: string | null;
 }
 
 export interface AirQualityDailyHistoryRow {
@@ -33,13 +45,21 @@ export interface AirQualityDailyHistoryRow {
   max_aqi_us: number | null;
   avg_temperature_c: number | null;
   avg_humidity_percent: number | null;
+  avg_weather_temperature_c: number | null;
+  avg_weather_humidity_percent: number | null;
+  avg_weather_wind_speed_kmh: number | null;
   dominant_pollutant_us: string | null;
   reading_count: number;
+  weather_reading_count: number;
 }
 
 export type AirQualityTrend = 'rising' | 'falling' | 'stable' | 'insufficient-data';
 
-export type AirQualityHistoryMetric = 'aqi_us' | 'temperature_c' | 'humidity_percent';
+export type AirQualityHistoryMetric =
+  | 'aqi_us'
+  | 'weather_temperature_c'
+  | 'weather_humidity_percent'
+  | 'weather_wind_speed_kmh';
 
 export type AirQualityDataQuality = 'fresh' | 'degraded';
 
@@ -85,6 +105,8 @@ export interface AirQualityData {
   };
   weather_icon?: string | null;
   main_pollutant_us?: string | null;
+  weather_provider?: string | null;
+  weather_timestamp?: string | null;
 }
 
 export type AirQualityStatus =

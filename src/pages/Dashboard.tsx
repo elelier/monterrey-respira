@@ -166,22 +166,27 @@ export default function Dashboard() {
       >
         <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
           <div className="md:mr-6">
-            <h2 className="mb-2 text-[1.1rem] font-bold leading-tight sm:mb-3 sm:text-2xl">Quieres ayudar a mejorar la calidad del aire?</h2>
+            <h2 className="mb-2 text-[1.1rem] font-bold leading-tight sm:mb-3 sm:text-2xl">
+              ¿Quieres actuar por un aire más limpio?
+            </h2>
             <p className="mb-0 text-sm text-gray-600 dark:text-gray-300 sm:mb-4 sm:text-base">
-              Conoce las asociaciones y organizaciones que trabajan activamente para mejorar el aire que respiramos en Monterrey y su area metropolitana.
+              Consulta organizaciones, recursos ciudadanos y una campaña externa con opciones para firmar,
+              voluntariar o informarte sin compartir datos con MtyRespira.
             </p>
           </div>
           <Link
-            to="/asociaciones"
+            to="/asociaciones#desahogate"
             className={`inline-flex items-center rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:px-6 sm:py-3 sm:text-lg ${getStatusButtonClass()}`}
           >
-            Unete al movimiento <IoArrowForwardOutline className="ml-2" />
+            Ver formas de participar <IoArrowForwardOutline className="ml-2" />
           </Link>
         </div>
       </motion.div>
 
       <div className="mt-8">
-        <h2 className="mb-4 text-[1.05rem] font-bold sm:mb-6 sm:text-xl" style={{ color: theme?.text }}>Recursos para cuidar nuestra calidad del aire</h2>
+        <h2 className="mb-4 text-[1.05rem] font-bold sm:mb-6 sm:text-xl" style={{ color: theme?.text }}>
+          Recursos para cuidar nuestra calidad del aire
+        </h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3 sm:gap-6">
           <a
             href="https://www.who.int/es/news-room/fact-sheets/detail/ambient-(outdoor)-air-quality-and-health"
@@ -198,9 +203,11 @@ export default function Dashboard() {
                 <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full sm:mb-4 sm:h-16 sm:w-16" style={{ backgroundColor: theme?.primary }}>
                   <IoEarthOutline className="h-6 w-6 text-white sm:h-8 sm:w-8" />
                 </div>
-                <h3 className="mb-2 text-base font-semibold sm:mb-3 sm:text-lg" style={{ color: theme?.text }}>Monitoreo Ambiental</h3>
+                <h3 className="mb-2 text-base font-semibold sm:mb-3 sm:text-lg" style={{ color: theme?.text }}>
+                  Entender el AQI
+                </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Accede a datos de monitoreo ambiental y aprende a interpretar los indices de calidad del aire y su impacto en la salud.
+                  Lee una guía de salud ambiental para interpretar la contaminación del aire y sus riesgos.
                 </p>
               </div>
             </motion.div>
@@ -221,9 +228,11 @@ export default function Dashboard() {
                 <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full sm:mb-4 sm:h-16 sm:w-16" style={{ backgroundColor: theme?.primary }}>
                   <IoLeafOutline className="h-6 w-6 text-white sm:h-8 sm:w-8" />
                 </div>
-                <h3 className="mb-2 text-base font-semibold sm:mb-3 sm:text-lg" style={{ color: theme?.text }}>Acciones Cotidianas</h3>
+                <h3 className="mb-2 text-base font-semibold sm:mb-3 sm:text-lg" style={{ color: theme?.text }}>
+                  Consultar red oficial
+                </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Descubre que puedes hacer en tu dia a dia para contribuir a mejorar la calidad del aire en tu comunidad.
+                  Abre el mapa oficial de calidad del aire de Nuevo León para comparar lecturas públicas.
                 </p>
               </div>
             </motion.div>
@@ -244,9 +253,11 @@ export default function Dashboard() {
                 <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full sm:mb-4 sm:h-16 sm:w-16" style={{ backgroundColor: theme?.primary }}>
                   <IoHelpBuoyOutline className="h-6 w-6 text-white sm:h-8 sm:w-8" />
                 </div>
-                <h3 className="mb-2 text-base font-semibold sm:mb-3 sm:text-lg" style={{ color: theme?.text }}>Proteccion Personal</h3>
+                <h3 className="mb-2 text-base font-semibold sm:mb-3 sm:text-lg" style={{ color: theme?.text }}>
+                  Protegerte en mala calidad
+                </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Medidas de proteccion personal y familiar durante episodios de contaminacion elevada del aire.
+                  Revisa medidas personales y familiares para episodios de contaminación elevada.
                 </p>
               </div>
             </motion.div>

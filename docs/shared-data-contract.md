@@ -59,7 +59,7 @@ Compatibility rule: do not rename it, remove output fields, change timestamp sem
 
 ## Additive raw history RPC
 
-The frontend may consume this additive Supabase RPC for raw historical city trends up to 31 days:
+The frontend consumes this additive Supabase RPC for raw historical city trends up to 31 days:
 
 ```ts
 supabase.rpc('get_air_quality_history_for_city', {
@@ -70,10 +70,12 @@ supabase.rpc('get_air_quality_history_for_city', {
 
 Compatibility rule: this RPC is additive and must not replace or modify `get_latest_air_quality_per_city`.
 
-Manual SQL to create or replace the function:
+Weather context rule: historical temperature, humidity, and wind charts must consume the canonical Open-Meteo fields (`weather_*`). The legacy WAQI weather fields (`temperature_c`, `humidity_percent`) remain in the RPC only for backward compatibility and must not be used for new public weather charts.
+
+Current function definition:
 
 ```sql
-create or replace function public.get_air_quality_history_for_city(
+create function public.get_air_quality_history_for_city(
   p_city_id bigint,
   p_hours integer default 24
 )
@@ -84,7 +86,12 @@ returns table (
   aqi_us smallint,
   main_pollutant_us text,
   temperature_c real,
-  humidity_percent smallint
+  humidity_percent smallint,
+  weather_temperature_c real,
+  weather_humidity_percent smallint,
+  weather_wind_speed_kmh real,
+  weather_timestamp timestamptz,
+  weather_provider text
 )
 language sql
 stable
@@ -98,7 +105,12 @@ as $$
     r.aqi_us,
     r.main_pollutant_us,
     r.temperature_c,
-    r.humidity_percent
+    r.humidity_percent,
+    r.weather_temperature_c,
+    r.weather_humidity_percent,
+    r.weather_wind_speed_kmh,
+    r.weather_timestamp,
+    r.weather_provider
   from public.air_quality_readings r
   join public.cities c on c.id = r.city_id
   where c.id = p_city_id
@@ -110,9 +122,11 @@ $$;
 grant execute on function public.get_air_quality_history_for_city(bigint, integer) to anon, authenticated;
 ```
 
+Migration note: because this RPC return type changed when canonical weather fields were added, PostgreSQL requires `drop function if exists public.get_air_quality_history_for_city(bigint, integer);` before recreating it.
+
 ## Additive daily aggregate history RPC
 
-The frontend may consume this additive Supabase RPC for 6 month daily aggregates:
+The frontend consumes this additive Supabase RPC for 6 month daily aggregates:
 
 ```ts
 supabase.rpc('get_daily_air_quality_history_for_city', {
@@ -121,10 +135,12 @@ supabase.rpc('get_daily_air_quality_history_for_city', {
 })
 ```
 
-Manual SQL to create or replace the function:
+Weather context rule: 6m weather charts must consume daily canonical aggregates (`avg_weather_*`). The legacy daily fields (`avg_temperature_c`, `avg_humidity_percent`) remain in the RPC only for backward compatibility and must not be used for new public weather charts.
+
+Current function definition:
 
 ```sql
-create or replace function public.get_daily_air_quality_history_for_city(
+create function public.get_daily_air_quality_history_for_city(
   p_city_id bigint,
   p_days integer default 183
 )
@@ -136,8 +152,12 @@ returns table (
   max_aqi_us smallint,
   avg_temperature_c numeric,
   avg_humidity_percent numeric,
+  avg_weather_temperature_c numeric,
+  avg_weather_humidity_percent numeric,
+  avg_weather_wind_speed_kmh numeric,
   dominant_pollutant_us text,
-  reading_count bigint
+  reading_count bigint,
+  weather_reading_count bigint
 )
 language sql
 stable
@@ -152,7 +172,10 @@ as $$
       r.aqi_us,
       r.main_pollutant_us,
       r.temperature_c,
-      r.humidity_percent
+      r.humidity_percent,
+      r.weather_temperature_c,
+      r.weather_humidity_percent,
+      r.weather_wind_speed_kmh
     from public.air_quality_readings r
     join public.cities c on c.id = r.city_id
     where c.id = p_city_id
@@ -180,8 +203,16 @@ as $$
     max(b.aqi_us) as max_aqi_us,
     round(avg(b.temperature_c)::numeric, 1) as avg_temperature_c,
     round(avg(b.humidity_percent)::numeric, 1) as avg_humidity_percent,
+    round(avg(b.weather_temperature_c)::numeric, 1) as avg_weather_temperature_c,
+    round(avg(b.weather_humidity_percent)::numeric, 1) as avg_weather_humidity_percent,
+    round(avg(b.weather_wind_speed_kmh)::numeric, 1) as avg_weather_wind_speed_kmh,
     max(pc.main_pollutant_us) filter (where pc.pollutant_rank = 1) as dominant_pollutant_us,
-    count(*) as reading_count
+    count(*) as reading_count,
+    count(*) filter (
+      where b.weather_temperature_c is not null
+         or b.weather_humidity_percent is not null
+         or b.weather_wind_speed_kmh is not null
+    ) as weather_reading_count
   from base b
   left join pollutant_counts pc
     on pc.city_id = b.city_id
@@ -193,6 +224,8 @@ $$;
 
 grant execute on function public.get_daily_air_quality_history_for_city(bigint, integer) to anon, authenticated;
 ```
+
+Migration note: because this RPC return type changed when canonical daily weather aggregates were added, PostgreSQL requires `drop function if exists public.get_daily_air_quality_history_for_city(bigint, integer);` before recreating it.
 
 Rollback SQL:
 
@@ -221,7 +254,12 @@ The frontend expects an array compatible with this shape:
     "wind_speed_ms": 2.5,
     "wind_direction_deg": 90,
     "weather_icon": "01d",
-    "last_successful_update_at": "2026-01-01T00:03:00+00:00"
+    "last_successful_update_at": "2026-01-01T00:03:00+00:00",
+    "weather_temperature_c": 23.4,
+    "weather_humidity_percent": 45,
+    "weather_wind_speed_kmh": 9.1,
+    "weather_provider": "open-meteo",
+    "weather_timestamp": "2026-01-01T00:00:00+00:00"
   }
 ]
 ```
@@ -239,7 +277,12 @@ The raw history RPC returns rows ordered by `reading_timestamp` ascending:
     "aqi_us": 75,
     "main_pollutant_us": "p2",
     "temperature_c": 23,
-    "humidity_percent": 45
+    "humidity_percent": 45,
+    "weather_temperature_c": 23.4,
+    "weather_humidity_percent": 45,
+    "weather_wind_speed_kmh": 9.1,
+    "weather_timestamp": "2026-01-01T00:00:00+00:00",
+    "weather_provider": "open-meteo"
   }
 ]
 ```
@@ -258,8 +301,12 @@ The daily history RPC returns rows ordered by `reading_date` ascending:
     "max_aqi_us": 92,
     "avg_temperature_c": 23.1,
     "avg_humidity_percent": 45.2,
+    "avg_weather_temperature_c": 23.4,
+    "avg_weather_humidity_percent": 45.0,
+    "avg_weather_wind_speed_kmh": 9.1,
     "dominant_pollutant_us": "p2",
-    "reading_count": 24
+    "reading_count": 24,
+    "weather_reading_count": 24
   }
 ]
 ```
@@ -273,18 +320,27 @@ The daily history RPC returns rows ordered by `reading_date` ascending:
 | `api_name` | `string` | required | Upstream/provider naming value normalized through Supabase. |
 | `latitude` | `number \| null` | nullable | Frontend falls back to static city coordinates if null. |
 | `longitude` | `number \| null` | nullable | Frontend falls back to static city coordinates if null. |
-| `reading_timestamp` | `string` | required | Source measurement time. Treat as UTC. |
+| `reading_timestamp` | `string` | required | Source AQI measurement time. Treat as UTC. |
 | `reading_date` | `string` | required for daily aggregate RPC | Daily bucket date derived from `reading_timestamp`. |
 | `aqi_us` | `number \| null` | nullable | If null, frontend must degrade to `unknown`. History chart excludes null metric rows. |
-| `avg_aqi_us` | `number \| null` | nullable | Daily aggregate average. |
-| `max_aqi_us` | `number \| null` | nullable | Daily aggregate max. |
+| `avg_aqi_us` | `number \| null` | nullable | Daily aggregate AQI average. |
+| `max_aqi_us` | `number \| null` | nullable | Daily aggregate AQI max. |
 | `main_pollutant_us` | `string \| null` | nullable | Dominant pollutant marker, not pollutant concentration. |
 | `dominant_pollutant_us` | `string \| null` | nullable | Daily dominant pollutant marker, not pollutant concentration. |
-| `temperature_c` | `number \| null` | nullable | UI shows `N/D` if missing. |
-| `avg_temperature_c` | `number \| null` | nullable | Daily aggregate average. |
-| `humidity_percent` | `number \| null` | nullable | UI shows `N/D` if missing. |
-| `avg_humidity_percent` | `number \| null` | nullable | Daily aggregate average. |
-| `wind_speed_ms` | `number \| null` | nullable | UI shows `N/D` if missing. |
+| `temperature_c` | `number \| null` | nullable | Legacy WAQI weather field; keep for compatibility, do not use for new public weather charts. |
+| `avg_temperature_c` | `number \| null` | nullable | Legacy daily weather average; keep for compatibility, do not use for new public weather charts. |
+| `humidity_percent` | `number \| null` | nullable | Legacy WAQI weather field; keep for compatibility, do not use for new public weather charts. |
+| `avg_humidity_percent` | `number \| null` | nullable | Legacy daily weather average; keep for compatibility, do not use for new public weather charts. |
+| `weather_temperature_c` | `number \| null` | nullable | Canonical Open-Meteo temperature for latest/raw history UI. |
+| `weather_humidity_percent` | `number \| null` | nullable | Canonical Open-Meteo humidity for latest/raw history UI. |
+| `weather_wind_speed_kmh` | `number \| null` | nullable | Canonical Open-Meteo wind speed in km/h for latest/raw history UI. |
+| `weather_timestamp` | `string \| null` | nullable | Weather measurement time. Treat as UTC. |
+| `weather_provider` | `string \| null` | nullable | Expected current value: `open-meteo`. |
+| `avg_weather_temperature_c` | `number \| null` | nullable | Canonical daily average temperature for 6m chart. |
+| `avg_weather_humidity_percent` | `number \| null` | nullable | Canonical daily average humidity for 6m chart. |
+| `avg_weather_wind_speed_kmh` | `number \| null` | nullable | Canonical daily average wind speed in km/h for 6m chart. |
+| `weather_reading_count` | `number` | required for daily aggregate RPC | Number of rows in the daily bucket with at least one canonical weather field. |
+| `wind_speed_ms` | `number \| null` | nullable | Legacy latest payload field. UI shows `N/D` if missing. |
 | `wind_direction_deg` | `number \| null` | nullable | UI hides icon rotation if missing. |
 | `weather_icon` | `string \| null` | nullable | UI hides weather icon if missing. |
 | `last_successful_update_at` | `string \| null` | nullable | Pipeline write success time. Treat as UTC. |
@@ -300,13 +356,15 @@ Confirmed product cadence:
 
 Rules:
 
-- `reading_timestamp` is measurement time.
+- `reading_timestamp` is AQI measurement time.
+- `weather_timestamp` is weather context measurement time.
 - `last_successful_update_at` is pipeline write success time.
 - The UI must not imply stronger freshness than the hourly producer cadence.
 - If data is missing, stale, nullable in critical fields, or contract-invalid, the frontend must fail closed to an explicit degraded/unknown state.
 - Historical charts are based only on stored measurements available in `air_quality_readings`; gaps are allowed and must not be filled with invented zeroes.
 - 24h, 7d, and 30d use raw readings by `reading_timestamp`.
 - 6m uses daily aggregates to avoid heavy mobile chart rendering.
+- Weather history charts must not fallback from canonical `weather_*` fields to legacy WAQI fields.
 
 ## Pollutant data limitation
 
@@ -330,6 +388,7 @@ Allowed:
 - Missing `aqi_us` in latest RPC -> `status: 'unknown'`, `dataQuality: 'degraded'`.
 - Missing secondary weather fields -> show `N/D`, not invented values.
 - Missing or unavailable history RPC -> hide the chart and show a small degraded history state while preserving the latest dashboard.
+- Missing canonical weather history values -> show a clear insufficient-data state for that weather metric.
 
 Prohibited:
 
@@ -337,7 +396,7 @@ Prohibited:
 - Do not represent missing data as AQI `0`.
 - Do not label a client refresh as a new upstream measurement.
 - Do not match cities by name when `city_id` is available.
-- Do not fallback historical charts to random, mocked, or zero-filled series.
+- Do not fallback historical charts to random, mocked, zero-filled, or legacy weather series.
 - Do not switch to AirVisual/IQAir silently to mask WAQI/AQICN failure.
 
 ## Release checklist for contract-affecting changes
