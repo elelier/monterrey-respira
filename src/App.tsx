@@ -6,6 +6,7 @@ import Asociaciones from './pages/Asociaciones';
 import AcercaDe from './pages/AcercaDe';
 import DatosYApis from './pages/DatosYApis';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import RouteMetadata from './components/RouteMetadata';
 import './App.css';
 
 // Componente que se asegura de que la página se desplace hacia arriba al navegar
@@ -33,6 +34,7 @@ function ScrollToTop() {
 function App() {
   return (
     <Router>
+      <RouteMetadata />
       <ScrollToTop />
       <AirQualityProvider>
         <Routes>
