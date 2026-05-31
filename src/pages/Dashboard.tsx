@@ -266,8 +266,7 @@ export default function Dashboard() {
               <a href="https://aqicn.org/api/" target="_blank" rel="noopener noreferrer" className={`ml-1 hover:underline ${getStatusBorderClass().replace('border-', 'text-')}`}>Ver API</a>
             </li>
             <li>
-              <strong>Open-Meteo:</strong> Fuente meteorologica para contexto de clima cuando esta disponible.
-              <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" className={`ml-1 hover:underline ${getStatusBorderClass().replace('border-', 'text-')}`}>Ver fuente</a>
+              <strong>Campos meteorologicos:</strong> Se muestran como contexto cuando vienen en la lectura disponible.
             </li>
           </ul>
 

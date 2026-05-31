@@ -30,7 +30,7 @@ export default function AcercaDe() {
             <div className="p-6">
               <h2 className="text-xl font-semibold mb-4 text-amber-700 dark:text-amber-400">¿Cómo funciona?</h2>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
-                MonterreyRespira consume lecturas normalizadas desde Supabase. El AQI proviene de WAQI/AQICN y el contexto de clima puede venir de Open-Meteo cuando está disponible.
+                MonterreyRespira consume lecturas normalizadas desde Supabase. El AQI proviene de WAQI/AQICN y los campos meteorológicos se presentan como contexto cuando vienen en la lectura reportada.
               </p>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
                 La plataforma presenta el Índice de Calidad del Aire (AQI), contaminante dominante cuando existe y recomendaciones generales según el estado reportado.

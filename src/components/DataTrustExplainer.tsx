@@ -6,8 +6,6 @@ interface DataTrustExplainerProps {
 }
 
 const AQICN_API_URL = 'https://aqicn.org/api/';
-const OPEN_METEO_URL = 'https://open-meteo.com/';
-
 const trustPoints = [
   {
     icon: IoAnalyticsOutline,
@@ -17,7 +15,7 @@ const trustPoints = [
   {
     icon: IoCloudOutline,
     title: 'Clima disponible',
-    body: 'El contexto de clima viene de Open-Meteo cuando hay datos disponibles para la lectura.',
+    body: 'Los campos meteorológicos se muestran como contexto cuando llegan en la lectura reportada.',
   },
   {
     icon: IoTimeOutline,
@@ -108,7 +106,7 @@ export default function DataTrustExplainer({ variant = 'full' }: DataTrustExplai
                 MtyRespira no escribe ni corrige valores ambientales desde el navegador.
               </p>
               <p>
-                AQI: WAQI/AQICN. Clima: Open-Meteo cuando está disponible. Los proveedores externos pueden retrasarse,
+                AQI: WAQI/AQICN. Los campos de clima pueden retrasarse,
                 omitir campos o degradar su servicio.
               </p>
               <div className="flex flex-wrap gap-3 pt-1">
@@ -119,14 +117,6 @@ export default function DataTrustExplainer({ variant = 'full' }: DataTrustExplai
                   className="inline-flex rounded-lg border border-amber-300 px-3 py-2 text-sm font-semibold text-amber-800 transition hover:bg-amber-50 dark:border-amber-700 dark:text-amber-200 dark:hover:bg-amber-900/30"
                 >
                   WAQI/AQICN
-                </a>
-                <a
-                  href={OPEN_METEO_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex rounded-lg border border-amber-300 px-3 py-2 text-sm font-semibold text-amber-800 transition hover:bg-amber-50 dark:border-amber-700 dark:text-amber-200 dark:hover:bg-amber-900/30"
-                >
-                  Open-Meteo
                 </a>
               </div>
             </div>
