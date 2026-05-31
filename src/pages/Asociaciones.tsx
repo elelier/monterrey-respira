@@ -155,17 +155,71 @@ export default function Asociaciones() {
   return (
     <Layout>
       <div className="mx-auto max-w-7xl">
-        <div className={`${getHeaderColorClass()} mb-12 rounded-lg px-8 py-12 text-white shadow-lg`}>
-          <h1 className="mb-4 text-3xl font-bold md:text-5xl">¡Únete al movimiento por un aire más limpio!</h1>
+        <div className={`${getHeaderColorClass()} mb-12 rounded-lg px-6 py-10 text-white shadow-lg sm:px-8 sm:py-12`}>
+          <h1 className="mb-4 text-3xl font-bold md:text-5xl">Participa por un aire más limpio</h1>
           <p className="mb-8 max-w-3xl text-lg md:text-xl">
-            Estas organizaciones trabajan activamente para mejorar la calidad del aire en Monterrey y su área metropolitana. Conoce su labor y descubre cómo puedes contribuir a esta importante causa.
+            Explora organizaciones, recursos ciudadanos y una campaña externa para pasar de consultar
+            datos a tomar acción informada por la calidad del aire en Nuevo León.
           </p>
           <a
             href="#desahogate"
-            className="inline-flex items-center rounded-md bg-white px-6 py-3 font-semibold text-blue-600 shadow-md transition-colors hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-amber-500"
+            className="inline-flex items-center rounded-md bg-white px-5 py-3 text-sm font-semibold text-blue-600 shadow-md transition-colors hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-amber-500 sm:px-6 sm:text-base"
           >
-            ¿Cómo puedo ayudar? <IoArrowForwardOutline className="ml-2" />
+            Ver campaña ciudadana <IoArrowForwardOutline className="ml-2" />
           </a>
+        </div>
+
+        <motion.section
+          id="desahogate"
+          className="mb-12 scroll-mt-24 overflow-hidden rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-sky-50 p-6 shadow-lg dark:border-amber-700/50 dark:from-slate-800 dark:via-slate-800 dark:to-slate-900"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
+        >
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div className="max-w-3xl">
+              <p className="mb-2 text-xs font-black uppercase tracking-[0.24em] text-amber-700 dark:text-amber-300">
+                Acción ciudadana externa
+              </p>
+              <h2 className="mb-3 text-2xl font-black text-slate-950 dark:text-white md:text-3xl">
+                Desahógate: Consulta Pública por el aire limpio en Nuevo León
+              </h2>
+              <p className="text-sm leading-6 text-slate-700 dark:text-slate-300 md:text-base">
+                Consulta puntos para firmar, voluntariado, documentos y preguntas frecuentes publicados por
+                la campaña ciudadana. MtyRespira solo referencia este recurso para facilitar participación informada.
+              </p>
+            </div>
+            <a
+              href="https://linktr.ee/sisepuedenuevoleon"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex shrink-0 items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white shadow-md transition hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200"
+            >
+              Abrir opciones de participación <IoArrowForwardOutline className="ml-2" />
+            </a>
+          </div>
+          <p className="mt-4 text-xs text-slate-500 dark:text-slate-400">
+            Referencia ciudadana externa. MtyRespira no procesa firmas ni datos personales de esta campaña
+            y no afirma afiliación formal con sus organizadores.
+          </p>
+        </motion.section>
+
+        <div className="mb-12 rounded-lg bg-green-50 p-6 dark:bg-green-900/20 sm:p-8">
+          <h2 className="mb-4 text-2xl font-bold text-green-800 dark:text-green-400">Tres formas claras de contribuir</h2>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            <motion.div whileHover={{ scale: 1.03 }} transition={{ type: 'spring', stiffness: 300 }} className="rounded-lg bg-white p-6 shadow dark:bg-slate-800">
+              <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Infórmate</h3>
+              <p className="text-gray-600 dark:text-gray-300">Consulta lecturas disponibles, revisa fuentes oficiales y comparte información verificable con tu comunidad.</p>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.03 }} transition={{ type: 'spring', stiffness: 300 }} className="rounded-lg bg-white p-6 shadow dark:bg-slate-800">
+              <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Participa</h3>
+              <p className="text-gray-600 dark:text-gray-300">Revisa campañas, eventos o convocatorias publicadas por organizaciones y colectivos ciudadanos.</p>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.03 }} transition={{ type: 'spring', stiffness: 300 }} className="rounded-lg bg-white p-6 shadow dark:bg-slate-800">
+              <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Conecta</h3>
+              <p className="text-gray-600 dark:text-gray-300">Visita los canales públicos de cada organización para conocer necesidades, voluntariado o donativos.</p>
+            </motion.div>
+          </div>
         </div>
 
         <div className="mb-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-2">
@@ -267,7 +321,7 @@ export default function Asociaciones() {
                           rel="noopener noreferrer"
                           className="flex items-center text-sm transition-colors hover:text-blue-500"
                         >
-                          Sitio Web <IoArrowForwardOutline className="ml-1 opacity-0 transition-opacity group-hover:opacity-100" />
+                          Sitio oficial <IoArrowForwardOutline className="ml-1 opacity-0 transition-opacity group-hover:opacity-100" />
                         </a>
                       </div>
                     )}
@@ -275,74 +329,25 @@ export default function Asociaciones() {
                 </div>
               </div>
 
-              <motion.div
-                className={`${getHeaderColorClass()} px-6 py-4 text-white`}
-                whileHover={{ scale: 1.02 }}
-                transition={{ type: 'spring', stiffness: 500 }}
-              >
-                <a
-                  href={asociacion.sitioWeb}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between font-medium text-white"
+              {asociacion.sitioWeb && (
+                <motion.div
+                  className={`${getHeaderColorClass()} px-6 py-4 text-white`}
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ type: 'spring', stiffness: 500 }}
                 >
-                  <span>Visitar organización</span>
-                  <IoArrowForwardOutline className="ml-2" />
-                </a>
-              </motion.div>
+                  <a
+                    href={asociacion.sitioWeb}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between font-medium text-white"
+                  >
+                    <span>Conocer su trabajo</span>
+                    <IoArrowForwardOutline className="ml-2" />
+                  </a>
+                </motion.div>
+              )}
             </motion.div>
           ))}
-        </div>
-
-        <motion.section
-          id="desahogate"
-          className="mb-12 scroll-mt-24 overflow-hidden rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-sky-50 p-6 shadow-lg dark:border-amber-700/50 dark:from-slate-800 dark:via-slate-800 dark:to-slate-900"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-        >
-          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-            <div className="max-w-3xl">
-              <p className="mb-2 text-xs font-black uppercase tracking-[0.24em] text-amber-700 dark:text-amber-300">
-                Campaña ciudadana activa
-              </p>
-              <h2 className="mb-3 text-2xl font-black text-slate-950 dark:text-white md:text-3xl">
-                Desahógate: Consulta Pública por el aire limpio en Nuevo León
-              </h2>
-              <p className="text-sm leading-6 text-slate-700 dark:text-slate-300 md:text-base">
-                Si quieres pasar de informarte a participar, esta campaña reúne puntos para firmar, voluntariado, documentos y preguntas frecuentes sobre la consulta pública por el aire limpio.
-              </p>
-            </div>
-            <a
-              href="https://linktr.ee/sisepuedenuevoleon"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex shrink-0 items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white shadow-md transition hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200"
-            >
-              Ver cómo participar <IoArrowForwardOutline className="ml-2" />
-            </a>
-          </div>
-          <p className="mt-4 text-xs text-slate-500 dark:text-slate-400">
-            Referencia ciudadana externa. MtyRespira no procesa firmas ni datos personales de esta campaña.
-          </p>
-        </motion.section>
-
-        <div className="mb-12 rounded-lg bg-green-50 p-8 dark:bg-green-900/20">
-          <h2 className="mb-4 text-2xl font-bold text-green-800 dark:text-green-400">¿Cómo puedo contribuir?</h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            <motion.div whileHover={{ scale: 1.03 }} transition={{ type: 'spring', stiffness: 300 }} className="rounded-lg bg-white p-6 shadow dark:bg-slate-800">
-              <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Infórmate</h3>
-              <p className="text-gray-600 dark:text-gray-300">Conoce la situación de la calidad del aire en tu ciudad y comparte información confiable con tu comunidad.</p>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.03 }} transition={{ type: 'spring', stiffness: 300 }} className="rounded-lg bg-white p-6 shadow dark:bg-slate-800">
-              <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Participa en actividades</h3>
-              <p className="text-gray-600 dark:text-gray-300">Únete a jornadas de reforestación, talleres de concientización y eventos organizados por estas asociaciones.</p>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.03 }} transition={{ type: 'spring', stiffness: 300 }} className="rounded-lg bg-white p-6 shadow dark:bg-slate-800">
-              <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Dona o voluntariza</h3>
-              <p className="text-gray-600 dark:text-gray-300">Apoya con recursos económicos o tu tiempo como voluntario para fortalecer estas iniciativas ciudadanas.</p>
-            </motion.div>
-          </div>
         </div>
       </div>
     </Layout>
