@@ -139,7 +139,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-2 lg:grid-cols-3 lg:gap-6">
+      <div id="datos" className="grid scroll-mt-24 grid-cols-1 gap-2 lg:grid-cols-3 lg:gap-6">
         <div className="flex flex-col gap-2 lg:col-span-2 lg:gap-6">
           <AirQualityCard data={airQualityData} />
           <CityHistoricalTrend cityId={selectedCity.city_id} cityName={selectedCity.name} />
@@ -262,28 +262,6 @@ export default function Dashboard() {
               </div>
             </motion.div>
           </a>
-        </div>
-      </div>
-
-      <div className="mt-8 rounded-2xl bg-white p-4 shadow-lg dark:bg-slate-800 sm:mt-6 sm:p-6">
-        <h2 className="mb-3 text-[1.05rem] font-bold text-gray-900 dark:text-white sm:mb-4 sm:text-xl">Fuentes de Datos</h2>
-
-        <div className="text-sm text-gray-600 dark:text-gray-400">
-          <p>Esta aplicacion muestra lecturas disponibles de proveedores externos y las presenta con estados de frescura.</p>
-
-          <ul className="mt-3 list-disc space-y-2 pl-5">
-            <li>
-              <strong>WAQI/AQICN:</strong> Proveedor activo para lecturas AQI de estaciones verificadas.
-              <a href="https://aqicn.org/api/" target="_blank" rel="noopener noreferrer" className={`ml-1 hover:underline ${getStatusBorderClass().replace('border-', 'text-')}`}>Ver API</a>
-            </li>
-            <li>
-              <strong>Campos meteorologicos:</strong> Se muestran como contexto cuando vienen en la lectura disponible.
-            </li>
-          </ul>
-
-          <p className={`mt-4 rounded-lg p-3 ${getStatusButtonClass().replace('bg-', 'bg-').replace('hover:bg-', 'bg-').replace('text-white', `bg-opacity-10 ${getStatusBorderClass().replace('border-', 'text-')}`)}`}>
-            La tarjeta principal muestra la hora de medicion y la ultima actualizacion del pipeline cuando aplica. Los datos externos pueden retrasarse, faltar o llegar con campos ausentes.
-          </p>
         </div>
       </div>
     </Layout>
