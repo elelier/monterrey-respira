@@ -34,7 +34,6 @@ function ScrollToTop() {
 function App() {
   return (
     <Router>
-      <RouteMetadata />
       <ScrollToTop />
       <AirQualityProvider>
         <Routes>
@@ -44,6 +43,7 @@ function App() {
           <Route path="/datos-y-apis" element={<DatosYApis />} />
           <Route path="/politica-de-privacidad" element={<PrivacyPolicy />} />
         </Routes>
+        <RouteMetadata />
       </AirQualityProvider>
     </Router>
   );
