@@ -6,6 +6,7 @@ import Asociaciones from './pages/Asociaciones';
 import AcercaDe from './pages/AcercaDe';
 import DatosYApis from './pages/DatosYApis';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import RouteMetadata from './components/RouteMetadata';
 import './App.css';
 
 // Componente que se asegura de que la página se desplace hacia arriba al navegar
@@ -42,6 +43,7 @@ function App() {
           <Route path="/datos-y-apis" element={<DatosYApis />} />
           <Route path="/politica-de-privacidad" element={<PrivacyPolicy />} />
         </Routes>
+        <RouteMetadata />
       </AirQualityProvider>
     </Router>
   );

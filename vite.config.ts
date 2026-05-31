@@ -11,6 +11,13 @@ export default defineConfig({
     assetsInlineLimit: 4096,
     sourcemap: true,
     rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        acercaDe: resolve(__dirname, 'acerca-de/index.html'),
+        datosYApis: resolve(__dirname, 'datos-y-apis/index.html'),
+        asociaciones: resolve(__dirname, 'asociaciones/index.html'),
+        politicaDePrivacidad: resolve(__dirname, 'politica-de-privacidad/index.html'),
+      },
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
