@@ -4,7 +4,7 @@ import { useAirQuality } from '../context/AirQualityContext';
 import { getMainLogoIcon, getPollutantInfo } from '../utils/airQualityUtils';
 import { AQI_STATUS_SHARE_LABELS } from '../utils/aqiDesignTokens';
 import { Link, useLocation } from 'react-router-dom';
-import { IoHomeOutline, IoInformationCircleOutline, IoLayersOutline, IoLinkOutline, IoMenuOutline, IoShareOutline } from 'react-icons/io5';
+import { IoHomeOutline, IoLayersOutline, IoLinkOutline, IoMenuOutline, IoShareOutline } from 'react-icons/io5';
 import { Metadata } from './seo/Metadata';
 import { Analytics } from './seo/Analytics';
 import { getCitySlug } from '../utils/cityRoutingUtils';
@@ -54,10 +54,12 @@ export default function Layout({ children }: LayoutProps) {
   const { theme, airQualityData, selectedCity } = useAirQuality();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const currentYear = new Date().getFullYear();
 
   // Obtener la ciudad actual para el mensaje de compartir.
   const currentCity = selectedCity.name;
   const shareDescription = buildCitySnapshotShareDescription(currentCity, airQualityData);
+  const closeMobileMenu = () => setMobileMenuOpen(false);
 
   const submitShareSignal = (shareMethod: CityShareMethod) => {
     const shareableAqi = airQualityData && hasReliableAqi(airQualityData)
@@ -197,7 +199,7 @@ export default function Layout({ children }: LayoutProps) {
                 </motion.div>
                 <div className="logo-container">
                   <h1 className={`${theme ? 'text-white' : 'text-black'} text-[1.2rem] font-bold leading-tight transition-colors duration-500 sm:text-2xl sm:font-black`}>MonterreyRespira</h1>
-                  <span className={`${theme ? 'text-slate-200' : 'text-gray-600'} text-xs sm:text-sm hidden sm:block transition-colors duration-500`}>Calidad del aire disponible</span>
+                  <span className={`${theme ? 'text-slate-200' : 'text-gray-600'} text-xs sm:text-sm hidden sm:block transition-colors duration-500`}>Lecturas disponibles del aire</span>
                 </div>
               </Link>
             </motion.div>
@@ -220,7 +222,7 @@ export default function Layout({ children }: LayoutProps) {
                 to="/datos-y-apis#metodologia-y-limites"
                 className={`px-3 py-2 rounded-md ${location.pathname === '/datos-y-apis' ? 'bg-white/20' : 'hover:bg-white/10'} text-white transition-colors`}
               >
-                Fuentes
+                Datos y fuentes
               </Link>
               <Link
                 to="/asociaciones"
@@ -304,19 +306,22 @@ export default function Layout({ children }: LayoutProps) {
               className="md:hidden border-t border-gray-200 dark:border-gray-700"
             >
               <nav className="px-4 py-2 rounded-md bg-white text-black">
-                <Link to="/" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
+                <Link to="/" onClick={closeMobileMenu} className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
                   Inicio
                 </Link>
-                <Link to="/acerca-de" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
+                <Link to="/acerca-de" onClick={closeMobileMenu} className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
                   Acerca de
                 </Link>
-                <Link to="/datos-y-apis#metodologia-y-limites" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
-                  Fuentes y metodología
+                <Link to="/datos-y-apis#metodologia-y-limites" onClick={closeMobileMenu} className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
+                  Datos, fuentes y metodología
                 </Link>
-                <Link to="/asociaciones" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
+                <Link to="/asociaciones" onClick={closeMobileMenu} className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
                   Asociaciones
                 </Link>
-                <Link to="/politica-de-privacidad" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
+                <Link to="/asociaciones#desahogate" onClick={closeMobileMenu} className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
+                  Acción ciudadana
+                </Link>
+                <Link to="/politica-de-privacidad" onClick={closeMobileMenu} className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
                   Política de Privacidad
                 </Link>
               </nav>
@@ -329,46 +334,40 @@ export default function Layout({ children }: LayoutProps) {
         </main>
 
         <footer className="container mx-auto py-6 md:py-8 px-4 sm:px-6 lg:px-8 text-center text-gray-500 dark:text-gray-400 text-sm">
-          <div className="space-y-2">
-            <p className="text-xs sm:text-sm">MonterreyRespira {new Date().getFullYear()} - Lecturas disponibles de calidad del aire en Monterrey, Nuevo León</p>
-            <div className="hidden md:block">
+          <div className="space-y-3">
+            <p className="text-xs sm:text-sm">MonterreyRespira {currentYear} - Lecturas disponibles de calidad del aire en Monterrey, Nuevo León</p>
+            <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2" aria-label="Enlaces secundarios">
+              <Link
+                to="/"
+                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+              >
+                Inicio
+              </Link>
               <Link
                 to="/acerca-de"
                 className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
               >
                 Acerca de
               </Link>
-              {' · '}
               <Link
                 to="/datos-y-apis#metodologia-y-limites"
                 className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
               >
-                Fuentes y metodología
+                Datos y metodología
               </Link>
-              {' · '}
               <Link
                 to="/asociaciones"
                 className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
               >
                 Asociaciones
               </Link>
-              {' · '}
               <Link
                 to="/politica-de-privacidad"
                 className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
               >
                 Política de Privacidad
               </Link>
-              {' · '}
-              <a
-                href="https://ko-fi.com/Y8Y11CCJPV"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
-              >
-                Apoya con un Cafecito
-              </a>
-            </div>
+            </nav>
             <div className="mt-2">
               <a
                 href="https://ko-fi.com/Y8Y11CCJPV"
@@ -388,34 +387,30 @@ export default function Layout({ children }: LayoutProps) {
 
         {/* Mobile bottom navigation */}
         <div className="fixed bottom-0 left-0 right-0 z-40 rounded-t-[1.5rem] border-t border-gray-200 bg-white/95 shadow-[0_-14px_35px_rgba(15,23,42,0.16)] backdrop-blur-md dark:border-slate-700 dark:bg-slate-900/95 md:hidden">
-          <div className="grid h-14 grid-cols-4">
+          <div className="grid h-14 grid-cols-3">
             <Link
               to="/"
+              aria-label="Ir al inicio"
               className={`flex flex-col items-center justify-center ${location.pathname === '/' ? getBottomNavActiveClass() : 'text-gray-500'}`}
             >
               <IoHomeOutline className="mb-0.5 text-lg" />
               <span className="text-[0.68rem]">Inicio</span>
             </Link>
             <Link
-              to="/acerca-de"
-              className={`flex flex-col items-center justify-center ${location.pathname === '/acerca-de' ? getBottomNavActiveClass() : 'text-gray-500'}`}
-            >
-              <IoInformationCircleOutline className="mb-0.5 text-lg" />
-              <span className="text-[0.68rem]">Acerca de</span>
-            </Link>
-            <Link
               to="/datos-y-apis#metodologia-y-limites"
+              aria-label="Ver datos, fuentes y metodología"
               className={`flex flex-col items-center justify-center ${location.pathname === '/datos-y-apis' ? getBottomNavActiveClass() : 'text-gray-500'}`}
             >
               <IoLayersOutline className="mb-0.5 text-lg" />
-              <span className="text-[0.68rem]">Fuentes</span>
+              <span className="text-[0.68rem]">Datos</span>
             </Link>
             <Link
-              to="/asociaciones"
+              to="/asociaciones#desahogate"
+              aria-label="Ver acciones ciudadanas"
               className={`flex flex-col items-center justify-center ${location.pathname === '/asociaciones' ? getBottomNavActiveClass() : 'text-gray-500'}`}
             >
               <IoLinkOutline className="mb-0.5 text-lg" />
-              <span className="text-[0.68rem]">Enlaces</span>
+              <span className="text-[0.68rem]">Acción</span>
             </Link>
           </div>
         </div>
