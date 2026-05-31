@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import Layout from '../components/Layout';
 import { useAirQuality } from '../context/AirQualityContext';
 import {
@@ -16,7 +15,6 @@ interface Asociacion {
   id: string;
   nombre: string;
   descripcion: string;
-  imagen: string;
   initials: string;
   sitioWeb?: string;
   redes: {
@@ -36,7 +34,6 @@ const asociaciones: Asociacion[] = [
     nombre: 'Fondo Ambiental Metropolitano de Monterrey',
     descripcion:
       'Organismo de carácter técnico y apolítico que trabaja en la generación y divulgación de información y propuestas para mejorar el entorno, incluyendo la calidad del aire en Nuevo León.',
-    imagen: 'https://ext.same-assets.com/809496781/1621669398.png',
     initials: 'FAMM',
     sitioWeb: 'http://famm.mx/',
     redes: {
@@ -53,7 +50,6 @@ const asociaciones: Asociacion[] = [
     nombre: 'Observatorio Ciudadano de Calidad del Aire',
     descripcion:
       'Organización civil dedicada a generar esfuerzos colaborativos y fundamento técnico para mejorar la calidad del aire en Nuevo León.',
-    imagen: 'https://ext.same-assets.com/2406198699/849522504.png',
     initials: 'OCCA',
     sitioWeb: 'https://www.observatoriodelaire.com/',
     redes: {
@@ -70,7 +66,6 @@ const asociaciones: Asociacion[] = [
     nombre: 'Alianza del Aire Nuevo León',
     descripcion:
       'Movimiento de organizaciones y ciudadanía preocupada por la contaminación del aire en Nuevo León, exigiendo acciones concretas para reducir la contaminación.',
-    imagen: 'https://ext.same-assets.com/4226829879/4201505317.png',
     initials: 'AANL',
     sitioWeb: 'https://www.alianzadelaire.org/',
     redes: {
@@ -86,7 +81,6 @@ const asociaciones: Asociacion[] = [
     nombre: 'Reforestación Extrema A.C.',
     descripcion:
       'Asociación civil que busca recuperar la capa vegetal urbana pública con acciones de protección al arbolado existente y sensibilización sobre su importancia para la calidad del aire.',
-    imagen: 'https://ext.same-assets.com/2180505901/826141865.jpeg',
     initials: 'RE',
     sitioWeb: 'https://www.facebook.com/reforestacionextrema',
     redes: {
@@ -100,7 +94,6 @@ const asociaciones: Asociacion[] = [
 
 export default function Asociaciones() {
   const { theme } = useAirQuality();
-  const [brokenImages, setBrokenImages] = useState<Record<string, boolean>>({});
 
   const getHeaderColorClass = () => {
     if (!theme) return 'bg-gradient-to-r from-blue-600 to-teal-500';
@@ -126,29 +119,13 @@ export default function Asociaciones() {
   const truncateText = (text: string, maxLength: number) =>
     text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
 
-  const markImageAsBroken = (id: string) => {
-    setBrokenImages((current) => ({ ...current, [id]: true }));
-  };
-
   const renderLogo = (asociacion: Asociacion) => (
-    <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full border-2 border-white bg-slate-100 shadow-md dark:bg-slate-700">
-      {brokenImages[asociacion.id] ? (
-        <div
-          className="flex h-full w-full items-center justify-center bg-gradient-to-br from-sky-100 to-emerald-100 px-2 text-center text-sm font-black leading-none text-slate-700 dark:from-slate-700 dark:to-slate-600 dark:text-white"
-          aria-label={`Identificador visual de ${asociacion.nombre}`}
-        >
-          {asociacion.initials}
-        </div>
-      ) : (
-        <img
-          src={asociacion.imagen}
-          alt={`Logo de ${asociacion.nombre}`}
-          className="h-full w-full object-contain p-1"
-          loading="lazy"
-          referrerPolicy="no-referrer"
-          onError={() => markImageAsBroken(asociacion.id)}
-        />
-      )}
+    <div
+      className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-white/70 bg-gradient-to-br from-sky-100 via-white to-emerald-100 px-2 text-center text-sm font-black leading-none text-slate-700 shadow-md ring-1 ring-slate-200 dark:border-slate-600 dark:from-slate-700 dark:via-slate-800 dark:to-slate-700 dark:text-white dark:ring-slate-600"
+      aria-label={`Identificador visual de ${asociacion.nombre}`}
+      title={asociacion.nombre}
+    >
+      {asociacion.initials}
     </div>
   );
 
@@ -222,24 +199,29 @@ export default function Asociaciones() {
           </div>
         </div>
 
-        <div className="mb-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-2">
+        <div className="mb-12 grid grid-cols-1 gap-8 md:grid-cols-2">
           {asociaciones.map((asociacion) => (
             <motion.div
               key={asociacion.id}
-              className="flex flex-col overflow-hidden rounded-lg bg-white shadow-lg dark:bg-slate-800"
+              className="flex h-full min-h-[25rem] flex-col overflow-hidden rounded-2xl bg-white shadow-lg ring-1 ring-slate-100 dark:bg-slate-800 dark:ring-slate-700"
               whileHover={{ y: -5 }}
               transition={{ type: 'spring', stiffness: 300 }}
             >
               <div className={`${getHeaderColorClass()} h-2`} />
 
-              <div className="flex-1 p-6">
+              <div className="flex flex-1 flex-col p-6">
                 <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
-                  <div className="flex items-center">
+                  <div className="flex min-w-0 items-center gap-4">
                     {renderLogo(asociacion)}
-                    <h2 className="ml-4 text-xl font-bold text-gray-900 dark:text-white">{asociacion.nombre}</h2>
+                    <div className="min-w-0">
+                      <h2 className="text-xl font-bold leading-tight text-gray-900 dark:text-white">{asociacion.nombre}</h2>
+                      <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                        Referencia pública
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="mt-2 flex space-x-3 sm:mt-0">
+                  <div className="flex shrink-0 space-x-3 sm:mt-0">
                     {asociacion.redes.facebook && (
                       <motion.a
                         href={asociacion.redes.facebook}
@@ -282,7 +264,7 @@ export default function Asociaciones() {
                   </div>
                 </div>
 
-                <p className="mb-6 text-sm text-gray-600 dark:text-gray-300">{asociacion.descripcion}</p>
+                <p className="mb-6 flex-1 text-sm leading-6 text-gray-600 dark:text-gray-300">{asociacion.descripcion}</p>
 
                 <div className="border-t border-gray-200 pt-4 dark:border-gray-700">
                   <div className="flex flex-wrap gap-3">
@@ -349,6 +331,12 @@ export default function Asociaciones() {
             </motion.div>
           ))}
         </div>
+
+        <p className="mb-12 rounded-xl border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+          Los identificadores de organizaciones se muestran como iniciales propias de MtyRespira para evitar
+          imágenes rotas o dependencias externas. Si se alojan logotipos oficiales en el futuro, deberá existir
+          permiso o una fuente pública verificable antes de agregarlos al repositorio.
+        </p>
       </div>
     </Layout>
   );
