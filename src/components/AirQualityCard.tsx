@@ -14,7 +14,7 @@ import {
   IoTimeOutline,
   IoWarningOutline,
 } from 'react-icons/io5';
-import { AirQualityData, AirQualityStatus } from '../types';
+import { AirQualityData, AirQualityStatus, MeasurementFreshness } from '../types';
 import {
   getHumidityIcon,
   getMainPollutantIcon,
@@ -28,7 +28,6 @@ import {
 } from '../utils/aqiDesignTokens';
 import {
   formatNullableNumber,
-  formatNullableTimestamp,
   getUnknownStateCopy,
   hasReliableAqi,
 } from '../utils/airQualityDisplay';
@@ -125,6 +124,13 @@ const STATUS_CLASSES: Record<
   },
 };
 
+const FRESHNESS_DOT_CLASSES: Record<MeasurementFreshness, string> = {
+  fresh: 'bg-emerald-300 shadow-[0_0_0_4px_rgba(110,231,183,0.18)]',
+  stale: 'bg-amber-300 shadow-[0_0_0_4px_rgba(252,211,77,0.18)]',
+  old: 'bg-orange-300 shadow-[0_0_0_4px_rgba(253,186,116,0.18)]',
+  unknown: 'bg-slate-300 shadow-[0_0_0_4px_rgba(203,213,225,0.18)]',
+};
+
 function getStatusIcon(status: AirQualityStatus, className: string) {
   switch (status) {
     case 'good':
@@ -142,6 +148,36 @@ function getStatusIcon(status: AirQualityStatus, className: string) {
     default:
       return <IoHelpCircleOutline className={className} aria-label="Sin lectura" />;
   }
+}
+
+function formatCompactTimestamp(value: string | null | undefined) {
+  if (!value) {
+    return 'N/D';
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return 'N/D';
+  }
+
+  const now = new Date();
+  const isToday = date.toDateString() === now.toDateString();
+  const time = new Intl.DateTimeFormat('es-MX', {
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(date);
+
+  if (isToday) {
+    return `Hoy, ${time}`;
+  }
+
+  return new Intl.DateTimeFormat('es-MX', {
+    day: 'numeric',
+    month: 'short',
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(date);
 }
 
 export default function AirQualityCard({ data, className = '' }: AirQualityCardProps) {
@@ -164,8 +200,8 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
     ? getPollutantInfo(data.main_pollutant_us).name
     : 'N/D';
   const freshnessCopy = getFreshnessDisplayCopy(data.measurementFreshness);
-  const measurementTime = reliableAqi ? formatNullableTimestamp(data.timestamp) : 'N/D';
-  const pipelineTime = formatNullableTimestamp(data.last_successful_update_at ?? null);
+  const measurementTime = reliableAqi ? formatCompactTimestamp(data.timestamp) : 'N/D';
+  const pipelineTime = formatCompactTimestamp(data.last_successful_update_at ?? null);
 
   return (
     <motion.section
@@ -174,7 +210,7 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
       aria-label={`Calidad del aire en ${data.location.name}: ${copy.label}`}
     >
       <div
-        className={`relative min-h-[26.25rem] overflow-hidden rounded-[1.35rem] bg-gradient-to-br ${classes.gradient} px-5 py-5 text-white shadow-[0_16px_34px_rgba(15,23,42,0.18)] ring-1 ${classes.ring} sm:min-h-[25rem] sm:rounded-[1.6rem] sm:px-8 sm:py-7`}
+        className={`relative min-h-[24.5rem] overflow-hidden rounded-[1.35rem] bg-gradient-to-br ${classes.gradient} px-5 py-5 text-white shadow-[0_16px_34px_rgba(15,23,42,0.18)] ring-1 ${classes.ring} sm:min-h-[25rem] sm:rounded-[1.6rem] sm:px-8 sm:py-7`}
       >
         <div
           className="absolute inset-0 bg-[url('/images/monterrey-cerro-silla.jpg')] bg-cover bg-[70%_100%] opacity-95"
@@ -243,18 +279,12 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
             </p>
           )}
 
-          <div className="mt-4 grid max-w-[34rem] grid-cols-1 gap-2 sm:grid-cols-2">
-            <InfoPill
-              icon={<IoTimeOutline className="h-6 w-6" />}
-              label={freshnessCopy.label}
-              value={`Medicion ${measurementTime}`}
-            />
-            <InfoPill
-              icon={<IoCloudOutline className="h-6 w-6" />}
-              label="Trazabilidad"
-              value={`Pipeline ${pipelineTime}`}
-            />
-          </div>
+          <FreshnessPill
+            freshness={data.measurementFreshness}
+            label={freshnessCopy.shortLabel}
+            measurementTime={measurementTime}
+            pipelineTime={pipelineTime}
+          />
         </div>
       </div>
 
@@ -339,20 +369,25 @@ export default function AirQualityCard({ data, className = '' }: AirQualityCardP
   );
 }
 
-interface InfoPillProps {
-  icon: React.ReactNode;
+interface FreshnessPillProps {
+  freshness: MeasurementFreshness;
   label: string;
-  value: string;
+  measurementTime: string;
+  pipelineTime: string;
 }
 
-function InfoPill({ icon, label, value }: InfoPillProps) {
+function FreshnessPill({ freshness, label, measurementTime, pipelineTime }: FreshnessPillProps) {
   return (
-    <div className="flex min-w-0 items-center gap-3 rounded-xl bg-white/95 px-3 py-2.5 text-slate-950 shadow-md backdrop-blur-md sm:rounded-2xl sm:px-4 sm:py-3">
-      <span className="shrink-0 text-amber-500 [&>svg]:h-7 [&>svg]:w-7 sm:[&>svg]:h-8 sm:[&>svg]:w-8">{icon}</span>
-      <span className="min-w-0">
-        <span className="block truncate text-[0.78rem] font-semibold text-slate-500 sm:text-sm">{label}</span>
-        <span className="block text-[0.9rem] font-black leading-tight sm:text-lg">{value}</span>
-      </span>
+    <div
+      className="mt-4 inline-flex max-w-full items-center gap-2 rounded-full bg-white/16 px-3 py-2 text-[0.72rem] font-semibold text-white shadow-sm ring-1 ring-white/25 backdrop-blur-md sm:px-4 sm:text-sm"
+      aria-label={`${label}. Medicion ${measurementTime}. Pipeline ${pipelineTime}.`}
+      title={`Pipeline: ${pipelineTime}`}
+    >
+      <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${FRESHNESS_DOT_CLASSES[freshness]}`} aria-hidden="true" />
+      <IoTimeOutline className="h-4 w-4 shrink-0 opacity-80" aria-hidden="true" />
+      <span className="shrink-0">{label}</span>
+      <span className="text-white/55" aria-hidden="true">·</span>
+      <span className="truncate">Medición {measurementTime}</span>
     </div>
   );
 }
