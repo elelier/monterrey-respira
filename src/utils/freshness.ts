@@ -73,18 +73,18 @@ export function getFreshnessDisplayCopy(freshness: MeasurementFreshness): Freshn
   switch (freshness) {
     case 'fresh':
       return {
-        label: 'Medición de hoy',
-        shortLabel: 'Hoy',
+        label: 'Medición vigente',
+        shortLabel: 'Actual',
       };
     case 'stale':
       return {
         label: 'Medición con retraso',
-        shortLabel: 'Retraso +12 h',
+        shortLabel: '+12 h',
       };
     case 'old':
       return {
         label: 'Dato viejo',
-        shortLabel: 'Viejo +24 h',
+        shortLabel: '+24 h',
       };
     default:
       return {
