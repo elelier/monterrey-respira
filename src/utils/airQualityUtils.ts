@@ -121,6 +121,31 @@ export const getWeatherIconUrl = (iconCode: string | null | undefined): string |
   return iconMap[iconCode];
 };
 
+export const getWeatherLabel = (iconCode: string | null | undefined): string => {
+  if (!iconCode) {
+    return 'Contexto ambiental';
+  }
+
+  const iconLabelMap: Record<string, string> = {
+    '01d': 'Despejado',
+    '01n': 'Despejado',
+    '02d': 'Parcialmente nublado',
+    '02n': 'Parcialmente nublado',
+    '03d': 'Nublado',
+    '03n': 'Nublado',
+    '04d': 'Nublado',
+    '04n': 'Nublado',
+    '09d': 'Lluvia',
+    '10d': 'Lluvia',
+    '10n': 'Lluvia',
+    '11d': 'Tormenta',
+    '13d': 'Frio',
+    '50d': 'Neblina',
+  };
+
+  return iconLabelMap[iconCode] ?? 'Contexto ambiental';
+};
+
 export const getAQIDescription = (status: AirQualityStatus): string => {
   return AQI_STATUS_DESCRIPTIONS[status];
 };
