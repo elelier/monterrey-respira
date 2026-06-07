@@ -1,7 +1,7 @@
 import { MeasurementFreshness } from '../types';
 
-export const FRESHNESS_STALE_THRESHOLD_HOURS = 2;
-export const FRESHNESS_OLD_THRESHOLD_HOURS = 6;
+export const FRESHNESS_STALE_THRESHOLD_HOURS = 12;
+export const FRESHNESS_OLD_THRESHOLD_HOURS = 24;
 const FUTURE_CLOCK_SKEW_TOLERANCE_HOURS = 5 / 60;
 
 export interface FreshnessDisplayCopy {
@@ -61,7 +61,7 @@ export function getMeasurementFreshnessReason(
     case 'old':
       return `Dato viejo para ${cityName}; revisar con cautela.`;
     case 'stale':
-      return `La medición ambiental de ${cityName} tiene retraso frente a la cadencia esperada.`;
+      return `La medición ambiental de ${cityName} tiene más de 12 horas.`;
     case 'unknown':
       return `No se pudo validar la hora de medición ambiental para ${cityName}.`;
     default:
@@ -73,18 +73,18 @@ export function getFreshnessDisplayCopy(freshness: MeasurementFreshness): Freshn
   switch (freshness) {
     case 'fresh':
       return {
-        label: 'Medición reciente',
-        shortLabel: 'Reciente',
+        label: 'Medición vigente',
+        shortLabel: 'Actual',
       };
     case 'stale':
       return {
         label: 'Medición con retraso',
-        shortLabel: 'Con retraso',
+        shortLabel: '+12 h',
       };
     case 'old':
       return {
         label: 'Dato viejo',
-        shortLabel: 'Viejo',
+        shortLabel: '+24 h',
       };
     default:
       return {

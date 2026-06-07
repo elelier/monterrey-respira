@@ -1,6 +1,5 @@
 import {
   IoBicycleOutline,
-  IoChevronForwardOutline,
   IoHelpCircleOutline,
   IoHomeOutline,
   IoLeafOutline,
@@ -10,7 +9,7 @@ import {
   IoWarningOutline,
 } from 'react-icons/io5';
 import { AirQualityStatus } from '../types';
-import { AQI_RECOMMENDATIONS, AQI_THEME_TOKENS } from '../utils/aqiDesignTokens';
+import { AQI_RECOMMENDATIONS } from '../utils/aqiDesignTokens';
 
 interface RecommendationsProps {
   status: AirQualityStatus;
@@ -90,45 +89,44 @@ function getRecommendationIcon(iconName: string, className: string) {
 export default function Recommendations({ status, className = '' }: RecommendationsProps) {
   const recommendations = AQI_RECOMMENDATIONS[status].slice(0, 3);
   const classes = STATUS_CLASSES[status];
-  const theme = AQI_THEME_TOKENS[status];
 
   return (
     <section
-      className={`rounded-[1.15rem] border border-slate-200 bg-white p-1.5 shadow-[0_10px_24px_rgba(15,23,42,0.08)] dark:border-slate-700 dark:bg-slate-800 sm:rounded-[1.35rem] sm:p-4 ${className}`}
+      className={`rounded-[1.15rem] border border-slate-200 bg-white p-3 shadow-[0_10px_24px_rgba(15,23,42,0.08)] dark:border-slate-700 dark:bg-slate-800 sm:rounded-[1.35rem] sm:p-4 ${className}`}
       aria-labelledby="recommendations-title"
     >
-      <div className="mb-1 flex items-center gap-2.5 sm:mb-3 sm:gap-3">
+      <div className="mb-3 flex items-center gap-2.5 sm:mb-4 sm:gap-3">
         <IoLeafOutline className={`h-[1.1rem] w-[1.1rem] ${classes.accent} sm:h-7 sm:w-7`} />
-        <h2 id="recommendations-title" className="text-[0.94rem] font-semibold text-slate-950 dark:text-white sm:text-xl sm:font-black">
-          Recomendaciones
-        </h2>
+        <div>
+          <h2 id="recommendations-title" className="text-[0.94rem] font-semibold leading-tight text-slate-950 dark:text-white sm:text-xl sm:font-black">
+            Recomendaciones
+          </h2>
+          <p className="mt-0.5 text-[0.62rem] leading-tight text-slate-500 dark:text-slate-400 sm:text-sm">
+            Guía rápida según el AQI disponible.
+          </p>
+        </div>
       </div>
 
-      <div className="space-y-1 sm:space-y-2">
+      <ul className="space-y-1.5 sm:space-y-2" aria-label="Recomendaciones de salud y actividad">
         {recommendations.map((recommendation) => (
-          <article
+          <li
             key={`${recommendation.title}-${recommendation.icon}`}
-            className={`grid h-[2.15rem] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg border ${classes.border} ${classes.bg} px-2 sm:h-auto sm:gap-3 sm:rounded-2xl sm:px-3 sm:py-3`}
+            className={`grid grid-cols-[auto_minmax(0,1fr)] items-start gap-2 rounded-lg border ${classes.border} ${classes.bg} px-2.5 py-2 sm:gap-3 sm:rounded-2xl sm:px-3 sm:py-3`}
           >
-            <div className={`flex h-6 w-6 items-center justify-center rounded-full ${classes.iconBg} sm:h-12 sm:w-12`}>
-              {getRecommendationIcon(recommendation.icon, `h-[0.95rem] w-[0.95rem] ${classes.accent} sm:h-7 sm:w-7`)}
+            <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${classes.iconBg} sm:h-12 sm:w-12`}>
+              {getRecommendationIcon(recommendation.icon, `h-4 w-4 ${classes.accent} sm:h-7 sm:w-7`)}
             </div>
             <div className="min-w-0">
-              <h3 className="truncate text-[0.72rem] font-medium leading-tight text-slate-950 dark:text-white sm:text-base sm:font-black">
+              <h3 className="text-[0.76rem] font-semibold leading-tight text-slate-950 dark:text-white sm:text-base sm:font-black">
                 {recommendation.title}
               </h3>
-              <p className="line-clamp-1 text-[0.56rem] leading-tight text-slate-600 dark:text-slate-300 sm:line-clamp-2 sm:text-sm">
+              <p className="mt-0.5 text-[0.62rem] leading-snug text-slate-600 dark:text-slate-300 sm:text-sm">
                 {recommendation.description}
               </p>
             </div>
-            <IoChevronForwardOutline
-              className="h-4 w-4 shrink-0 sm:h-6 sm:w-6"
-              style={{ color: theme.secondary }}
-              aria-hidden="true"
-            />
-          </article>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }

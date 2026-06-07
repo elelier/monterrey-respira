@@ -261,28 +261,31 @@ export default function AirQualityMap() {
       )}
 
       <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:p-4">
-        <h3 className="text-[0.95rem] font-bold text-gray-900 dark:text-white sm:text-base">Escala AQI (US)</h3>
-        <div className="mt-3 grid grid-cols-2 gap-2 text-center text-xs sm:grid-cols-4 lg:grid-cols-7">
+        <div className="flex items-baseline justify-between gap-3">
+          <h3 className="text-[0.95rem] font-bold text-gray-900 dark:text-white sm:text-base">Escala AQI (US)</h3>
+          <p className="text-[0.68rem] text-gray-500 dark:text-gray-400 sm:hidden">US EPA</p>
+        </div>
+        <div className="mt-2 -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 text-center text-[0.64rem] sm:mx-0 sm:mt-3 sm:grid sm:grid-cols-4 sm:gap-2 sm:overflow-visible sm:px-0 sm:pb-0 sm:text-xs lg:grid-cols-7">
           {AQI_LEGEND.map((item) => {
             const theme = getAirQualityTheme(item.status);
 
             return (
-              <div key={item.status}>
+              <div key={item.status} className="min-w-[5.2rem] shrink-0 sm:min-w-0 sm:shrink">
                 <div
-                  className="rounded-lg px-2 py-1.5 font-bold text-white"
+                  className="rounded-md px-2 py-1 font-bold text-white sm:rounded-lg sm:py-1.5"
                   style={{ backgroundColor: theme.primary }}
                 >
                   {item.range}
                 </div>
-                <p className="mt-1 font-medium text-gray-700 dark:text-gray-300">
+                <p className="mt-0.5 truncate font-medium text-gray-700 dark:text-gray-300 sm:mt-1 sm:whitespace-normal">
                   {item.shortLabel}
                 </p>
               </div>
             );
           })}
         </div>
-        <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
-          AQI: Indice de Calidad del Aire bajo escala US EPA.
+        <p className="mt-1 text-[0.65rem] leading-snug text-gray-500 dark:text-gray-400 sm:mt-3 sm:text-xs">
+          AQI bajo escala US EPA.
         </p>
       </div>
     </section>
