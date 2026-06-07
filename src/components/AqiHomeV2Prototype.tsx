@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import {
   IoAlertCircleOutline,
@@ -110,7 +111,7 @@ function MiniMetric({
 }: {
   label: string;
   value: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
 }) {
   return (
     <div className="min-w-0 rounded-2xl border border-white/20 bg-white/10 px-3 py-2 backdrop-blur-md">
