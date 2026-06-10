@@ -94,7 +94,7 @@ function getGaugeProgress(aqi: number | null | undefined) {
 
 function getWeatherProviderLabel(provider: string | null | undefined) {
   if (!provider) {
-    return 'Clima contextual';
+    return 'Clima local';
   }
 
   if (provider.toLowerCase() === 'open-meteo') {
@@ -114,12 +114,12 @@ function MiniMetric({
   icon: ReactNode;
 }) {
   return (
-    <div className="min-w-0 rounded-2xl border border-white/20 bg-white/10 px-3 py-2 backdrop-blur-md">
-      <div className="flex items-center gap-1.5 text-white/70">
-        <span className="shrink-0 text-white/80">{icon}</span>
-        <span className="truncate text-[0.66rem] font-semibold uppercase tracking-[0.16em]">{label}</span>
+    <div className="min-w-0 border-l border-white/10 pl-3 first:border-l-0 first:pl-0">
+      <div className="flex items-center gap-1 text-white/55">
+        <span className="shrink-0 text-white/65">{icon}</span>
+        <span className="truncate text-[0.62rem] font-bold uppercase tracking-[0.14em]">{label}</span>
       </div>
-      <p className="mt-1 truncate text-[1rem] font-black leading-none text-white sm:text-lg">{value}</p>
+      <p className="mt-1 truncate text-sm font-black leading-none text-white sm:text-base">{value}</p>
     </div>
   );
 }
@@ -137,6 +137,7 @@ export default function AqiHomeV2Prototype({ data, weatherIcon, onRefresh }: Aqi
   const weatherIconUrl = getWeatherIconUrl(resolvedWeatherIcon);
   const weatherLabel = getWeatherLabel(resolvedWeatherIcon);
   const measurementTime = formatCompactTime(data.timestamp);
+  const windSpeedLabel = formatNullableNumber(data.wind.speed, ' km/h', 0);
 
   return (
     <motion.section
@@ -225,24 +226,24 @@ export default function AqiHomeV2Prototype({ data, weatherIcon, onRefresh }: Aqi
           </div>
         </div>
 
-        <div className="rounded-[1.6rem] border border-white/20 bg-white/14 p-4 shadow-[0_18px_44px_rgba(15,23,42,0.22)] backdrop-blur-xl">
+        <div className="rounded-[1.45rem] border border-white/14 bg-white/[0.09] p-3 shadow-[0_14px_34px_rgba(15,23,42,0.16)] backdrop-blur-xl sm:p-4" aria-label="Clima local de referencia">
           <div className="flex items-center gap-3">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/18 ring-1 ring-white/20">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/15">
               {weatherIconUrl ? (
-                <img src={weatherIconUrl} alt="" className="h-11 w-11 object-contain" aria-hidden="true" />
+                <img src={weatherIconUrl} alt="" className="h-9 w-9 object-contain" aria-hidden="true" />
               ) : (
-                <IoCloudOutline className="h-8 w-8 text-white/85" />
+                <IoCloudOutline className="h-7 w-7 text-white/80" />
               )}
             </div>
             <div className="min-w-0">
-              <p className="truncate text-2xl font-black leading-none">{weatherLabel}</p>
-              <p className="mt-1 truncate text-xs font-semibold text-white/65">
-                {getWeatherProviderLabel(data.weather_provider)} · contexto, no AQI
+              <p className="truncate text-xl font-black leading-none sm:text-2xl">{weatherLabel}</p>
+              <p className="mt-1 truncate text-[0.72rem] font-semibold text-white/58">
+                Clima local · {getWeatherProviderLabel(data.weather_provider)}
               </p>
             </div>
           </div>
 
-          <div className="mt-4 grid grid-cols-3 gap-2">
+          <div className="mt-3 grid grid-cols-3 rounded-2xl border border-white/10 bg-black/12 px-3 py-2.5">
             <MiniMetric
               label="Temp."
               value={formatNullableNumber(data.temperature, '°C', 1)}
@@ -255,7 +256,7 @@ export default function AqiHomeV2Prototype({ data, weatherIcon, onRefresh }: Aqi
             />
             <MiniMetric
               label="Viento"
-              value={formatNullableNumber(data.wind.speed, ' km/h', 1)}
+              value={windSpeedLabel}
               icon={<IoLeafOutline className="h-4 w-4" />}
             />
           </div>
