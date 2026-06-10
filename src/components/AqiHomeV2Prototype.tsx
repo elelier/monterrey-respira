@@ -57,24 +57,17 @@ const FRESHNESS_DOT_CLASSES: Record<AirQualityData['measurementFreshness'], stri
 };
 
 function formatCompactTime(value: string | null | undefined) {
-  if (!value) {
-    return 'N/D';
-  }
+  if (!value) return 'N/D';
 
   const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return 'N/D';
-  }
+  if (Number.isNaN(date.getTime())) return 'N/D';
 
   const time = new Intl.DateTimeFormat('es-MX', {
     hour: 'numeric',
     minute: '2-digit',
   }).format(date);
 
-  if (date.toDateString() === new Date().toDateString()) {
-    return time;
-  }
+  if (date.toDateString() === new Date().toDateString()) return time;
 
   return new Intl.DateTimeFormat('es-MX', {
     day: 'numeric',
@@ -85,23 +78,9 @@ function formatCompactTime(value: string | null | undefined) {
 }
 
 function getGaugeProgress(aqi: number | null | undefined) {
-  if (!isFiniteNumber(aqi) || aqi < 0) {
-    return 0;
-  }
+  if (!isFiniteNumber(aqi) || aqi < 0) return 0;
 
   return Math.min(aqi, MAX_AQI_FOR_GAUGE) / MAX_AQI_FOR_GAUGE;
-}
-
-function getWeatherProviderLabel(provider: string | null | undefined) {
-  if (!provider) {
-    return 'Clima local';
-  }
-
-  if (provider.toLowerCase() === 'open-meteo') {
-    return 'Open-Meteo';
-  }
-
-  return provider;
 }
 
 function MiniMetric({
@@ -117,9 +96,9 @@ function MiniMetric({
     <div className="min-w-0 border-l border-white/10 pl-3 first:border-l-0 first:pl-0">
       <div className="flex items-center gap-1 text-white/55">
         <span className="shrink-0 text-white/65">{icon}</span>
-        <span className="truncate text-[0.62rem] font-bold uppercase tracking-[0.14em]">{label}</span>
+        <span className="text-[0.62rem] font-bold uppercase tracking-[0.12em]">{label}</span>
       </div>
-      <p className="mt-1 truncate text-sm font-black leading-none text-white sm:text-base">{value}</p>
+      <p className="mt-1 whitespace-nowrap text-sm font-black leading-none text-white sm:text-base">{value}</p>
     </div>
   );
 }
@@ -173,18 +152,11 @@ export default function AqiHomeV2Prototype({ data, weatherIcon, onRefresh }: Aqi
         </button>
       </div>
 
-      <div className="relative z-10 mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-center">
+      <div className="relative z-10 mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_23rem] lg:items-center xl:grid-cols-[minmax(0,1fr)_24rem]">
         <div className="grid gap-5 sm:grid-cols-[12rem_minmax(0,1fr)] sm:items-center">
           <div className="relative mx-auto h-48 w-48 sm:mx-0">
             <svg className="h-full w-full -rotate-90" viewBox="0 0 180 180" role="img" aria-label={`AQI ${aqiLabel}`}>
-              <circle
-                cx="90"
-                cy="90"
-                r={GAUGE_RADIUS}
-                fill="none"
-                stroke="rgba(255,255,255,0.2)"
-                strokeWidth="14"
-              />
+              <circle cx="90" cy="90" r={GAUGE_RADIUS} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="14" />
               <motion.circle
                 cx="90"
                 cy="90"
@@ -226,8 +198,8 @@ export default function AqiHomeV2Prototype({ data, weatherIcon, onRefresh }: Aqi
           </div>
         </div>
 
-        <div className="rounded-[1.45rem] border border-white/14 bg-white/[0.09] p-3 shadow-[0_14px_34px_rgba(15,23,42,0.16)] backdrop-blur-xl sm:p-4" aria-label="Clima local de referencia">
-          <div className="flex items-center gap-3">
+        <div className="rounded-[1.45rem] border border-white/14 bg-white/[0.09] p-4 shadow-[0_14px_34px_rgba(15,23,42,0.16)] backdrop-blur-xl sm:p-5" aria-label="Clima local de referencia">
+          <div className="flex items-start gap-3">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/15">
               {weatherIconUrl ? (
                 <img src={weatherIconUrl} alt="" className="h-9 w-9 object-contain" aria-hidden="true" />
@@ -235,30 +207,18 @@ export default function AqiHomeV2Prototype({ data, weatherIcon, onRefresh }: Aqi
                 <IoCloudOutline className="h-7 w-7 text-white/80" />
               )}
             </div>
-            <div className="min-w-0">
-              <p className="truncate text-xl font-black leading-none sm:text-2xl">{weatherLabel}</p>
-              <p className="mt-1 truncate text-[0.72rem] font-semibold text-white/58">
-                Clima local · {getWeatherProviderLabel(data.weather_provider)}
+            <div className="min-w-0 flex-1">
+              <p className="text-2xl font-black leading-tight text-white sm:text-[1.65rem]">{weatherLabel}</p>
+              <p className="mt-1 text-[0.72rem] font-semibold leading-snug text-white/58">
+                Temperatura, humedad y viento
               </p>
             </div>
           </div>
 
-          <div className="mt-3 grid grid-cols-3 rounded-2xl border border-white/10 bg-black/12 px-3 py-2.5">
-            <MiniMetric
-              label="Temp."
-              value={formatNullableNumber(data.temperature, '°C', 1)}
-              icon={<IoSpeedometerOutline className="h-4 w-4" />}
-            />
-            <MiniMetric
-              label="Humedad"
-              value={formatNullableNumber(data.humidity, '%')}
-              icon={<IoWaterOutline className="h-4 w-4" />}
-            />
-            <MiniMetric
-              label="Viento"
-              value={windSpeedLabel}
-              icon={<IoLeafOutline className="h-4 w-4" />}
-            />
+          <div className="mt-4 grid grid-cols-3 gap-3 rounded-2xl border border-white/10 bg-black/12 px-4 py-3">
+            <MiniMetric label="Temp." value={formatNullableNumber(data.temperature, '°C', 1)} icon={<IoSpeedometerOutline className="h-4 w-4" />} />
+            <MiniMetric label="Humedad" value={formatNullableNumber(data.humidity, '%')} icon={<IoWaterOutline className="h-4 w-4" />} />
+            <MiniMetric label="Viento" value={windSpeedLabel} icon={<IoLeafOutline className="h-4 w-4" />} />
           </div>
         </div>
       </div>
