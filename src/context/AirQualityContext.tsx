@@ -198,7 +198,7 @@ function transformApiResponse(
       latitude: cityData.latitude ?? city.latitude,
       longitude: cityData.longitude ?? city.longitude,
     },
-    weather_icon: null,
+    weather_icon: cityData.weather_icon,
     main_pollutant_us: cityData.main_pollutant_us,
     weather_provider: cityData.weather_provider,
     weather_timestamp: cityData.weather_timestamp,

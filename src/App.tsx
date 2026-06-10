@@ -6,6 +6,7 @@ import Asociaciones from './pages/Asociaciones';
 import AcercaDe from './pages/AcercaDe';
 import DatosYApis from './pages/DatosYApis';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import AqiHomeExperiment from './pages/AqiHomeExperiment';
 import RouteMetadata from './components/RouteMetadata';
 import './App.css';
 
@@ -42,6 +43,7 @@ function App() {
           <Route path="/acerca-de" element={<AcercaDe />} />
           <Route path="/datos-y-apis" element={<DatosYApis />} />
           <Route path="/politica-de-privacidad" element={<PrivacyPolicy />} />
+          <Route path="/lab/aqi-home-v2" element={<AqiHomeExperiment />} />
         </Routes>
         <RouteMetadata />
       </AirQualityProvider>
