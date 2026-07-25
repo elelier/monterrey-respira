@@ -1,6 +1,6 @@
-# PR de prueba
+# PR de prueba legacy
 
-Este archivo es solo para probar el flujo de Pull Request en Netlify.
+Este archivo histórico probaba un flujo anterior de Pull Request. No describe el despliegue vigente; el frontend público actual se despliega en Cloudflare Pages.
 
 Fecha: 24/07/2025
 Autor: GitHub Copilot

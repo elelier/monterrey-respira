@@ -51,22 +51,25 @@ Core DB no se usa para lecturas ambientales.
 ### Instalación
 
 1. Clona el repositorio:
+
    ```bash
    git clone https://github.com/elelier/monterrey-respira.git
    cd monterrey-respira
    ```
 
 2. Instala las dependencias:
+
    ```bash
    bun install
    ```
 
 3. Inicia el servidor de desarrollo:
+
    ```bash
    bun dev
    ```
 
-4. Abre [http://localhost:5173](http://localhost:5173) en tu navegador.
+4. Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
 
 ## 📚 Documentación canónica
 
@@ -78,10 +81,10 @@ La documentación principal vive en la carpeta [docs](./docs):
 - [Arquitectura](./docs/architecture.md)
 - [Roadmap](./docs/roadmap.md)
 - [Contrato compartido de datos](./docs/shared-data-contract.md)
+- [Pipeline de datos](./docs/data-pipeline.md)
 - [Freshness Truth UX](./docs/freshness-truth-ux.md)
 - [Mapa de blindaje y cambio de curso](./docs/blindaje-y-cambio-de-curso.md)
 - [Guía de Estilo](./docs/style-guide.md)
-- [API](./docs/api.md)
 - [Contribución](./docs/contributing.md)
 
 ## 🤝 Contribuir
@@ -90,7 +93,7 @@ Las contribuciones son bienvenidas dentro del alcance de MtyRespira. Antes de ab
 
 ## 📝 Licencia
 
-Este proyecto está licenciado bajo la Licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
+Este proyecto está licenciado bajo la Licencia MIT.
 
 ## 📧 Contacto
 
