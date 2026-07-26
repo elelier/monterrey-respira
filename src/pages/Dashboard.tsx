@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { IoArrowForwardOutline, IoEarthOutline, IoHelpBuoyOutline, IoLeafOutline } from 'react-icons/io5';
 import { useAirQuality } from '../context/AirQualityContext';
 import Layout from '../components/Layout';
-import AirQualityCard from '../components/AirQualityCard';
+import AqiHomeV2Prototype from '../components/AqiHomeV2Prototype';
 import Recommendations from '../components/Recommendations';
 import CitySelector from '../components/CitySelector';
 import AirQualityMap from '../components/AirQualityMap';
@@ -21,7 +21,10 @@ export default function Dashboard() {
     theme,
     selectedCity,
     cityOptions,
+    cityRows,
   } = useAirQuality();
+
+  const selectedRow = cityRows.find((row) => row.city_id === selectedCity.city_id);
 
   const getStatusButtonClass = () => {
     if (!theme) return 'bg-blue-500 hover:bg-blue-600 text-white';
@@ -141,7 +144,11 @@ export default function Dashboard() {
 
       <div id="datos" className="grid scroll-mt-24 grid-cols-1 gap-2 lg:grid-cols-3 lg:gap-6">
         <div className="flex flex-col gap-2 lg:col-span-2 lg:gap-6">
-          <AirQualityCard data={airQualityData} />
+          <AqiHomeV2Prototype
+            data={airQualityData}
+            weatherIcon={selectedRow?.weather_icon ?? null}
+            onRefresh={refreshData}
+          />
           <CityHistoricalTrend cityId={selectedCity.city_id} cityName={selectedCity.name} />
           <Recommendations status={hasReliableAqi(airQualityData) ? airQualityData.status : 'unknown'} />
           <div className="lg:hidden">

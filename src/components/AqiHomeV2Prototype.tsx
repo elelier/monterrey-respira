@@ -124,7 +124,7 @@ export default function AqiHomeV2Prototype({ data, weatherIcon, onRefresh }: Aqi
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35 }}
       className="relative isolate overflow-hidden rounded-[2rem] bg-slate-950 p-4 text-white shadow-[0_24px_60px_rgba(15,23,42,0.3)] ring-1 ring-white/10 sm:p-6 lg:p-8"
-      aria-label={`Prototipo de lectura ambiental: ${data.location.name}`}
+      aria-label={`Lectura de calidad del aire en ${data.location.name}: ${statusCopy.label}`}
     >
       <div className="absolute inset-0 bg-[url('/images/monterrey-cerro-silla.jpg')] bg-cover bg-[62%_100%] opacity-55" aria-hidden="true" />
       <div
@@ -139,7 +139,7 @@ export default function AqiHomeV2Prototype({ data, weatherIcon, onRefresh }: Aqi
 
       <div className="relative z-10 flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.3em] text-white/65">Laboratorio AQI v2</p>
+          <p className="text-xs font-bold uppercase tracking-[0.3em] text-white/65">Lectura ambiental</p>
           <h2 className="mt-1 text-3xl font-black leading-none sm:text-5xl">{data.location.name}</h2>
         </div>
         <button
