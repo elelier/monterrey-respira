@@ -142,8 +142,8 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div id="datos" className="grid scroll-mt-24 grid-cols-1 gap-2 lg:grid-cols-3 lg:gap-6">
-        <div className="flex flex-col gap-2 lg:col-span-2 lg:gap-6">
+      <div id="datos" className="grid scroll-mt-24 grid-cols-1 gap-2 lg:gap-6">
+        <div className="flex flex-col gap-2 lg:gap-6">
           <AqiHomeV2Prototype
             data={airQualityData}
             weatherIcon={selectedRow?.weather_icon ?? null}
