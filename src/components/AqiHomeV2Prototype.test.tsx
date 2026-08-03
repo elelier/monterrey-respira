@@ -61,8 +61,10 @@ describe('AqiHomeV2Prototype', () => {
   it.each<[AirQualityStatus, number, string, string]>([
     ['good', 42, 'Aire limpio', 'Riesgo bajo'],
     ['moderate', 84, 'Moderada', 'Riesgo moderado'],
+    ['unhealthy-sensitive', 126, 'Sensibles', 'Riesgo para sensibles'],
     ['unhealthy', 172, 'Dañina', 'Riesgo alto'],
     ['very-unhealthy', 238, 'Muy dañina', 'Riesgo muy alto'],
+    ['hazardous', 321, 'Peligrosa', 'Riesgo extremo'],
   ])('keeps the semantic copy for %s AQI', (status, aqi, heroLabel, riskLabel) => {
     renderCard({ status, aqi });
 

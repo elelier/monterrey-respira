@@ -202,13 +202,13 @@ export default function CityHistoricalTrend({ cityId, cityName }: CityHistorical
   const chartValueLabel = `${metricConfig.label}${metricConfig.suffix === ' AQI' ? '' : ` (${metricConfig.suffix.trim()})`}`;
 
   return (
-    <section className="rounded-[1.15rem] border border-slate-200 bg-white p-3 shadow-[0_10px_24px_rgba(15,23,42,0.08)] dark:border-slate-700 dark:bg-slate-800 sm:rounded-[1.35rem] sm:p-5">
+    <section className="surface-card rounded-[1.15rem] p-3 sm:rounded-[1.35rem] sm:p-5">
       <div className="mb-2 flex items-center justify-between gap-3 sm:mb-4">
         <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
           <IoTrendingUpOutline className="h-5 w-5 shrink-0 sm:h-7 sm:w-7" style={{ color: theme.secondary }} />
           <div className="min-w-0">
-            <h2 className="truncate text-[0.94rem] font-bold text-slate-950 dark:text-white sm:text-xl sm:font-black">Tendencia reciente</h2>
-            <p className="text-[0.68rem] font-medium text-slate-600 dark:text-slate-300 sm:hidden">
+            <h2 className="truncate text-[0.94rem] font-bold text-[var(--mty-text)] sm:text-xl sm:font-black">Tendencia reciente</h2>
+            <p className="text-[0.68rem] font-medium text-[var(--mty-muted-text)] sm:hidden">
               {metricConfig.label} · {range}
             </p>
           </div>
@@ -218,7 +218,7 @@ export default function CityHistoricalTrend({ cityId, cityName }: CityHistorical
         </span>
       </div>
 
-      <div className="mb-2 grid grid-cols-4 rounded-full border border-slate-200 bg-white p-0.5 dark:border-slate-700 dark:bg-slate-900/60 sm:mb-3 sm:p-1">
+      <div className="mb-2 grid grid-cols-4 rounded-full border border-[var(--mty-border)] bg-[var(--mty-surface-muted)] p-0.5 sm:mb-3 sm:p-1">
         {RANGE_OPTIONS.map((option) => (
           <button key={option.value} type="button" onClick={() => setRange(option.value)} className={`rounded-full px-3 py-1 text-xs font-semibold transition sm:py-2 sm:text-sm sm:font-black ${CHART_FOCUS_CLASS}`} style={{ backgroundColor: range === option.value ? `${theme.primary}22` : 'transparent', color: range === option.value ? theme.text : undefined, boxShadow: range === option.value ? `inset 0 0 0 1px ${theme.primary}66` : undefined }} aria-pressed={range === option.value}>
             {option.label}
@@ -226,7 +226,7 @@ export default function CityHistoricalTrend({ cityId, cityName }: CityHistorical
         ))}
       </div>
 
-      <div className="mb-3 grid grid-cols-4 rounded-full border border-slate-200 bg-white p-0.5 dark:border-slate-700 dark:bg-slate-900/60 sm:mb-4 sm:p-1">
+      <div className="mb-3 grid grid-cols-4 rounded-full border border-[var(--mty-border)] bg-[var(--mty-surface-muted)] p-0.5 sm:mb-4 sm:p-1">
         {METRIC_OPTIONS.map((option) => (
           <button key={option.value} type="button" onClick={() => setMetric(option.value)} className={`rounded-full px-2 py-1 text-[0.68rem] font-semibold transition sm:px-3 sm:py-2 sm:text-sm sm:font-black ${CHART_FOCUS_CLASS}`} style={{ backgroundColor: metric === option.value ? `${theme.primary}22` : 'transparent', color: metric === option.value ? theme.text : undefined, boxShadow: metric === option.value ? `inset 0 0 0 1px ${theme.primary}66` : undefined }} aria-pressed={metric === option.value}>
             {option.label}
@@ -235,9 +235,9 @@ export default function CityHistoricalTrend({ cityId, cityName }: CityHistorical
       </div>
 
       {degradedReason ? (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800" role="status">{degradedReason}</div>
+        <div className="callout callout--warning" role="status">{degradedReason}</div>
       ) : !hasEnoughPointsForChart ? (
-        <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-center text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-300 sm:px-4 sm:py-6 sm:text-sm" role="status">
+        <div className="surface-card--muted rounded-xl border border-[var(--mty-border)] px-3 py-3 text-center text-xs text-[var(--mty-muted-text)] sm:px-4 sm:py-6 sm:text-sm" role="status">
           {loading ? 'Cargando histórico disponible...' : getInsufficientDataCopy(metric)}
         </div>
       ) : (
@@ -257,9 +257,9 @@ export default function CityHistoricalTrend({ cityId, cityName }: CityHistorical
         </div>
       )}
 
-      <p className="mt-2 text-[0.72rem] font-medium leading-5 text-slate-600 dark:text-slate-300 sm:mt-3 sm:text-sm">Basado en {getMetricCopy(metric, range)}. La gráfica muestra solo puntos con datos disponibles; MtyRespira no estima valores faltantes.</p>
+      <p className="mt-2 text-[0.72rem] font-medium leading-5 text-[var(--mty-muted-text)] sm:mt-3 sm:text-sm">Basado en {getMetricCopy(metric, range)}. La gráfica muestra solo puntos con datos disponibles; MtyRespira no estima valores faltantes.</p>
 
-      <div className="mt-4 hidden rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/40 md:block">
+      <div className="surface-card--muted mt-4 hidden rounded-xl border border-[var(--mty-border)] p-4 md:block">
         <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Contaminante dominante</p>

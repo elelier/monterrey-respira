@@ -10,7 +10,7 @@ import {
   IoWaterOutline,
 } from 'react-icons/io5';
 import type { AirQualityData, AirQualityStatus } from '../types';
-import { AQI_STATUS_COPY, AQI_THEME_TOKENS } from '../utils/aqiDesignTokens';
+import { AQI_STATUS_COPY, AQI_THEME_TOKENS } from '../theme/aqiDesignTokens';
 import {
   getPollutantInfo,
   getWeatherIconUrl,

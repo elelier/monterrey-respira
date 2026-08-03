@@ -92,16 +92,16 @@ export default function Recommendations({ status, className = '' }: Recommendati
 
   return (
     <section
-      className={`rounded-[1.15rem] border border-slate-200 bg-white p-3 shadow-[0_10px_24px_rgba(15,23,42,0.08)] dark:border-slate-700 dark:bg-slate-800 sm:rounded-[1.35rem] sm:p-4 ${className}`}
+      className={`surface-card rounded-[1.15rem] p-3 sm:rounded-[1.35rem] sm:p-4 ${className}`}
       aria-labelledby="recommendations-title"
     >
       <div className="mb-3 flex items-center gap-2.5 sm:mb-4 sm:gap-3">
         <IoLeafOutline className={`h-[1.1rem] w-[1.1rem] ${classes.accent} sm:h-7 sm:w-7`} />
         <div>
-          <h2 id="recommendations-title" className="text-[0.94rem] font-semibold leading-tight text-slate-950 dark:text-white sm:text-xl sm:font-black">
+          <h2 id="recommendations-title" className="text-[0.94rem] font-semibold leading-tight text-[var(--mty-text)] sm:text-xl sm:font-black">
             Recomendaciones
           </h2>
-          <p className="mt-0.5 text-[0.62rem] leading-tight text-slate-500 dark:text-slate-400 sm:text-sm">
+          <p className="mt-0.5 text-[0.62rem] leading-tight text-[var(--mty-muted-text)] sm:text-sm">
             Guía rápida según el AQI disponible.
           </p>
         </div>
@@ -117,10 +117,10 @@ export default function Recommendations({ status, className = '' }: Recommendati
               {getRecommendationIcon(recommendation.icon, `h-4 w-4 ${classes.accent} sm:h-7 sm:w-7`)}
             </div>
             <div className="min-w-0">
-              <h3 className="text-[0.76rem] font-semibold leading-tight text-slate-950 dark:text-white sm:text-base sm:font-black">
+              <h3 className="text-[0.76rem] font-semibold leading-tight text-[var(--mty-text)] sm:text-base sm:font-black">
                 {recommendation.title}
               </h3>
-              <p className="mt-0.5 text-[0.62rem] leading-snug text-slate-600 dark:text-slate-300 sm:text-sm">
+              <p className="mt-0.5 text-[0.62rem] leading-snug text-[var(--mty-muted-text)] sm:text-sm">
                 {recommendation.description}
               </p>
             </div>

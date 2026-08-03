@@ -50,23 +50,23 @@ export default function DataTrustExplainer({ variant = 'full' }: DataTrustExplai
     <section
       id="metodologia-y-limites"
       className={isCompact
-        ? 'rounded-2xl border border-slate-200 bg-white p-4 shadow-lg dark:border-slate-700 dark:bg-slate-800 sm:p-6'
+        ? 'surface-card p-4 sm:p-6'
         : 'space-y-6'}
       aria-labelledby="metodologia-y-limites-title"
     >
-      <div className={isCompact ? 'space-y-3' : 'rounded-2xl bg-white p-5 shadow-lg dark:bg-slate-800 sm:p-6'}>
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+      <div className={isCompact ? 'space-y-3' : 'surface-card p-5 sm:p-6'}>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--mty-muted-text)]">
           Fuentes y metodología
         </p>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h2
               id="metodologia-y-limites-title"
-              className="text-[1.15rem] font-bold leading-tight text-slate-950 dark:text-white sm:text-2xl"
+              className="text-[1.15rem] font-bold leading-tight text-[var(--mty-text)] sm:text-2xl"
             >
               Cómo leer MtyRespira sin promesas excesivas
             </h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300 sm:text-base">
+            <p className="mt-2 text-sm leading-6 text-[var(--mty-muted-text)] sm:text-base">
               MtyRespira muestra lecturas disponibles para ayudarte a entender el contexto del aire.
               No promete monitoreo en vivo y no sustituye fuentes públicas de referencia ni alertas de emergencia.
             </p>
@@ -75,7 +75,7 @@ export default function DataTrustExplainer({ variant = 'full' }: DataTrustExplai
           {isCompact && (
             <Link
               to="/datos-y-apis#metodologia-y-limites"
-              className="inline-flex w-fit items-center justify-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200"
+              className="inline-flex w-fit items-center justify-center rounded-full bg-[var(--mty-accent)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--mty-focus)] focus:outline-none focus:ring-2 focus:ring-[var(--mty-focus)]"
             >
               Leer metodología
             </Link>
@@ -88,7 +88,7 @@ export default function DataTrustExplainer({ variant = 'full' }: DataTrustExplai
               <Link
                 key={link.to}
                 to={link.to}
-                className="inline-flex rounded-lg border border-amber-300 px-3 py-2 text-sm font-semibold text-amber-800 transition hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:border-amber-700 dark:text-amber-200 dark:hover:bg-amber-900/30"
+                className="inline-flex rounded-full border border-[var(--mty-border)] px-3 py-2 text-sm font-semibold text-[var(--mty-accent)] transition hover:bg-[var(--mty-accent-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--mty-focus)]"
               >
                 {link.label}
               </Link>
@@ -104,11 +104,11 @@ export default function DataTrustExplainer({ variant = 'full' }: DataTrustExplai
           return (
             <article
               key={point.title}
-              className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/40"
+              className="surface-card--muted rounded-xl border border-[var(--mty-border)] p-4"
             >
               <Icon className="mb-3 h-6 w-6 text-amber-700 dark:text-amber-300" aria-hidden="true" />
-              <h3 className="text-sm font-bold text-slate-950 dark:text-white sm:text-base">{point.title}</h3>
-              <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">{point.body}</p>
+              <h3 className="text-sm font-bold text-[var(--mty-text)] sm:text-base">{point.title}</h3>
+              <p className="mt-1 text-sm leading-6 text-[var(--mty-muted-text)]">{point.body}</p>
             </article>
           );
         })}
@@ -116,10 +116,10 @@ export default function DataTrustExplainer({ variant = 'full' }: DataTrustExplai
 
       {!isCompact && (
         <div className="grid gap-4">
-          <div id="como-leer-aqi" className="scroll-mt-24 rounded-2xl bg-white p-5 shadow-lg dark:bg-slate-800 sm:p-6">
+          <div id="como-leer-aqi" className="surface-card scroll-mt-24 p-5 sm:p-6">
             <IoReaderOutline className="mb-3 h-6 w-6 text-amber-700 dark:text-amber-300" aria-hidden="true" />
-            <h3 className="text-lg font-bold text-amber-800 dark:text-amber-300">Qué mide y qué no mide</h3>
-            <ul className="mt-3 space-y-3 text-sm leading-6 text-slate-700 dark:text-slate-300">
+            <h3 className="text-lg font-bold text-[var(--mty-accent)]">Qué mide y qué no mide</h3>
+            <ul className="mt-3 space-y-3 text-sm leading-6 text-[var(--mty-muted-text)]">
               <li>El AQI visible es una lectura externa procesada y normalizada para consulta pública.</li>
               <li>El contaminante principal se muestra solo cuando la fuente lo reporta; si falta, debe verse como N/D.</li>
               <li>Las gráficas históricas muestran puntos guardados; los huecos no se rellenan ni se suavizan.</li>
@@ -127,9 +127,9 @@ export default function DataTrustExplainer({ variant = 'full' }: DataTrustExplai
             </ul>
           </div>
 
-          <div className="rounded-2xl bg-white p-5 shadow-lg dark:bg-slate-800 sm:p-6">
-            <h3 className="text-lg font-bold text-amber-800 dark:text-amber-300">Cómo leer una medición</h3>
-            <ul className="mt-3 space-y-3 text-sm leading-6 text-slate-700 dark:text-slate-300">
+          <div className="surface-card p-5 sm:p-6">
+            <h3 className="text-lg font-bold text-[var(--mty-accent)]">Cómo leer una medición</h3>
+            <ul className="mt-3 space-y-3 text-sm leading-6 text-[var(--mty-muted-text)]">
               <li><strong>Hora de medición:</strong> cuándo fue reportada la lectura ambiental de origen.</li>
               <li><strong>Actualización del pipeline:</strong> cuándo MtyRespira pudo procesar datos correctamente.</li>
               <li><strong>Contexto meteorológico:</strong> si aparece, puede venir de Open-Meteo como fuente secundaria.</li>
@@ -137,9 +137,9 @@ export default function DataTrustExplainer({ variant = 'full' }: DataTrustExplai
             </ul>
           </div>
 
-          <div className="rounded-2xl bg-white p-5 shadow-lg dark:bg-slate-800 sm:p-6">
-            <h3 className="text-lg font-bold text-amber-800 dark:text-amber-300">Fuentes, atribución y alcance</h3>
-            <div className="mt-3 space-y-3 text-sm leading-6 text-slate-700 dark:text-slate-300">
+          <div className="surface-card p-5 sm:p-6">
+            <h3 className="text-lg font-bold text-[var(--mty-accent)]">Fuentes, atribución y alcance</h3>
+            <div className="mt-3 space-y-3 text-sm leading-6 text-[var(--mty-muted-text)]">
               <p>
                 El flujo público es: proveedor externo, pipeline horario, Supabase y lectura en la app.
                 MtyRespira no escribe ni corrige valores ambientales desde el navegador.
@@ -157,7 +157,7 @@ export default function DataTrustExplainer({ variant = 'full' }: DataTrustExplai
                   href={AQICN_API_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex rounded-lg border border-amber-300 px-3 py-2 text-sm font-semibold text-amber-800 transition hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:border-amber-700 dark:text-amber-200 dark:hover:bg-amber-900/30"
+                  className="inline-flex rounded-full border border-[var(--mty-border)] px-3 py-2 text-sm font-semibold text-[var(--mty-accent)] transition hover:bg-[var(--mty-accent-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--mty-focus)]"
                 >
                   WAQI/AQICN
                 </a>
@@ -165,7 +165,7 @@ export default function DataTrustExplainer({ variant = 'full' }: DataTrustExplai
                   href={OPEN_METEO_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex rounded-lg border border-sky-300 px-3 py-2 text-sm font-semibold text-sky-800 transition hover:bg-sky-50 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:border-sky-700 dark:text-sky-200 dark:hover:bg-sky-900/30"
+                  className="inline-flex rounded-full border border-[var(--mty-border)] px-3 py-2 text-sm font-semibold text-[var(--mty-accent)] transition hover:bg-[var(--mty-accent-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--mty-focus)]"
                 >
                   Open-Meteo
                 </a>
