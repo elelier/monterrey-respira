@@ -9,6 +9,7 @@ interface RouteMetadataConfig {
   title: string;
   description: string;
   path: string;
+  noindex?: boolean;
 }
 
 const routeMetadata: Record<string, RouteMetadataConfig> = {
@@ -42,6 +43,12 @@ const routeMetadata: Record<string, RouteMetadataConfig> = {
       'Consulta cómo MonterreyRespira describe el uso de datos de navegación, ubicación del navegador y servicios externos de la web pública.',
     path: '/politica-de-privacidad',
   },
+  '/lab/aqi-home-v2': {
+    title: 'Laboratorio AQI Home V2 | MonterreyRespira',
+    description: 'Ruta de laboratorio para validar el sistema visual de la pantalla principal de MonterreyRespira.',
+    path: '/lab/aqi-home-v2',
+    noindex: true,
+  },
 };
 
 function normalizePathname(pathname: string) {
@@ -61,6 +68,7 @@ export default function RouteMetadata() {
     <Helmet>
       <title>{metadata.title}</title>
       <meta name="description" content={metadata.description} />
+      {metadata.noindex && <meta name="robots" content="noindex,nofollow" />}
       <link rel="canonical" href={canonicalUrl} />
 
       <meta property="og:site_name" content={SITE_NAME} />

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { IoArrowForwardOutline, IoEarthOutline, IoHelpBuoyOutline, IoLeafOutline } from 'react-icons/io5';
 import { useAirQuality } from '../context/AirQualityContext';
 import Layout from '../components/Layout';
-import AirQualityCard from '../components/AirQualityCard';
+import AqiHomeV2Prototype from '../components/AqiHomeV2Prototype';
 import Recommendations from '../components/Recommendations';
 import CitySelector from '../components/CitySelector';
 import AirQualityMap from '../components/AirQualityMap';
@@ -21,7 +21,10 @@ export default function Dashboard() {
     theme,
     selectedCity,
     cityOptions,
+    cityRows,
   } = useAirQuality();
+
+  const selectedRow = cityRows.find((row) => row.city_id === selectedCity.city_id);
 
   const getStatusButtonClass = () => {
     if (!theme) return 'bg-blue-500 hover:bg-blue-600 text-white';
@@ -94,13 +97,13 @@ export default function Dashboard() {
     return (
       <Layout>
         <div className="flex flex-col items-center justify-center py-20">
-          <div className="relative rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700" role="alert">
+          <div className="callout callout--warning" role="alert">
             <strong className="font-bold">Error: </strong>
             <span className="block sm:inline">{error}</span>
           </div>
           <button
             onClick={() => refreshData()}
-            className="mt-4 rounded-md bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600"
+            className="mt-4 rounded-full bg-[var(--mty-accent)] px-4 py-2 text-white transition-colors hover:bg-[var(--mty-focus)]"
             type="button"
           >
             Intentar de nuevo
@@ -117,7 +120,7 @@ export default function Dashboard() {
   return (
     <Layout>
       <div className="relative sticky top-14 z-[1000] mb-1 py-1.5 sm:top-16 sm:mb-3 sm:py-3">
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-[-1] h-full bg-gradient-to-b from-white/95 via-white/85 to-transparent backdrop-blur-md dark:from-slate-950/95 dark:via-slate-950/80" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-[-1] h-full bg-gradient-to-b from-[var(--mty-background)]/95 via-[var(--mty-background)]/85 to-transparent backdrop-blur-md" />
         <CitySelector
           onCityChange={changeCity}
           selectedCity={selectedCity}
@@ -128,20 +131,24 @@ export default function Dashboard() {
       {airQualityData.dataQuality === 'degraded'
         && airQualityData.measurementFreshness !== 'stale'
         && airQualityData.degradationReason && (
-        <div className="mb-4 hidden rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800 sm:block" role="status">
+        <div className="callout callout--warning mb-4 hidden sm:block" role="status">
           {airQualityData.degradationReason}
         </div>
       )}
 
       {error && (
-        <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800" role="status">
+        <div className="callout callout--warning mb-4" role="status">
           {error}
         </div>
       )}
 
-      <div id="datos" className="grid scroll-mt-24 grid-cols-1 gap-2 lg:grid-cols-3 lg:gap-6">
-        <div className="flex flex-col gap-2 lg:col-span-2 lg:gap-6">
-          <AirQualityCard data={airQualityData} />
+      <div id="datos" className="grid scroll-mt-24 grid-cols-1 gap-2 lg:gap-6">
+        <div className="flex flex-col gap-2 lg:gap-6">
+          <AqiHomeV2Prototype
+            data={airQualityData}
+            weatherIcon={selectedRow?.weather_icon ?? null}
+            onRefresh={refreshData}
+          />
           <CityHistoricalTrend cityId={selectedCity.city_id} cityName={selectedCity.name} />
           <Recommendations status={hasReliableAqi(airQualityData) ? airQualityData.status : 'unknown'} />
           <div className="lg:hidden">
@@ -162,14 +169,14 @@ export default function Dashboard() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.5 }}
-        className={`mt-8 rounded-2xl border-2 ${getStatusBorderClass()} bg-white p-4 shadow-lg dark:bg-gray-800 sm:mt-10 sm:p-6`}
+        className={`surface-card mt-8 rounded-2xl border-2 ${getStatusBorderClass()} p-4 sm:mt-10 sm:p-6`}
       >
         <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
           <div className="md:mr-6">
             <h2 className="mb-2 text-[1.1rem] font-bold leading-tight sm:mb-3 sm:text-2xl">
               ¿Quieres actuar por un aire más limpio?
             </h2>
-            <p className="mb-0 text-sm text-gray-600 dark:text-gray-300 sm:mb-4 sm:text-base">
+            <p className="mb-0 text-sm text-[var(--mty-muted-text)] sm:mb-4 sm:text-base">
               Consulta organizaciones, recursos ciudadanos y una campaña externa con opciones para firmar,
               voluntariar o informarte sin compartir datos con MtyRespira.
             </p>
@@ -184,7 +191,7 @@ export default function Dashboard() {
       </motion.div>
 
       <div className="mt-8">
-        <h2 className="mb-4 text-[1.05rem] font-bold sm:mb-6 sm:text-xl" style={{ color: theme?.text }}>
+        <h2 className="mb-4 text-[1.05rem] font-bold text-[var(--mty-text)] sm:mb-6 sm:text-xl">
           Recursos para cuidar nuestra calidad del aire
         </h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3 sm:gap-6">
@@ -196,17 +203,17 @@ export default function Dashboard() {
             <motion.div
               whileHover={{ y: -5 }}
               transition={{ type: 'spring', stiffness: 300 }}
-              className="h-full cursor-pointer overflow-hidden rounded-xl bg-white shadow dark:bg-slate-800"
+              className="surface-card h-full cursor-pointer overflow-hidden"
               style={{ borderColor: theme?.primary }}
             >
               <div className="flex h-full flex-col items-center p-4 text-center sm:p-6">
                 <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full sm:mb-4 sm:h-16 sm:w-16" style={{ backgroundColor: theme?.primary }}>
                   <IoEarthOutline className="h-6 w-6 text-white sm:h-8 sm:w-8" />
                 </div>
-                <h3 className="mb-2 text-base font-semibold sm:mb-3 sm:text-lg" style={{ color: theme?.text }}>
+                <h3 className="mb-2 text-base font-semibold text-[var(--mty-text)] sm:mb-3 sm:text-lg">
                   Entender el AQI
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
+                <p className="text-sm text-[var(--mty-muted-text)]">
                   Lee una guía de salud ambiental para interpretar la contaminación del aire y sus riesgos.
                 </p>
               </div>
@@ -221,17 +228,17 @@ export default function Dashboard() {
             <motion.div
               whileHover={{ y: -5 }}
               transition={{ type: 'spring', stiffness: 300 }}
-              className="h-full cursor-pointer overflow-hidden rounded-xl bg-white shadow dark:bg-slate-800"
+              className="surface-card h-full cursor-pointer overflow-hidden"
               style={{ borderColor: theme?.primary }}
             >
               <div className="flex h-full flex-col items-center p-4 text-center sm:p-6">
                 <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full sm:mb-4 sm:h-16 sm:w-16" style={{ backgroundColor: theme?.primary }}>
                   <IoLeafOutline className="h-6 w-6 text-white sm:h-8 sm:w-8" />
                 </div>
-                <h3 className="mb-2 text-base font-semibold sm:mb-3 sm:text-lg" style={{ color: theme?.text }}>
+                <h3 className="mb-2 text-base font-semibold text-[var(--mty-text)] sm:mb-3 sm:text-lg">
                   Consultar red oficial
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
+                <p className="text-sm text-[var(--mty-muted-text)]">
                   Abre el mapa oficial de calidad del aire de Nuevo León para comparar lecturas públicas.
                 </p>
               </div>
@@ -246,17 +253,17 @@ export default function Dashboard() {
             <motion.div
               whileHover={{ y: -5 }}
               transition={{ type: 'spring', stiffness: 300 }}
-              className="h-full cursor-pointer overflow-hidden rounded-xl bg-white shadow dark:bg-slate-800"
+              className="surface-card h-full cursor-pointer overflow-hidden"
               style={{ borderColor: theme?.primary }}
             >
               <div className="flex h-full flex-col items-center p-4 text-center sm:p-6">
                 <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full sm:mb-4 sm:h-16 sm:w-16" style={{ backgroundColor: theme?.primary }}>
                   <IoHelpBuoyOutline className="h-6 w-6 text-white sm:h-8 sm:w-8" />
                 </div>
-                <h3 className="mb-2 text-base font-semibold sm:mb-3 sm:text-lg" style={{ color: theme?.text }}>
+                <h3 className="mb-2 text-base font-semibold text-[var(--mty-text)] sm:mb-3 sm:text-lg">
                   Protegerte en mala calidad
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
+                <p className="text-sm text-[var(--mty-muted-text)]">
                   Revisa medidas personales y familiares para episodios de contaminación elevada.
                 </p>
               </div>

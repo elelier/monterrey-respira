@@ -10,7 +10,7 @@ import {
   IoWaterOutline,
 } from 'react-icons/io5';
 import type { AirQualityData, AirQualityStatus } from '../types';
-import { AQI_STATUS_COPY, AQI_THEME_TOKENS } from '../utils/aqiDesignTokens';
+import { AQI_STATUS_COPY, AQI_THEME_TOKENS } from '../theme/aqiDesignTokens';
 import {
   getPollutantInfo,
   getWeatherIconUrl,
@@ -124,7 +124,7 @@ export default function AqiHomeV2Prototype({ data, weatherIcon, onRefresh }: Aqi
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35 }}
       className="relative isolate overflow-hidden rounded-[2rem] bg-slate-950 p-4 text-white shadow-[0_24px_60px_rgba(15,23,42,0.3)] ring-1 ring-white/10 sm:p-6 lg:p-8"
-      aria-label={`Prototipo de lectura ambiental: ${data.location.name}`}
+      aria-label={`Lectura de calidad del aire en ${data.location.name}: ${statusCopy.label}`}
     >
       <div className="absolute inset-0 bg-[url('/images/monterrey-cerro-silla.jpg')] bg-cover bg-[62%_100%] opacity-55" aria-hidden="true" />
       <div
@@ -139,7 +139,7 @@ export default function AqiHomeV2Prototype({ data, weatherIcon, onRefresh }: Aqi
 
       <div className="relative z-10 flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.3em] text-white/65">Laboratorio AQI v2</p>
+          <p className="text-xs font-bold uppercase tracking-[0.3em] text-white/65">Lectura ambiental</p>
           <h2 className="mt-1 text-3xl font-black leading-none sm:text-5xl">{data.location.name}</h2>
         </div>
         <button
@@ -190,9 +190,13 @@ export default function AqiHomeV2Prototype({ data, weatherIcon, onRefresh }: Aqi
                 <IoAlertCircleOutline className="h-4 w-4" />
                 {pollutantLabel}
               </span>
-              <span className="inline-flex items-center gap-2 rounded-full bg-black/22 px-3 py-2 text-xs font-bold text-white/90 ring-1 ring-white/15 backdrop-blur-md">
+              <span className="inline-flex flex-col items-center gap-1 rounded-full bg-black/22 px-3 py-2 text-xs font-bold text-white/90 ring-1 ring-white/15 backdrop-blur-md sm:flex-row sm:gap-2">
                 <span className={`h-2.5 w-2.5 rounded-full ${FRESHNESS_DOT_CLASSES[data.measurementFreshness]}`} />
-                {FRESHNESS_LABELS[data.measurementFreshness]} · {measurementTime}
+                <span className="flex flex-col items-center leading-none sm:flex-row sm:items-center sm:gap-1">
+                  <span>{FRESHNESS_LABELS[data.measurementFreshness]}</span>
+                  <span className="hidden sm:inline" aria-hidden="true">·</span>
+                  <span className="text-white/80">{measurementTime}</span>
+                </span>
               </span>
             </div>
           </div>

@@ -281,7 +281,7 @@ const CitySelector = ({
       <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
         <motion.div
           whileTap={{ scale: 0.98 }}
-          className="flex min-h-[2.9rem] min-w-0 cursor-pointer items-center justify-between rounded-2xl border border-gray-100 bg-white px-3 py-1.5 shadow-[0_10px_25px_rgba(15,23,42,0.12)] dark:border-gray-700 dark:bg-slate-800 sm:min-h-[3.55rem] sm:p-3"
+          className="surface-card flex min-h-[2.9rem] min-w-0 cursor-pointer items-center justify-between rounded-2xl px-3 py-1.5 sm:min-h-[3.55rem] sm:p-3"
           onClick={() => setIsOpen(!isOpen)}
           role="combobox"
           aria-expanded={isOpen}
@@ -312,7 +312,7 @@ const CitySelector = ({
         <button
           type="button"
           onClick={handleUseLocation}
-          className="inline-flex min-h-[2.9rem] min-w-[7rem] items-center justify-center gap-1 rounded-2xl border border-purple-100 bg-white px-3 py-1.5 text-sm font-semibold text-purple-700 shadow-[0_10px_25px_rgba(15,23,42,0.12)] transition hover:bg-purple-50 disabled:cursor-wait disabled:opacity-70 dark:border-purple-900/60 dark:bg-slate-800 dark:text-purple-300 dark:hover:bg-purple-900/20 sm:min-h-[3.55rem] sm:min-w-[9.5rem] sm:gap-2 sm:px-4 sm:text-sm sm:font-black"
+          className="inline-flex min-h-[2.9rem] min-w-[7rem] items-center justify-center gap-1 rounded-2xl border border-[var(--mty-border)] bg-[var(--mty-surface)] px-3 py-1.5 text-sm font-semibold text-[var(--mty-accent)] transition hover:bg-[var(--mty-accent-soft)] disabled:cursor-wait disabled:opacity-70 sm:min-h-[3.55rem] sm:min-w-[9.5rem] sm:gap-2 sm:px-4 sm:text-sm sm:font-black"
           disabled={geolocationStatus === 'loading'}
           aria-label="Usar mi ubicación"
         >
@@ -346,7 +346,7 @@ const CitySelector = ({
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="absolute mt-1 w-full overflow-hidden rounded-xl border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-slate-800"
+          className="surface-card absolute mt-1 w-full overflow-hidden rounded-xl"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}

@@ -2,6 +2,7 @@ import { createRoot } from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 import './index.css';
 import App from './App.tsx';
+import { ThemeProvider } from './context/ThemeContext';
 
 const element = document.getElementById('root');
 
@@ -11,6 +12,8 @@ if (!element) {
 
 createRoot(element).render(
   <HelmetProvider>
-    <App />
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>
   </HelmetProvider>,
 );

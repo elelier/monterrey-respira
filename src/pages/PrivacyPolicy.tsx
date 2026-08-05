@@ -1,227 +1,99 @@
 import Layout from '../components/Layout';
-import { motion } from 'framer-motion';
-import { useAirQuality } from '../context/AirQualityContext';
+import { Callout, PageMasthead, Section, SurfaceCard } from '../components/ui/VisualPrimitives';
+
+interface PrivacyGroup {
+  title: string;
+  items: string[];
+}
+
+const groups: PrivacyGroup[] = [
+  {
+    title: '1. Uso de Google Analytics 4',
+    items: [
+      'La aplicación inicializa Google Analytics 4 y envía una vista de página únicamente cuando el deployment tiene configurada la variable VITE_GOOGLE_ANALYTICS_ID.',
+      'Si esa variable no está configurada, la integración de analítica no se inicializa.',
+    ],
+  },
+  {
+    title: '2. Geolocalización en el navegador',
+    items: [
+      'La opción "Usar mi ubicación" solicita permiso al navegador y usa la posición recibida para encontrar el municipio compatible más cercano.',
+      'En el flujo del selector, la posición exacta se usa en el navegador; las señales de cobertura envían una ciudad de referencia, una distancia redondeada y un rango de distancia, no las coordenadas exactas.',
+    ],
+  },
+  {
+    title: '3. Información guardada localmente',
+    items: [
+      'El sitio usa localStorage para conservar la preferencia de tema, el municipio seleccionado y una copia temporal de lecturas de calidad del aire junto con su marca de tiempo.',
+      'La copia local de lecturas se considera válida durante una hora; después se ignora y puede solicitarse una lectura nueva. No se afirma aquí un periodo de retención para datos almacenados por servicios externos.',
+      'La aplicación no escribe cookies propias mediante document.cookie y no monta un flujo propio de consentimiento de cookies en las rutas públicas actuales.',
+    ],
+  },
+  {
+    title: '4. Señales de producto',
+    items: [
+      'Cuando las variables públicas de Core DB están configuradas, el sitio puede enviar señales de compartir ciudad y de demanda fuera de cobertura mediante la RPC submit_signal.',
+      'La señal de compartir puede incluir ciudad, ruta, método de compartir, AQI disponible, estado de frescura, idioma del navegador y zona horaria.',
+      'La señal fuera de cobertura puede incluir la ciudad compatible más cercana, distancia redondeada, rango de distancia, área de cobertura, idioma del navegador y zona horaria.',
+      'Core DB se usa para estas señales de producto; no es la fuente de las lecturas ambientales.',
+    ],
+  },
+  {
+    title: '5. Datos que no solicita la interfaz pública',
+    items: [
+      'No se solicitan nombre, correo electrónico, teléfono, dirección, cuenta de usuario ni formulario de contacto.',
+    ],
+  },
+  {
+    title: '6. Retención, seguridad y límites de esta descripción',
+    items: [
+      'El repositorio solo define la expiración de una hora para la copia local de lecturas descrita arriba. No define periodos de retención para Google Analytics 4 ni para las señales de Core DB.',
+      'Esta página no enumera medidas de seguridad específicas porque el repositorio no define un catálogo público de controles.',
+      'La descripción se limita a comportamientos técnicos verificables y queda sujeta a aprobación del contenido legal y del responsable correspondiente.',
+    ],
+  },
+];
+
+function PrivacyGroupCard({ group }: { group: PrivacyGroup }) {
+  return (
+    <SurfaceCard className="p-5">
+      <h3 className="mb-3 text-base font-bold text-[var(--mty-text)]">{group.title}</h3>
+      <ul className="list-disc space-y-1 pl-5 text-sm leading-6 text-[var(--mty-muted-text)]">
+        {group.items.map((item) => <li key={item}>{item}</li>)}
+      </ul>
+    </SurfaceCard>
+  );
+}
 
 export default function PrivacyPolicy() {
-  const { theme } = useAirQuality();
-
-  // Función para obtener el color de texto basado en el tema actual
-  const getThemeTextColor = () => {
-    if (!theme) return 'text-blue-600';
-
-    switch (theme.primary) {
-      case '#4ade80': return 'text-green-600 dark:text-green-400';
-      case '#fbbf24': return 'text-amber-600 dark:text-amber-400';
-      case '#fb923c': return 'text-orange-600 dark:text-orange-400';
-      case '#f87171': return 'text-red-600 dark:text-red-400';
-      case '#c084fc': return 'text-purple-600 dark:text-purple-400';
-      case '#9f1239': return 'text-rose-600 dark:text-rose-400';
-      default: return 'text-blue-600 dark:text-blue-400';
-    }
-  };
-
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h1 className="text-3xl md:text-4xl font-bold mb-6 text-amber-800 dark:text-amber-300">Política de Privacidad</h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-8">Última actualización: [Fecha]</p>
+      <div className="mx-auto max-w-5xl">
+        <PageMasthead
+          eyebrow="Documento público"
+          title="Política de privacidad"
+          description="Descripción factual de los datos técnicos que el producto puede usar en el navegador y de las señales de producto que puede enviar cuando la configuración correspondiente está habilitada."
+        />
 
-          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden mb-8">
-            <div className="p-6">
-              <h2 className="text-xl font-semibold mb-4 text-amber-700 dark:text-amber-400">1. Información que recopilamos</h2>
-              
-              <div className="space-y-6">
-                <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2">1.1 Información que recopilamos automáticamente</h3>
-                  <ul className="text-sm text-gray-600 dark:text-gray-300 list-disc pl-5 space-y-1">
-                    <li>Datos de uso del sitio web</li>
-                    <li>Información del dispositivo</li>
-                    <li>Datos de ubicación (solo para mostrar datos de calidad del aire)</li>
-                    <li>Datos de navegación</li>
-                  </ul>
-                </div>
+        <Callout tone="warning" title="Contenido pendiente de aprobación">
+          La fecha de entrada en vigor y la identidad o contacto del responsable legal aún no están definidos en el repositorio. Este documento describe únicamente comportamientos técnicos verificables y requiere revisión humana antes de considerarse definitivo.
+        </Callout>
 
-                <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2">1.2 Información de Google AdSense</h3>
-                  <ul className="text-sm text-gray-600 dark:text-gray-300 list-disc pl-5 space-y-1">
-                    <li>Datos de visualización de anuncios</li>
-                    <li>Interacciones con anuncios</li>
-                    <li>Datos de geolocalización (para anuncios relevantes)</li>
-                  </ul>
-                </div>
-              </div>
-
-              <h2 className="text-xl font-semibold mb-4 text-amber-700 dark:text-amber-400 mt-6">2. Uso de la información</h2>
-              
-              <div className="space-y-6">
-                <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2">2.1 Uso de datos de usuarios</h3>
-                  <ul className="text-sm text-gray-600 dark:text-gray-300 list-disc pl-5 space-y-1">
-                    <li>Mejorar la experiencia del usuario</li>
-                    <li>Proporcionar información relevante sobre calidad del aire</li>
-                    <li>Personalizar el contenido del sitio</li>
-                  </ul>
-                </div>
-
-                <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2">2.2 Uso de datos de AdSense</h3>
-                  <ul className="text-sm text-gray-600 dark:text-gray-300 list-disc pl-5 space-y-1">
-                    <li>Mostrar anuncios relevantes</li>
-                    <li>Personalizar la publicidad según el contexto</li>
-                    <li>Optimizar la entrega de anuncios</li>
-                  </ul>
-                </div>
-              </div>
-
-              <h2 className="text-xl font-semibold mb-4 text-amber-700 dark:text-amber-400 mt-6">3. Cookies y tecnologías similares</h2>
-              
-              <div className="space-y-6">
-                <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2">3.1 Cookies de AdSense</h3>
-                  <ul className="text-sm text-gray-600 dark:text-gray-300 list-disc pl-5 space-y-1">
-                    <li>Google AdSense utiliza cookies para:</li>
-                    <ul className="text-sm text-gray-600 dark:text-gray-300 list-disc pl-5 space-y-1">
-                      <li>Mostrar anuncios relevantes</li>
-                      <li>Medir el rendimiento de los anuncios</li>
-                      <li>Personalizar la experiencia publicitaria</li>
-                    </ul>
-                  </ul>
-                </div>
-
-                <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2">3.2 Cookies de rendimiento</h3>
-                  <ul className="text-sm text-gray-600 dark:text-gray-300 list-disc pl-5 space-y-1">
-                    <li>Medir el uso del sitio web</li>
-                    <li>Mejorar la funcionalidad</li>
-                    <li>Optimizar el rendimiento</li>
-                  </ul>
-                </div>
-              </div>
-
-              <h2 className="text-xl font-semibold mb-4 text-amber-700 dark:text-amber-400 mt-6">4. Protección de datos</h2>
-              
-              <div className="space-y-6">
-                <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2">4.1 Medidas de seguridad</h3>
-                  <ul className="text-sm text-gray-600 dark:text-gray-300 list-disc pl-5 space-y-1">
-                    <li>Encriptación de datos</li>
-                    <li>Protección contra accesos no autorizados</li>
-                    <li>Seguridad del sitio web</li>
-                  </ul>
-                </div>
-
-                <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2">4.2 Retención de datos</h3>
-                  <ul className="text-sm text-gray-600 dark:text-gray-300 list-disc pl-5 space-y-1">
-                    <li>Datos de uso: 30 días</li>
-                    <li>Datos de ubicación: 24 horas</li>
-                    <li>Datos de AdSense: según políticas de Google</li>
-                  </ul>
-                </div>
-              </div>
-
-              <h2 className="text-xl font-semibold mb-4 text-amber-700 dark:text-amber-400 mt-6">5. Tus derechos</h2>
-              
-              <div className="space-y-6">
-                <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2">5.1 Derechos de los usuarios</h3>
-                  <ul className="text-sm text-gray-600 dark:text-gray-300 list-disc pl-5 space-y-1">
-                    <li>Acceder a tus datos</li>
-                    <li>Corregir datos inexactos</li>
-                    <li>Eliminar tus datos</li>
-                    <li>Oponerte al procesamiento de datos</li>
-                  </ul>
-                </div>
-
-                <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2">5.2 Control de anuncios</h3>
-                  <ul className="text-sm text-gray-600 dark:text-gray-300 list-disc pl-5 space-y-1">
-                    <li>Opt-out de anuncios personalizados</li>
-                    <li>Configurar preferencias de anuncios</li>
-                    <li>Controlar cookies de AdSense</li>
-                  </ul>
-                </div>
-              </div>
-
-              <h2 className="text-xl font-semibold mb-4 text-amber-700 dark:text-amber-400 mt-6">6. Cambios en la Política de Privacidad</h2>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">
-                Esta política puede actualizarse periódicamente. Los cambios significativos se comunicarán. Se mantendrá la fecha de última actualización.
-              </p>
-
-              <h2 className="text-xl font-semibold mb-4 text-amber-700 dark:text-amber-400 mt-6">7. Contacto</h2>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">
-                Si tienes preguntas sobre esta política de privacidad, puedes contactarnos a:
-              </p>
-              <ul className="text-sm text-gray-600 dark:text-gray-300 list-disc pl-5 space-y-1">
-                <li>[Tu correo electrónico]</li>
-                <li>[Tu dirección]</li>
-                <li>[Tu teléfono]</li>
-              </ul>
-
-              <h2 className="text-xl font-semibold mb-4 text-amber-700 dark:text-amber-400 mt-6">8. Enlaces a recursos externos</h2>
-              <div className="space-y-4">
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                  className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors"
-                >
-                  <a
-                    href="https://policies.google.com/privacy"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`block ${getThemeTextColor()} hover:text-white dark:hover:text-white font-medium text-sm transition-colors flex items-center justify-between`}
-                  >
-                    <span>Política de privacidad de Google AdSense</span>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </a>
-                </motion.div>
-
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                  className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors"
-                >
-                  <a
-                    href="https://www.google.com/adsense/localized-terms"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`block ${getThemeTextColor()} hover:text-white dark:hover:text-white font-medium text-sm transition-colors flex items-center justify-between`}
-                  >
-                    <span>Términos de servicio de Google AdSense</span>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </a>
-                </motion.div>
-
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                  className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors"
-                >
-                  <a
-                    href="https://policies.google.com/technologies/cookies"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`block ${getThemeTextColor()} hover:text-white dark:hover:text-white font-medium text-sm transition-colors flex items-center justify-between`}
-                  >
-                    <span>Política de cookies de Google</span>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </a>
-                </motion.div>
-              </div>
-            </div>
+        <Section ariaLabel="Comportamientos de privacidad">
+          <div className="section-header"><h2 className="section-header__title">Comportamientos descritos</h2></div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {groups.map((group) => <PrivacyGroupCard key={group.title} group={group} />)}
           </div>
-        </motion.div>
+        </Section>
+
+        <Section ariaLabel="Alcance de esta política">
+          <SurfaceCard className="space-y-4 p-6 sm:p-8">
+            <h2 className="text-xl font-bold text-[var(--mty-accent)]">Alcance</h2>
+            <p className="leading-7 text-[var(--mty-muted-text)]">
+              Las lecturas ambientales provienen del flujo público de Supabase y sus RPC de consulta. Esta página no agrega fuentes de datos, no define políticas de terceros y no sustituye la revisión legal pendiente.
+            </p>
+          </SurfaceCard>
+        </Section>
       </div>
     </Layout>
   );

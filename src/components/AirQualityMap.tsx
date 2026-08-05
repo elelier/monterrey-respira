@@ -104,7 +104,7 @@ export default function AirQualityMap() {
     return (
       <section
         aria-labelledby="aqi-map-title"
-        className="rounded-[1.35rem] border border-slate-200 bg-white p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700 dark:bg-slate-800"
+        className="surface-card rounded-[1.35rem] p-5"
       >
         <h2 id="aqi-map-title" className="text-xl font-black text-gray-900 dark:text-white">
           Mapa metropolitano AQI
@@ -136,16 +136,16 @@ export default function AirQualityMap() {
   return (
     <section
       aria-labelledby="aqi-map-title"
-      className="space-y-4 rounded-[1.35rem] border border-slate-200 bg-white p-4 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700 dark:bg-slate-800 sm:p-5"
+      className="surface-card space-y-4 rounded-[1.35rem] p-4 sm:p-5"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 gap-3">
           <IoLocationSharp className="h-8 w-8 shrink-0" style={{ color: selectedTheme.secondary }} />
           <div className="min-w-0">
-            <h2 id="aqi-map-title" className="text-xl font-black leading-tight text-slate-950 dark:text-white">
+            <h2 id="aqi-map-title" className="text-xl font-black leading-tight text-[var(--mty-text)]">
               Mapa metropolitano AQI
             </h2>
-            <p className="mt-1 text-sm leading-snug text-slate-600 dark:text-slate-300">
+            <p className="mt-1 text-sm leading-snug text-[var(--mty-muted-text)]">
               Toca un municipio para ver sus detalles y actualizar la tarjeta principal.
             </p>
           </div>
@@ -214,7 +214,7 @@ export default function AirQualityMap() {
       </div>
 
       {selectedRow && (
-        <article className="mt-4 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:p-4">
+        <article className="surface-card mt-4 rounded-2xl p-3 sm:p-4">
           <h3 className="text-[1rem] font-bold leading-tight text-gray-900 dark:text-white sm:text-lg">
             {selectedRow.city_name}
           </h3>
@@ -260,7 +260,7 @@ export default function AirQualityMap() {
         </article>
       )}
 
-      <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:p-4">
+      <div className="surface-card mt-4 rounded-2xl p-3 sm:p-4">
         <div className="flex items-baseline justify-between gap-3">
           <h3 className="text-[0.95rem] font-bold text-gray-900 dark:text-white sm:text-base">Escala AQI (US)</h3>
           <p className="text-[0.68rem] text-gray-500 dark:text-gray-400 sm:hidden">US EPA</p>
