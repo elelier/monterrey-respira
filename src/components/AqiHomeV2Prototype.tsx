@@ -190,9 +190,13 @@ export default function AqiHomeV2Prototype({ data, weatherIcon, onRefresh }: Aqi
                 <IoAlertCircleOutline className="h-4 w-4" />
                 {pollutantLabel}
               </span>
-              <span className="inline-flex items-center gap-2 rounded-full bg-black/22 px-3 py-2 text-xs font-bold text-white/90 ring-1 ring-white/15 backdrop-blur-md">
+              <span className="inline-flex flex-col items-center gap-1 rounded-full bg-black/22 px-3 py-2 text-xs font-bold text-white/90 ring-1 ring-white/15 backdrop-blur-md sm:flex-row sm:gap-2">
                 <span className={`h-2.5 w-2.5 rounded-full ${FRESHNESS_DOT_CLASSES[data.measurementFreshness]}`} />
-                {FRESHNESS_LABELS[data.measurementFreshness]} · {measurementTime}
+                <span className="flex flex-col items-center leading-none sm:flex-row sm:items-center sm:gap-1">
+                  <span>{FRESHNESS_LABELS[data.measurementFreshness]}</span>
+                  <span className="hidden sm:inline" aria-hidden="true">·</span>
+                  <span className="text-white/80">{measurementTime}</span>
+                </span>
               </span>
             </div>
           </div>

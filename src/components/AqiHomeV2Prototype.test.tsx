@@ -94,7 +94,19 @@ describe('AqiHomeV2Prototype', () => {
   ])('shows %s freshness without changing the measurement timestamp', (measurementFreshness, label) => {
     renderCard({ measurementFreshness });
 
-    expect(screen.getByText(new RegExp(`^${label.replace('+', '\\+')} ·`))).toBeInTheDocument();
+    expect(screen.getByText(label)).toBeInTheDocument();
+  });
+
+  it('separates freshness from measurement time for responsive layout', () => {
+    renderCard();
+
+    const freshnessLabel = screen.getByText('Actual');
+    const measurementTime = freshnessLabel.parentElement?.lastElementChild;
+
+    expect(measurementTime).not.toBeNull();
+    expect(measurementTime).not.toBe(freshnessLabel);
+    expect(measurementTime).toHaveTextContent(/:/);
+    expect(freshnessLabel.parentElement).toHaveClass('flex-col', 'sm:flex-row');
   });
 
   it('shows degraded and missing-reading states without inventing AQI', () => {

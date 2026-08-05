@@ -129,7 +129,11 @@ export default function Layout({ children }: LayoutProps) {
 
             <div className="flex items-center gap-1 sm:gap-2">
               {airQualityData && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="info-pill info-pill--status hidden sm:inline-flex">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="info-pill info-pill--status inline-flex shrink-0 flex-col items-center gap-0.5 whitespace-nowrap sm:flex-row sm:gap-1"
+                >
                   <span>Medición</span>
                   <span>{formatNullableTimestamp(airQualityData.timestamp, { hour: '2-digit', minute: '2-digit', hour12: true })}</span>
                 </motion.div>
