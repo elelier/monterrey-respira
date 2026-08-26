@@ -214,12 +214,12 @@ export default function Layout({ children }: LayoutProps) {
               <Link to="/politica-de-privacidad">Política de privacidad</Link>
             </nav>
             <div className="mt-2">
-              <a href="https://ko-fi.com/Y8Y11CCJPV" target="_blank" rel="noopener noreferrer" className="inline-flex items-center rounded-full bg-[#f5c451] px-3 py-1.5 text-sm text-[#3d3216] shadow-sm transition-colors hover:bg-[#eeb33a]">
+              <a href="https://ko-fi.com/Y8Y11CCJPV" target="_blank" rel="noopener noreferrer" className="inline-flex items-center rounded-full border border-[#d69a24] bg-[#f6c453] px-3 py-1.5 text-sm !text-[#241b08] shadow-sm transition-colors hover:bg-[#eab43c] hover:!text-[#171207]">
                 <img src="https://ko-fi.com/img/cup-border.png" className="mr-1 h-4 w-4 object-contain" alt="Ko-fi" />
                 <span className="text-xs">¡Apoya con un cafecito!</span>
               </a>
             </div>
-            <p className="mt-2 text-xs sm:text-sm">Desarrollado con <span aria-label="corazón" role="img">❤️</span> por <a href="https://www.elelier.com" target="_blank" rel="noopener noreferrer">elelier</a></p>
+            <p className="mt-2 text-xs sm:text-sm">Desarrollado por <a href="https://www.elelier.com" target="_blank" rel="noopener noreferrer">elelier</a></p>
           </div>
         </footer>
 

@@ -39,4 +39,23 @@ describe('Layout', () => {
     expect(screen.getByRole('button', { name: 'Cambiar a modo claro' })).toBeInTheDocument();
     expect(document.documentElement).toHaveClass('dark');
   });
+
+  it('keeps the support CTA readable and uses the simplified developer credit', () => {
+    render(
+      <HelmetProvider>
+        <MemoryRouter>
+          <ThemeProvider>
+            <Layout><div>Contenido de prueba</div></Layout>
+          </ThemeProvider>
+        </MemoryRouter>
+      </HelmetProvider>,
+    );
+
+    const supportCta = screen.getByText('¡Apoya con un cafecito!').closest('a');
+    expect(supportCta).toHaveClass('!text-[#241b08]');
+
+    const developerLink = screen.getByRole('link', { name: 'elelier' });
+    expect(developerLink.parentElement).toHaveTextContent(/^Desarrollado por elelier$/);
+    expect(screen.queryByLabelText('corazón')).not.toBeInTheDocument();
+  });
 });
