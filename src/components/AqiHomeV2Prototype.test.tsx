@@ -123,4 +123,46 @@ describe('AqiHomeV2Prototype', () => {
     expect(screen.getByText('Sin lectura disponible para Monterrey.')).toBeInTheDocument();
     expect(screen.getByRole('img', { name: 'AQI N/D' })).toBeInTheDocument();
   });
+
+  it('does not suggest SIMA when the AQI reading is fresh', () => {
+    renderCard({ measurementFreshness: 'fresh' });
+
+    expect(screen.queryByRole('link', { name: /Consultar información oficial/i })).not.toBeInTheDocument();
+    expect(screen.queryByText('Datos AQI sin actualización reciente')).not.toBeInTheDocument();
+  });
+
+  it.each<MeasurementFreshness>(['stale', 'old'])(
+    'offers official SIMA context for %s AQI without presenting it as US AQI',
+    (measurementFreshness) => {
+      renderCard({ measurementFreshness });
+
+      expect(screen.getByText('Datos AQI sin actualización reciente')).toBeInTheDocument();
+      const measurementLabel = screen.getByText(/Última medición AQI US reportada:/);
+      expect(measurementLabel).toBeInTheDocument();
+      expect(measurementLabel.textContent).not.toMatch(/\.\.$/);
+      expect(screen.getByText(/Índice Aire y Salud de México; no es AQI US/)).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: /Consultar información oficial/i })).toHaveAttribute(
+        'href',
+        'https://aire.nl.gob.mx/icars2020/map_calidad_icars.php',
+      );
+      expect(screen.getByRole('link', { name: /Consultar información oficial/i })).toHaveAttribute('target', '_blank');
+      expect(screen.getByRole('link', { name: /Consultar información oficial/i })).toHaveAttribute('rel', 'noopener noreferrer');
+    },
+  );
+
+  it('offers the official source without inventing a measurement time for unknown AQI', () => {
+    renderCard({
+      aqi: null,
+      status: 'unknown',
+      dataQuality: 'degraded',
+      measurementFreshness: 'unknown',
+      timestamp: null,
+      degradationReason: 'Sin lectura disponible para Monterrey.',
+    });
+
+    expect(screen.getByText('Sin lectura AQI verificable')).toBeInTheDocument();
+    expect(screen.getByText('Hora de medición AQI US no disponible.')).toBeInTheDocument();
+    expect(screen.getByText('Sin lectura disponible para Monterrey.')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Consultar información oficial/i })).toBeInTheDocument();
+  });
 });

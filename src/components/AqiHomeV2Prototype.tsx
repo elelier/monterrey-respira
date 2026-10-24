@@ -117,6 +117,7 @@ export default function AqiHomeV2Prototype({ data, weatherIcon, onRefresh }: Aqi
   const weatherLabel = getWeatherLabel(resolvedWeatherIcon);
   const measurementTime = formatCompactTime(data.timestamp);
   const windSpeedLabel = formatNullableNumber(data.wind.speed, ' km/h', 0);
+  const hasUnverifiedMeasurement = data.measurementFreshness !== 'fresh';
 
   return (
     <motion.section
@@ -227,7 +228,40 @@ export default function AqiHomeV2Prototype({ data, weatherIcon, onRefresh }: Aqi
         </div>
       </div>
 
-      {data.degradationReason && (
+      {hasUnverifiedMeasurement ? (
+        <aside
+          aria-label="Aviso sobre la actualización del AQI"
+          className="relative z-10 mt-4 rounded-2xl border border-amber-100/35 bg-slate-950/65 px-4 py-3 text-sm text-white shadow-sm backdrop-blur-md"
+        >
+          <p className="font-bold text-amber-100">
+            {data.measurementFreshness === 'unknown'
+              ? 'Sin lectura AQI verificable'
+              : 'Datos AQI sin actualización reciente'}
+          </p>
+          {data.degradationReason && (
+            <p className="mt-1 text-white/90">{data.degradationReason}</p>
+          )}
+          <p className="mt-1 text-white/90">
+            {measurementTime === 'N/D'
+              ? 'Hora de medición AQI US no disponible.'
+              : `Última medición AQI US reportada: ${measurementTime}`}
+          </p>
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <a
+              href="https://aire.nl.gob.mx/icars2020/map_calidad_icars.php"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-10 items-center rounded-lg bg-white px-3 py-2 font-bold text-slate-900 transition-colors hover:bg-amber-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            >
+              Consultar información oficial
+              <span className="sr-only"> (se abre en otra pestaña)</span>
+            </a>
+            <span className="text-xs leading-snug text-white/85">
+              SIMA usa el Índice Aire y Salud de México; no es AQI US.
+            </span>
+          </div>
+        </aside>
+      ) : data.degradationReason && (
         <p className="relative z-10 mt-4 rounded-2xl border border-amber-200/35 bg-amber-100/14 px-4 py-3 text-sm font-semibold text-amber-50 backdrop-blur-md">
           {data.degradationReason}
         </p>
