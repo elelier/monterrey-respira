@@ -244,7 +244,7 @@ export default function AqiHomeV2Prototype({ data, weatherIcon, onRefresh }: Aqi
           <p className="mt-1 text-white/90">
             {measurementTime === 'N/D'
               ? 'Hora de medición AQI US no disponible.'
-              : `Última medición AQI US reportada: ${measurementTime}.`}
+              : `Última medición AQI US reportada: ${measurementTime}`}
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-3">
             <a

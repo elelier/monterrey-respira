@@ -137,7 +137,9 @@ describe('AqiHomeV2Prototype', () => {
       renderCard({ measurementFreshness });
 
       expect(screen.getByText('Datos AQI sin actualización reciente')).toBeInTheDocument();
-      expect(screen.getByText(/Última medición AQI US reportada:/)).toBeInTheDocument();
+      const measurementLabel = screen.getByText(/Última medición AQI US reportada:/);
+      expect(measurementLabel).toBeInTheDocument();
+      expect(measurementLabel.textContent).not.toMatch(/\.\.$/);
       expect(screen.getByText(/Índice Aire y Salud de México; no es AQI US/)).toBeInTheDocument();
       expect(screen.getByRole('link', { name: /Consultar información oficial/i })).toHaveAttribute(
         'href',
