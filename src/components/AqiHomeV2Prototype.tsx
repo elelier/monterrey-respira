@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import {
   IoAlertCircleOutline,
@@ -104,6 +104,8 @@ function MiniMetric({
 }
 
 export default function AqiHomeV2Prototype({ data, weatherIcon, onRefresh }: AqiHomeV2PrototypeProps) {
+  const [showSimaMap, setShowSimaMap] = useState(false);
+  const simaMapId = useId();
   const reliableAqi = hasReliableAqi(data);
   const status = reliableAqi ? data.status : 'unknown';
   const theme = AQI_THEME_TOKENS[status];
@@ -256,9 +258,29 @@ export default function AqiHomeV2Prototype({ data, weatherIcon, onRefresh }: Aqi
               Consultar información oficial
               <span className="sr-only"> (se abre en otra pestaña)</span>
             </a>
-            <span className="text-xs leading-snug text-white/85">
-              SIMA usa el Índice Aire y Salud de México; no es AQI US.
-            </span>
+            <button
+              type="button"
+              aria-expanded={showSimaMap}
+              aria-controls={simaMapId}
+              onClick={() => setShowSimaMap((visible) => !visible)}
+              className="inline-flex min-h-10 items-center rounded-lg border border-white/50 px-3 py-2 font-bold transition-colors hover:bg-white/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            >
+              {showSimaMap ? 'Ocultar mapa oficial de SIMA' : 'Mostrar mapa oficial de SIMA'}
+            </button>
+          </div>
+          <p className="mt-2 text-xs leading-snug text-white/85">
+            SIMA usa el Índice Aire y Salud de México; no es AQI US.
+          </p>
+          <div id={simaMapId} hidden={!showSimaMap} className="mt-3">
+            {showSimaMap && (
+              <iframe
+                title="Mapa oficial del Índice Aire y Salud de SIMA"
+                src="https://aire.nl.gob.mx/SIMA2017phpgoogle/mapaSimaprbBing_icars_alt_ns_copy_L3.php"
+                sandbox="allow-scripts allow-same-origin"
+                referrerPolicy="no-referrer"
+                className="h-[min(70vh,42rem)] w-full rounded-lg bg-white"
+              />
+            )}
           </div>
         </aside>
       ) : data.degradationReason && (
