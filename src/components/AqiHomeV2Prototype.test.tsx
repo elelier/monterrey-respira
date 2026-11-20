@@ -128,6 +128,7 @@ describe('AqiHomeV2Prototype', () => {
     renderCard({ measurementFreshness: 'fresh' });
 
     expect(screen.queryByRole('link', { name: /Consultar información oficial/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Ver AQI de Monterrey en IQAir/ })).not.toBeInTheDocument();
     expect(screen.queryByText('Datos AQI sin actualización reciente')).not.toBeInTheDocument();
   });
 
@@ -149,6 +150,15 @@ describe('AqiHomeV2Prototype', () => {
       expect(screen.getByRole('link', { name: /Consultar información oficial/i })).toHaveAttribute('rel', 'noopener noreferrer');
     },
   );
+
+  it('links to the external Monterrey AQI when the local reading is old', () => {
+    renderCard({ measurementFreshness: 'old' });
+
+    const link = screen.getByRole('link', { name: /Ver AQI de Monterrey en IQAir/ });
+    expect(link).toHaveAttribute('href', 'https://www.iqair.com/air-quality/mexico/nuevo-leon/monterrey');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  });
 
   it('offers the official source without inventing a measurement time for unknown AQI', () => {
     renderCard({

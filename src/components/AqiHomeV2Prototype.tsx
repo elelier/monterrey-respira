@@ -256,10 +256,19 @@ export default function AqiHomeV2Prototype({ data, weatherIcon, onRefresh }: Aqi
               Consultar información oficial
               <span className="sr-only"> (se abre en otra pestaña)</span>
             </a>
-            <span className="text-xs leading-snug text-white/85">
-              SIMA usa el Índice Aire y Salud de México; no es AQI US.
-            </span>
+            <a
+              href="https://www.iqair.com/air-quality/mexico/nuevo-leon/monterrey"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-10 items-center rounded-lg border border-white/50 px-3 py-2 font-bold transition-colors hover:bg-white/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            >
+              Ver AQI de Monterrey en IQAir
+              <span className="sr-only"> (se abre en otra pestaña)</span>
+            </a>
           </div>
+          <p className="mt-2 text-xs leading-snug text-white/85">
+            SIMA usa el Índice Aire y Salud de México; no es AQI US.
+          </p>
         </aside>
       ) : data.degradationReason && (
         <p className="relative z-10 mt-4 rounded-2xl border border-amber-200/35 bg-amber-100/14 px-4 py-3 text-sm font-semibold text-amber-50 backdrop-blur-md">
