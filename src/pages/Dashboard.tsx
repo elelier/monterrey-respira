@@ -4,6 +4,7 @@ import { IoArrowForwardOutline, IoEarthOutline, IoHelpBuoyOutline, IoLeafOutline
 import { useAirQuality } from '../context/AirQualityContext';
 import Layout from '../components/Layout';
 import AqiHomeV2Prototype from '../components/AqiHomeV2Prototype';
+import SimaObservations from '../components/SimaObservations';
 import Recommendations from '../components/Recommendations';
 import CitySelector from '../components/CitySelector';
 import AirQualityMap from '../components/AirQualityMap';
@@ -149,6 +150,7 @@ export default function Dashboard() {
             weatherIcon={selectedRow?.weather_icon ?? null}
             onRefresh={refreshData}
           />
+          <SimaObservations />
           <CityHistoricalTrend cityId={selectedCity.city_id} cityName={selectedCity.name} />
           <Recommendations status={hasReliableAqi(airQualityData) ? airQualityData.status : 'unknown'} />
           <div className="lg:hidden">
