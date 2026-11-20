@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { AirQualityData, AirQualityStatus, MeasurementFreshness } from '../types';
 import AqiHomeV2Prototype from './AqiHomeV2Prototype';
@@ -128,6 +128,7 @@ describe('AqiHomeV2Prototype', () => {
     renderCard({ measurementFreshness: 'fresh' });
 
     expect(screen.queryByRole('link', { name: /Consultar información oficial/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Ver AQI de Monterrey en IQAir/ })).not.toBeInTheDocument();
     expect(screen.queryByText('Datos AQI sin actualización reciente')).not.toBeInTheDocument();
   });
 
@@ -150,21 +151,13 @@ describe('AqiHomeV2Prototype', () => {
     },
   );
 
-  it('loads the official SIMA map on demand when AQI US is old', () => {
+  it('links to the external Monterrey AQI when the local reading is old', () => {
     renderCard({ measurementFreshness: 'old' });
 
-    const toggle = screen.getByRole('button', { name: 'Mostrar mapa oficial de SIMA' });
-    expect(screen.queryByTitle('Mapa oficial del Índice Aire y Salud de SIMA')).not.toBeInTheDocument();
-
-    fireEvent.click(toggle);
-    expect(toggle).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByTitle('Mapa oficial del Índice Aire y Salud de SIMA')).toHaveAttribute(
-      'src',
-      'https://aire.nl.gob.mx/SIMA2017phpgoogle/mapaSimaprbBing_icars_alt_ns_copy_L3.php',
-    );
-
-    fireEvent.click(toggle);
-    expect(screen.queryByTitle('Mapa oficial del Índice Aire y Salud de SIMA')).not.toBeInTheDocument();
+    const link = screen.getByRole('link', { name: /Ver AQI de Monterrey en IQAir/ });
+    expect(link).toHaveAttribute('href', 'https://www.iqair.com/air-quality/mexico/nuevo-leon/monterrey');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
   it('offers the official source without inventing a measurement time for unknown AQI', () => {
