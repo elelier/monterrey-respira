@@ -170,34 +170,3 @@ export const fetchDailyAirQualityHistoryForCity = async (
     throw new AirQualityServiceError('unknown_fetch_error', errorMessage, error);
   }
 };
-
-export interface SimaObservation {
-  station_id: string;
-  station_name: string;
-  municipality: string;
-  observed_at: string;
-  pollutant: string;
-  concentration: number;
-  unit: string;
-}
-
-export async function fetchRecentSimaObservations(signal: AbortSignal): Promise<SimaObservation[]> {
-  const now = Date.now();
-  const { data, error } = await getSupabaseClient()
-    .from('sima_observations')
-    .select('station_id, station_name, municipality, observed_at, pollutant, concentration, unit')
-    .gte('observed_at', new Date(now - 6 * 60 * 60 * 1000).toISOString())
-    .lte('observed_at', new Date(now).toISOString())
-    .order('observed_at', { ascending: false })
-    .order('station_id')
-    .limit(120)
-    .abortSignal(signal);
-
-  if (error) throw error;
-
-  const latest = new Map<string, SimaObservation>();
-  for (const observation of data) {
-    if (!latest.has(observation.station_id)) latest.set(observation.station_id, observation);
-  }
-  return [...latest.values()].sort((a, b) => a.municipality.localeCompare(b.municipality, 'es-MX'));
-}
